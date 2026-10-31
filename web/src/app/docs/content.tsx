@@ -743,7 +743,7 @@ export function verify(secret: string, header: string, body: string) {
         </Callout>
         <h2>Report a vulnerability</h2>
         <p>
-          Please report privately and do not share details publicly or test against mainnet funds. <ContactLine purpose="Security reports" />
+          Never test against mainnet funds. <ContactLine purpose="Security reports" />
         </p>
       </>
     ),

@@ -79,16 +79,32 @@ export function DefTable({ rows, head }: { rows: [ReactNode, ReactNode][]; head?
   );
 }
 
-/** How to reach the project. Uses the published contact email; otherwise says where it will appear. */
-export function ContactLine({ purpose = "Questions, data requests and security reports" }: { purpose?: string }) {
-  if (site.contactEmail) {
+/** How to reach the project: GitHub issues for questions, a private GitHub security advisory for vulnerabilities. */
+export function ContactLine({ purpose = "Questions and data requests" }: { purpose?: string }) {
+  const security = /security/i.test(purpose);
+  if (site.githubUrl) {
+    if (security) {
+      return (
+        <>
+          Report it privately through a{" "}
+          <a className="text-link" href={`${site.githubUrl}/security/advisories/new`} rel="noopener noreferrer" target="_blank">
+            GitHub security advisory
+          </a>{" "}
+          on the Unslept repository. Do not open a public issue or share details elsewhere.
+        </>
+      );
+    }
     return (
       <>
-        {purpose} go to{" "}
-        <a className="text-link" href={`mailto:${site.contactEmail}`}>
-          {site.contactEmail}
+        {purpose} go through{" "}
+        <a className="text-link" href={`${site.githubUrl}/issues`} rel="noopener noreferrer" target="_blank">
+          GitHub issues
+        </a>{" "}
+        on the Unslept repository. Security reports go through a private{" "}
+        <a className="text-link" href={`${site.githubUrl}/security/advisories/new`} rel="noopener noreferrer" target="_blank">
+          GitHub security advisory
         </a>
-        . For security reports, put &quot;Security&quot; in the subject and do not share details publicly.
+        , never a public issue.
       </>
     );
   }
@@ -103,5 +119,5 @@ export function ContactLine({ purpose = "Questions, data requests and security r
       </>
     );
   }
-  return <>A contact address for {purpose.toLowerCase()} will be published on this page.</>;
+  return <>Contact details for {purpose.toLowerCase()} will be published on this page.</>;
 }
