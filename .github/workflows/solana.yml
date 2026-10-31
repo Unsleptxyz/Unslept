@@ -33,8 +33,12 @@ jobs:
         run: |
           sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.21/install)" > /dev/null
           echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
-          npm install -g @coral-xyz/anchor-cli@0.31.1 > /dev/null
-          chmod +x "$(npm root -g)/@coral-xyz/anchor-cli/anchor"
+          mkdir -p "$HOME/.local/bin"; echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          if ! curl -sSfL -o "$HOME/.local/bin/anchor" https://github.com/solana-foundation/anchor/releases/download/v0.31.1/anchor-0.31.1-x86_64-unknown-linux-gnu; then
+            curl -sSfL -o "$HOME/.local/bin/anchor" https://github.com/coral-xyz/anchor/releases/download/v0.31.1/anchor-0.31.1-x86_64-unknown-linux-gnu || \
+              cargo install --git https://github.com/solana-foundation/anchor --tag v0.31.1 anchor-cli --locked --root "$HOME/.local"
+          fi
+          chmod +x "$HOME/.local/bin/anchor"; "$HOME/.local/bin/anchor" --version
       - name: Build and test
         working-directory: solana
         shell: bash {0}
