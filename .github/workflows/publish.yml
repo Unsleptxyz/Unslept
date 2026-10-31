@@ -1,6 +1,6 @@
 name: publish-packages
 
-# Publishes @unslept/sdk and @unslept/mcp to npm, and unslept to PyPI.
+# Publishes @unslept/sdk, @unslept/mcp and @unslept/pay to npm, and unslept to PyPI.
 # Setup once:
 #   npm:  create the "unslept" org on npmjs.com, make an automation token, save it as repo secret NPM_TOKEN.
 #   PyPI: on pypi.org add a pending trusted publisher: project "unslept", owner "Unsleptxyz", repo "Unslept",
@@ -40,8 +40,9 @@ jobs:
             echo "# Publish check $(date -u +%FT%TZ)"
             (cd packages/sdk-ts && npm install --no-audit --no-fund >/dev/null 2>&1 && npm test >/dev/null 2>&1 && npm run build >/dev/null 2>&1 && echo "sdk-ts build+test ok" && npm pack --dry-run 2>&1 | grep -E "Tarball Contents|total files|package size" ) || echo "sdk-ts FAILED"
             (cd packages/mcp && npm install --no-audit --no-fund >/dev/null 2>&1 && npm test >/dev/null 2>&1 && npm run build >/dev/null 2>&1 && echo "mcp build+test ok" && npm pack --dry-run 2>&1 | grep -E "total files|package size") || echo "mcp FAILED"
+            (cd packages/pay && npm install --no-audit --no-fund >/dev/null 2>&1 && npm test >/dev/null 2>&1 && npm run build >/dev/null 2>&1 && echo "pay build+test ok" && npm pack --dry-run 2>&1 | grep -E "total files|package size") || echo "pay FAILED"
             (cd packages/sdk-py && python -m pip install -q build pytest && python -m pytest -q tests >/dev/null && python -m build >/dev/null 2>&1 && echo "sdk-py build+test ok: $(ls dist | tr '\n' ' ')") || echo "sdk-py FAILED"
-            for n in @unslept/sdk @unslept/mcp; do s=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/${n/\//%2f}"); echo "npm $n: $([ "$s" = 404 ] && echo available || echo "TAKEN or exists ($s)")"; done
+            for n in @unslept/sdk @unslept/mcp @unslept/pay; do s=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/${n/\//%2f}"); echo "npm $n: $([ "$s" = 404 ] && echo available || echo "TAKEN or exists ($s)")"; done
             s=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/-/org/unslept/package"); echo "npm org unslept lookup: $s"
             s=$(curl -s -o /dev/null -w "%{http_code}" https://pypi.org/pypi/unslept/json); echo "pypi unslept: $([ "$s" = 404 ] && echo available || echo "TAKEN or exists ($s)")"
           } > $out
@@ -68,6 +69,7 @@ jobs:
         run: |
           (cd packages/sdk-ts && npm install --no-audit --no-fund && npm test && npm run build)
           (cd packages/mcp && npm install --no-audit --no-fund && npm test && npm run build)
+          (cd packages/pay && npm install --no-audit --no-fund && npm test && npm run build)
           SDKV=$(node -p "require('./packages/sdk-ts/package.json').version")
           cd packages/mcp && node -e "const p=require('./package.json');p.dependencies['@unslept/sdk']='^$SDKV';require('fs').writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n')"
       - name: Publish

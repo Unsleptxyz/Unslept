@@ -1,0 +1,47 @@
+name: demo-agent
+
+# The official demo agent: pays verified x402 Directory endpoints so the live feed shows real settlements.
+# Needs repo secrets DEMO_AGENT_ACCOUNT and DEMO_AGENT_SIGNER_KEY (an agent account created in the app, with a small
+# daily cap, some USDG in it, and a little ETH on the signer for gas). Skips quietly when they are missing.
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: demo-agent
+  cancel-in-progress: false
+
+jobs:
+  pay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DEMO_AGENT_ACCOUNT: ${{ secrets.DEMO_AGENT_ACCOUNT }}
+      DEMO_AGENT_SIGNER_KEY: ${{ secrets.DEMO_AGENT_SIGNER_KEY }}
+      DEMO_AGENT_BUDGET: "20000"
+      UNSLEPT_CHAIN_ID: "4663"
+      UNSLEPT_RPC_URL: ${{ secrets.ROBINHOOD_RPC_URL || 'https://rpc.mainnet.chain.robinhood.com' }}
+      UNSLEPT_USDG: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+      UNSLEPT_ROUTER: "0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b"
+      UNSLEPT_BUFFERS: "0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D"
+    steps:
+      - name: Check secrets
+        id: gate
+        run: |
+          if [ -z "$DEMO_AGENT_ACCOUNT" ] || [ -z "$DEMO_AGENT_SIGNER_KEY" ]; then echo "Demo agent secrets are not set, skipping."; echo "run=false" >> "$GITHUB_OUTPUT"; else echo "run=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: 22
+      - name: Pay
+        if: steps.gate.outputs.run == 'true'
+        working-directory: packages/sdk-ts
+        run: |
+          npm install --no-audit --no-fund > /dev/null
+          node --import tsx scripts/demo-agent.ts

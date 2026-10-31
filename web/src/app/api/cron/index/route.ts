@@ -3,6 +3,7 @@ import { createPublicClient, parseAbiItem } from "viem";
 import { addresses, appTransport, chain, deployBlock } from "@/lib/web3";
 import { DEV_WALLET, PONS_FACTORIES, TOKEN_SYMBOL } from "@/lib/token";
 import { pad } from "viem";
+import { probeEndpoint } from "@/lib/directory";
 
 /**
  * Lightweight indexer. Each call reads new SettlementRouter and factory events since the last indexed block,
@@ -165,5 +166,20 @@ export async function GET() {
     });
   }
 
-  return NextResponse.json({ token: foundToken?.address, indexedTo: Number(to), head: Number(head), payments: payments.length, accounts: accounts.length });
+  // Directory health: re-check the five listings checked longest ago.
+  let checked = 0;
+  try {
+    const due = ((await rpc("un_directory_due", { p_secret: secret, p_limit: 5 })) ?? []) as { id: number; url: string }[];
+    await Promise.all(
+      due.map(async (d) => {
+        const p = await probeEndpoint(d.url);
+        await rpc("un_directory_checked", { p_secret: secret, p_id: d.id, p_ok: p.ok });
+        checked++;
+      }),
+    );
+  } catch {
+    /* directory checks never block indexing */
+  }
+
+  return NextResponse.json({ token: foundToken?.address, directoryChecked: checked, indexedTo: Number(to), head: Number(head), payments: payments.length, accounts: accounts.length });
 }

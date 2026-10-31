@@ -42,6 +42,20 @@ const explore = [
     body: "Park, pay, rebalance, earn: the four steps that keep agent money ready to pay and working at the same time.",
   },
   {
+    href: "/directory",
+    icon: <IconLayers />,
+    eyebrow: "Discover",
+    title: "x402 Directory",
+    body: "Paid APIs that accept USDG on Robinhood Chain, checked automatically, with a snippet your agent can run as is.",
+  },
+  {
+    href: "/pay",
+    icon: <IconBolt />,
+    eyebrow: "Earn",
+    title: "Unslept Pay",
+    body: "Charge AI agents per request. A few lines in your API, USDG straight to your wallet, no provider fees.",
+  },
+  {
     href: "/developers",
     icon: <IconCode />,
     eyebrow: "Build",

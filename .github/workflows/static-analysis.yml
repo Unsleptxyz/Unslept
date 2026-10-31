@@ -1,0 +1,34 @@
+name: static-analysis
+
+# Slither static analysis of the contracts. Results are committed to ops/slither.txt.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  slither:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Slither
+        working-directory: contracts
+        shell: bash {0}
+        run: |
+          pip install --quiet slither-analyzer solc-select
+          forge build > /dev/null
+          mkdir -p ../ops
+          { echo "# Slither $(date -u +%FT%TZ)"; slither . --filter-paths "lib/|test/|script/" --exclude-informational --exclude-optimization 2>&1 | tail -200; } > ../ops/slither.txt
+          cat ../ops/slither.txt | tail -40
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add ops/slither.txt && git commit -q -m "ops: slither report" && git push -q || echo "nothing to commit"

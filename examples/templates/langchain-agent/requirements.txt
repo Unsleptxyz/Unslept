@@ -1,0 +1,3 @@
+unslept[web3,langchain]
+langchain>=1.0
+langchain-openai

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Publishes @unslept/sdk then @unslept/mcp. Writes a readable log to ops/npm-publish.txt (no secrets).
+# Publishes @unslept/sdk, @unslept/mcp, then @unslept/pay. Writes a readable log to ops/npm-publish.txt (no secrets).
 out="$GITHUB_WORKSPACE/ops/npm-publish.txt"
 : > "$out"
 if [ -z "$NODE_AUTH_TOKEN" ]; then echo "NPM_TOKEN secret is missing" >> "$out"; exit 1; fi
 echo "whoami: $(npm whoami 2>&1 | tail -1)" >> "$out"
 fail=0
-for pkg in sdk-ts mcp; do
+for pkg in sdk-ts mcp pay; do
   cd "$GITHUB_WORKSPACE/packages/$pkg"
   name=$(node -p "require('./package.json').name"); ver=$(node -p "require('./package.json').version")
   echo "== $name@$ver" >> "$out"

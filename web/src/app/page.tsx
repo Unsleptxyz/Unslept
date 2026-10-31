@@ -3,6 +3,7 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { RevealObserver } from "@/components/Reveal";
 import { BuiltWith, Closing, Hero, Problem, Stats, StatsSkeleton } from "@/components/landing/Sections";
 import { Explore } from "@/components/landing/Pages";
+import { AgentsAtWork } from "@/components/landing/AgentsAtWork";
 import { site } from "@/lib/config";
 import { getNetworkStats } from "@/lib/stats";
 
@@ -20,6 +21,7 @@ export default function Home() {
       <main id="main" className="landing">
         <Hero docsUrl={site.docsUrl} />
         <BuiltWith />
+        <AgentsAtWork />
         <Problem />
         <Explore />
         <Suspense fallback={<StatsSkeleton />}>

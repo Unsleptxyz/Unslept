@@ -22,6 +22,8 @@ jobs:
         working-directory: packages/sdk-ts
       - run: npm install --no-save tsx typescript @types/node && node --import tsx --test test/*.test.ts
         working-directory: packages/mcp
+      - run: npm install && npm test && npx tsc -p tsconfig.json --noEmit
+        working-directory: packages/pay
       - run: python -m unittest discover -s tests
         working-directory: packages/sdk-py
 

@@ -28,6 +28,7 @@ export function Brand({ href = "/" }: { href?: string }) {
 
 const nav = [
   { href: "/how-it-works", label: "How it works" },
+  { href: "/directory", label: "Directory" },
   { href: "/developers", label: "Developers" },
   { href: "/security", label: "Security" },
   { href: "/token", label: "$UNSLEPT" },
@@ -109,6 +110,7 @@ export function SiteFooter({ docsUrl, githubUrl, xUrl }: ChromeLinks) {
           <nav aria-label="Product" className="site-footer__col">
             <h2>Product</h2>
             <FooterLink href="/how-it-works">How it works</FooterLink>
+            <FooterLink href="/directory">x402 Directory</FooterLink>
             <FooterLink href="/app">Launch app</FooterLink>
             <FooterLink href="/app/buffer">Buffer deposits</FooterLink>
             <FooterLink href="/token">$UNSLEPT</FooterLink>
@@ -116,6 +118,8 @@ export function SiteFooter({ docsUrl, githubUrl, xUrl }: ChromeLinks) {
           <nav aria-label="Developers" className="site-footer__col">
             <h2>Developers</h2>
             <FooterLink href="/developers">Overview</FooterLink>
+            <FooterLink href="/templates">Agent templates</FooterLink>
+            <FooterLink href="/pay">Unslept Pay</FooterLink>
             <FooterLink href={docsUrl}>Docs</FooterLink>
             <FooterLink href={`${docsUrl}/quickstart`}>Quickstart</FooterLink>
             <FooterLink href={`${docsUrl}/contracts`}>Contracts</FooterLink>
