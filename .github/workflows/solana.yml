@@ -26,17 +26,16 @@ jobs:
             ~/.cargo/git
             ~/.local/share/solana
             solana/target
-          key: solana-${{ hashFiles('solana/Cargo.lock', 'solana/**/Cargo.toml') }}
-          restore-keys: solana-
+          key: solana-v1-${{ hashFiles('solana/Cargo.lock', 'solana/**/Cargo.toml') }}
+          restore-keys: solana-v1-
       - name: Install Solana and Anchor
         shell: bash
         run: |
-          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.21/install)" > /dev/null
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)" > /dev/null
           echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
           mkdir -p "$HOME/.local/bin"; echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          if ! curl -sSfL -o "$HOME/.local/bin/anchor" https://github.com/solana-foundation/anchor/releases/download/v0.31.1/anchor-0.31.1-x86_64-unknown-linux-gnu; then
-            curl -sSfL -o "$HOME/.local/bin/anchor" https://github.com/coral-xyz/anchor/releases/download/v0.31.1/anchor-0.31.1-x86_64-unknown-linux-gnu || \
-              cargo install --git https://github.com/solana-foundation/anchor --tag v0.31.1 anchor-cli --locked --root "$HOME/.local"
+          if ! curl -sSfL -o "$HOME/.local/bin/anchor" https://github.com/solana-foundation/anchor/releases/download/v1.0.0/anchor-1.0.0-x86_64-unknown-linux-gnu; then
+            cargo install --git https://github.com/solana-foundation/anchor --tag v1.0.0 anchor-cli --locked --root "$HOME/.local"
           fi
           chmod +x "$HOME/.local/bin/anchor"; "$HOME/.local/bin/anchor" --version
       - name: Build and test
