@@ -1,0 +1,25 @@
+name: fonts
+
+# Copies the site fonts (OFL) from npm to the "fonts" branch, for rendering brand assets outside the web build.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fonts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: |
+          mkdir f && cd f && npm init -y > /dev/null
+          npm install --no-save @fontsource/instrument-serif @fontsource/inter @fontsource/ibm-plex-mono > /dev/null
+          mkdir out
+          cp node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-*.woff2 out/
+          cp node_modules/@fontsource/inter/files/inter-latin-{300,400,500}-normal.woff2 out/
+          cp node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-{400,500}-normal.woff2 out/
+          cd out && git init -q -b fonts && git config user.name "github-actions[bot]" && git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m fonts && git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" fonts
