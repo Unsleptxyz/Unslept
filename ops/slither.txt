@@ -1,201 +1,66 @@
-# Slither 2026-10-31T14:49:05Z
-		AgentAccount.requestPayment(AgentAccount.PaymentRequest)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt = b.debtOf(address(this)) (src/AgentAccount.sol#214)
-	Calls stack containing the loop:
-		AgentAccount.repayBuffer()
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt < usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.repayBuffer()
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: paid += b.repay(address(this),amt) (src/AgentAccount.sol#219)
-	Calls stack containing the loop:
-		AgentAccount.repayBuffer()
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: amt = usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.repayBuffer()
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt = b.debtOf(address(this)) (src/AgentAccount.sol#214)
-	Calls stack containing the loop:
-		AgentAccount.unwindFrom(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt < usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.unwindFrom(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: paid += b.repay(address(this),amt) (src/AgentAccount.sol#219)
-	Calls stack containing the loop:
-		AgentAccount.unwindFrom(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: amt = usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.unwindFrom(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt = b.debtOf(address(this)) (src/AgentAccount.sol#214)
-	Calls stack containing the loop:
-		AgentAccount.ownerUnwind(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt < usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.ownerUnwind(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: paid += b.repay(address(this),amt) (src/AgentAccount.sol#219)
-	Calls stack containing the loop:
-		AgentAccount.ownerUnwind(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: amt = usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.ownerUnwind(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt = b.debtOf(address(this)) (src/AgentAccount.sol#214)
-	Calls stack containing the loop:
-		AgentAccount.withdraw(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: debt < usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.withdraw(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: paid += b.repay(address(this),amt) (src/AgentAccount.sol#219)
-	Calls stack containing the loop:
-		AgentAccount.withdraw(address,uint256)
-AgentAccount._repay() (src/AgentAccount.sol#209-221) has external calls inside a loop: amt = usdg.balanceOf(address(this)) (src/AgentAccount.sol#216)
-	Calls stack containing the loop:
-		AgentAccount.withdraw(address,uint256)
-AgentAccount.totalDebt() (src/AgentAccount.sol#155-160) has external calls inside a loop: d += IUnsleptBuffer(bufs[i]).debtOf(address(this)) (src/AgentAccount.sol#158)
-	Calls stack containing the loop:
-		AgentAccount.withdraw(address,uint256)
-AgentAccount.parkedValue() (src/AgentAccount.sol#145-149) has external calls inside a loop: v += IAssetAdapter(_positions[i]).valueOf(address(this)) (src/AgentAccount.sol#147)
-	Calls stack containing the loop:
-		AgentAccount.withdraw(address,uint256)
-		AgentAccount.totalValue()
-Allocator.settleDebt(address) (src/Allocator.sol#122-137) has external calls inside a loop: v = IAssetAdapter(pos[i]).valueOf(account) (src/Allocator.sol#129)
-Allocator.settleDebt(address) (src/Allocator.sol#122-137) has external calls inside a loop: got = acct.unwindFrom(pos[i],take) (src/Allocator.sol#132)
-Allocator.settleDebt(address) (src/Allocator.sol#122-137) has external calls inside a loop: debt = IAccountPositions(account).totalDebt() (src/Allocator.sol#134)
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		ERC4626.convertToShares(uint256)
-		ERC4626._convertToShares(uint256,Math.Rounding)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		ERC4626.convertToAssets(uint256)
-		ERC4626._convertToAssets(uint256,Math.Rounding)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		ERC4626.previewDeposit(uint256)
-		ERC4626._convertToShares(uint256,Math.Rounding)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		ERC4626.previewMint(uint256)
-		ERC4626._convertToAssets(uint256,Math.Rounding)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		ERC4626.previewWithdraw(uint256)
-		ERC4626._convertToShares(uint256,Math.Rounding)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		ERC4626.previewRedeem(uint256)
-		ERC4626._convertToAssets(uint256,Math.Rounding)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.utilizationBps()
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.maxDeposit(address)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.maxMint(address)
-		UnsleptBuffer.maxDeposit(address)
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.maxWithdraw(address)
-		UnsleptBuffer._instantMax()
-		UnsleptBuffer.utilizationBps()
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.maxRedeem(address)
-		UnsleptBuffer.maxWithdraw(address)
-		UnsleptBuffer._instantMax()
-		UnsleptBuffer.utilizationBps()
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.withdraw(uint256,address,address)
-		UnsleptBuffer.maxWithdraw(address)
-		UnsleptBuffer._instantMax()
-		UnsleptBuffer.utilizationBps()
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.redeem(uint256,address,address)
-		UnsleptBuffer.maxRedeem(address)
-		UnsleptBuffer.maxWithdraw(address)
-		UnsleptBuffer._instantMax()
-		UnsleptBuffer.utilizationBps()
-		UnsleptBuffer.totalAssets()
-UnsleptBuffer.adapterValue() (src/UnsleptBuffer.sol#105-109) has external calls inside a loop: v += IAssetAdapter(_adapters[i]).valueOf(address(this)) (src/UnsleptBuffer.sol#107)
-	Calls stack containing the loop:
-		UnsleptBuffer.requestWithdraw(uint256,address,address)
-		ERC4626.previewRedeem(uint256)
-		ERC4626._convertToAssets(uint256,Math.Rounding)
-		UnsleptBuffer.totalAssets()
-Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+# Slither 2026-10-31T14:54:54Z
+## Medium and high impact (full)
+'forge clean' running (wd: /home/runner/work/Unslept/Unslept/contracts)
+'forge config --json' running
+'forge build --build-info --deny never --skip ./test/** ./script/** --force' running (wd: /home/runner/work/Unslept/Unslept/contracts)
 INFO:Detectors:
-Detector: reentrancy-benign
-Reentrancy in AgentAccountFactory.createAccount(address,IAgentAccount.Policy,bytes32) (src/AgentAccountFactory.sol#50-59):
-	External calls:
-	- AgentAccount(address(account)).initialize(address(this),msg.sender,signer,policy) (src/AgentAccountFactory.sol#55)
-	State variables written after the call(s):
-	- _accountsOf[msg.sender].push(account) (src/AgentAccountFactory.sol#57)
-	- isAccount[account] = true (src/AgentAccountFactory.sol#56)
+Detector: divide-before-multiply
+FeeModule.feeFor(address,uint256) (src/FeeModule.sol#84-88) performs a multiplication on the result of a division:
+	- base = (amount * feeBps) / BPS (src/FeeModule.sol#85)
+	- base - (base * d) / BPS (src/FeeModule.sol#87)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+INFO:Detectors:
+Detector: incorrect-equality
+AgentAccount._repay() (src/AgentAccount.sol#209-221) uses a dangerous strict equality:
+	- amt == 0 (src/AgentAccount.sol#217)
+AgentAccount.remainingToday() (src/AgentAccount.sol#162-166) uses a dangerous strict equality:
+	- today == spendDay (src/AgentAccount.sol#164)
+AgentAccount.requestPayment(AgentAccount.PaymentRequest) (src/AgentAccount.sol#177-202) uses a dangerous strict equality:
+	- today == spendDay (src/AgentAccount.sol#190)
+UnsleptBuffer.maxMint(address) (src/UnsleptBuffer.sol#168-171) uses a dangerous strict equality:
+	- assets == 0 (src/UnsleptBuffer.sol#170)
+UnsleptBuffer.requestWithdraw(uint256,address,address) (src/UnsleptBuffer.sol#230-245) uses a dangerous strict equality:
+	- assets == 0 (src/UnsleptBuffer.sol#238)
+UnsleptBuffer.utilizationBps() (src/UnsleptBuffer.sol#125-129) uses a dangerous strict equality:
+	- ta == 0 (src/UnsleptBuffer.sol#127)
+MockAssetAdapter.deposit(uint256) (src/adapters/MockAssetAdapter.sol#78-87) uses a dangerous strict equality:
+	- totalShares == 0 || a == 0 (src/adapters/MockAssetAdapter.sol#83)
+MockAssetAdapter.withdraw(uint256,address) (src/adapters/MockAssetAdapter.sol#89-102) uses a dangerous strict equality:
+	- assets == 0 (src/adapters/MockAssetAdapter.sol#95)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+Detector: reentrancy-no-eth
 Reentrancy in ERC4626Adapter.deposit(uint256) (src/adapters/ERC4626Adapter.sol#107-117):
 	External calls:
 	- shares = vault.deposit(assets,address(this)) (src/adapters/ERC4626Adapter.sol#113)
 	State variables written after the call(s):
-	- sharesOf[msg.sender] += shares (src/adapters/ERC4626Adapter.sol#114)
-Reentrancy in UnsleptBuffer.unwind(address,uint256) (src/UnsleptBuffer.sol#350-354):
-	External calls:
-	- got = IAssetAdapter(adapter).withdraw(amount,address(this)) (src/UnsleptBuffer.sol#351)
-	State variables written after the call(s):
-	- _processQueue(8) (src/UnsleptBuffer.sol#353)
-		- t.funded = true (src/UnsleptBuffer.sol#259)
-	- _processQueue(8) (src/UnsleptBuffer.sol#353)
-		- queueHead = head (src/UnsleptBuffer.sol#268)
-	- _processQueue(8) (src/UnsleptBuffer.sol#353)
-		- queuedAssets -= t.assets (src/UnsleptBuffer.sol#261)
-	- _processQueue(8) (src/UnsleptBuffer.sol#353)
-		- reserved += t.assets (src/UnsleptBuffer.sol#260)
-Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+	- totalShares += shares (src/adapters/ERC4626Adapter.sol#115)
+	ERC4626Adapter.totalShares (src/adapters/ERC4626Adapter.sol#35) can be used in cross function reentrancies:
+	- ERC4626Adapter.maxDeposit() (src/adapters/ERC4626Adapter.sol#101-105)
+	- ERC4626Adapter.totalShares (src/adapters/ERC4626Adapter.sol#35)
+	- ERC4626Adapter.totalValue() (src/adapters/ERC4626Adapter.sol#91-94)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
 INFO:Detectors:
-Detector: reentrancy-events
-Reentrancy in AgentAccountFactory.createAccount(address,IAgentAccount.Policy,bytes32) (src/AgentAccountFactory.sol#50-59):
-	External calls:
-	- AgentAccount(address(account)).initialize(address(this),msg.sender,signer,policy) (src/AgentAccountFactory.sol#55)
-	Event emitted after the call(s):
-	- AccountCreated(account,msg.sender,signer,signer == address(0)) (src/AgentAccountFactory.sol#58)
-Reentrancy in Allocator.settleDebt(address) (src/Allocator.sol#122-137):
-	External calls:
-	- acct.repayBuffer() (src/Allocator.sol#125)
-	- got = acct.unwindFrom(pos[i],take) (src/Allocator.sol#132)
-	Event emitted after the call(s):
-	- DebtSettled(account,unwound) (src/Allocator.sol#136)
-Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
-INFO:Detectors:
-Detector: timestamp
-AgentAccount.remainingToday() (src/AgentAccount.sol#162-166) uses timestamp for comparisons
-	Dangerous comparisons:
-	- today == spendDay (src/AgentAccount.sol#164)
-AgentAccount.requestPayment(AgentAccount.PaymentRequest) (src/AgentAccount.sol#177-202) uses timestamp for comparisons
-	Dangerous comparisons:
-	- today == spendDay (src/AgentAccount.sol#190)
-UnsleptStaking.unstake() (src/UnsleptStaking.sol#60-67) uses timestamp for comparisons
-	Dangerous comparisons:
-	- block.timestamp < p.unlockAt (src/UnsleptStaking.sol#63)
-ERC4626Adapter._checkFresh() (src/adapters/ERC4626Adapter.sol#86-89) uses timestamp for comparisons
-	Dangerous comparisons:
-	- block.timestamp > t + maxStaleness && address(navFeed) != address(0) (src/adapters/ERC4626Adapter.sol#88)
-MockAssetAdapter._checkFresh() (src/adapters/MockAssetAdapter.sol#54-56) uses timestamp for comparisons
-	Dangerous comparisons:
-	- block.timestamp > priceUpdatedAt + maxStaleness (src/adapters/MockAssetAdapter.sol#55)
-Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
-INFO:Slither:. analyzed (54 contracts with 76 detectors), 81 result(s) found
+Detector: unused-return
+AgentAccount._allocate(address,uint256) (src/AgentAccount.sol#238-251) ignores return value by IAssetAdapter(adapter).deposit(amount) (src/AgentAccount.sol#249)
+AgentAccount.validateUserOp(PackedUserOperation,bytes32,uint256) (src/AgentAccount.sol#340-364) ignores return value by (signer,err,None) = ECDSA.tryRecover(MessageHashUtils.toEthSignedMessageHash(userOpHash),userOp.signature) (src/AgentAccount.sol#346-347)
+Allocator.allocateAgent(address,address,uint256) (src/Allocator.sol#90-95) ignores return value by IAgentAccount(account).repayBuffer() (src/Allocator.sol#93)
+Allocator.unwindAgent(address,address,uint256) (src/Allocator.sol#108-111) ignores return value by IAgentAccount(account).unwindFrom(adapter,amount) (src/Allocator.sol#110)
+Allocator.unwindBuffer(address,address,uint256) (src/Allocator.sol#113-116) ignores return value by IBufferAlloc(buffer).unwind(adapter,amount) (src/Allocator.sol#115)
+Allocator.settleDebt(address) (src/Allocator.sol#122-137) ignores return value by acct.repayBuffer() (src/Allocator.sol#125)
+UnsleptBuffer.allocate(address,uint256) (src/UnsleptBuffer.sol#336-348) ignores return value by IAssetAdapter(adapter).deposit(amount) (src/UnsleptBuffer.sol#346)
+ERC4626Adapter.lastPriceUpdate() (src/adapters/ERC4626Adapter.sol#79-84) ignores return value by (None,answer,None,updatedAt,None) = navFeed.latestRoundData() (src/adapters/ERC4626Adapter.sol#81)
+ERC4626Adapter.withdraw(uint256,address) (src/adapters/ERC4626Adapter.sol#119-131) ignores return value by vault.withdraw(assets,to,address(this)) (src/adapters/ERC4626Adapter.sol#128)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+## All findings excluding informational, by detector
+      1 #unused-return
+      1 #reentrancy-vulnerabilities-4
+      1 #reentrancy-vulnerabilities-3
+      1 #reentrancy-vulnerabilities-2
+      1 #missing-zero-address-validation
+      1 #missing-events-arithmetic
+      1 #divide-before-multiply
+      1 #dangerous-strict-equalities
+      1 #calls-inside-a-loop
+      1 #block-timestamp
