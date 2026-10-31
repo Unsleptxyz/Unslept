@@ -59,7 +59,7 @@ export async function GET() {
   const to = head < from + CHUNK * MAX_CHUNKS ? head : from + CHUNK * MAX_CHUNKS - 1n;
 
   // $UNSLEPT launch detection: look for Pons factory logs naming the dev wallet as deployer, until one is found.
-  const tokenKnown = !!process.env.NEXT_PUBLIC_UNSLEPT_TOKEN_ADDRESS || !!(await rpc("un_token_get", {}))?.address;
+  const tokenKnown = process.env.UNSLEPT_TOKEN_DETECT !== "1" || !!process.env.NEXT_PUBLIC_UNSLEPT_TOKEN_ADDRESS || !!(await rpc("un_token_get", {}))?.address;
   const devTopic = pad(DEV_WALLET.toLowerCase() as `0x${string}`);
   let foundToken: { address: `0x${string}`; factory: string; block: number; tx: string } | undefined;
   const symbolAbi = [{ type: "function", name: "symbol", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] }] as const;

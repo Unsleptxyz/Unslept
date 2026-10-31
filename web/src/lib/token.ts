@@ -20,6 +20,8 @@ export const PONS_FACTORIES: `0x${string}`[] = (
 /** The token address to show: the env override, else the address the indexer found. Cached for a minute. */
 export async function getTokenAddress(): Promise<string | undefined> {
   if (token.address) return token.address;
+  // Showing the detected address is off unless UNSLEPT_TOKEN_SHOW=1.
+  if (process.env.UNSLEPT_TOKEN_SHOW !== "1") return undefined;
   const url = process.env.SUPABASE_URL?.replace(/\/$/, "");
   const key = process.env.SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return undefined;

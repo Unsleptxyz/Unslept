@@ -700,7 +700,7 @@ export function Token({ address, ponsUrl, explorerUrl, head = true }: { address?
                     address
                   )
                 ) : (
-                  "Not launched yet. The address will be published here and on official channels only."
+                  "Published on official Unslept channels only. Always check the address before you trade."
                 )}
               </dd>
             </div>
