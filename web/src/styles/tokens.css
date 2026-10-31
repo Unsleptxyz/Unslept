@@ -1,0 +1,88 @@
+/*
+ * Unslept design tokens. Single source of truth for color, type and space.
+ * Dark (night shift) is the reference theme. Light is derived from the same
+ * palette: Moon paper background, Night ink text, Sodium lamp darkened for AA.
+ */
+
+:root {
+  /* Palette (brand names) */
+  --night-ink: #0e1630;
+  --late-shift: #18234a;
+  --sodium-lamp: #f2a93b;
+  --moon-paper: #e8e6f0;
+  --overcast: #8a93b8;
+  --accrual-teal: #4fd1b5;
+
+  /* Semantic, dark theme */
+  --ink: var(--night-ink);
+  --surface: var(--late-shift);
+  --surface-2: #121c3c;
+  --fg: var(--moon-paper);
+  --muted: var(--overcast);
+  --line: #2a3560;
+  --lamp: var(--sodium-lamp);
+  --lamp-strong: #f6bd67;
+  --lamp-ink: var(--night-ink);
+  --lamp-glow: rgba(242, 169, 59, 0.16);
+  --accrual: var(--accrual-teal);
+  --night-shade: #0a1126;
+  --focus: var(--sodium-lamp);
+
+  /* Type */
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-plex), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --step-3: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  --step-4: clamp(3rem, 1.8rem + 5.6vw, 6.25rem);
+
+  /* Space and shape */
+  --gutter: clamp(1.25rem, 0.6rem + 3vw, 3rem);
+  --section: clamp(4.5rem, 3rem + 7vw, 9rem);
+  --radius-s: 6px;
+  --radius-m: 12px;
+  --radius-l: 22px;
+  --max: 76rem;
+  --measure: 66ch;
+
+  color-scheme: dark;
+}
+
+/* Light theme, derived. Applied by the OS preference unless the user picked dark. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --ink: var(--moon-paper);
+    --surface: #f5f4fa;
+    --surface-2: #dcd9e8;
+    --fg: var(--night-ink);
+    --muted: #4a5275;
+    --line: #c3c0d6;
+    --lamp: #8f5507;
+    --lamp-strong: #6e4104;
+    --lamp-ink: #ffffff;
+    --lamp-glow: rgba(168, 101, 8, 0.12);
+    --accrual: #0b6b56;
+    --night-shade: #cfcbe0;
+    --focus: #6e4104;
+    color-scheme: light;
+  }
+}
+
+:root[data-theme="light"] {
+  --ink: var(--moon-paper);
+  --surface: #f5f4fa;
+  --surface-2: #dcd9e8;
+  --fg: var(--night-ink);
+  --muted: #4a5275;
+  --line: #c3c0d6;
+  --lamp: #8f5507;
+  --lamp-strong: #6e4104;
+  --lamp-ink: #ffffff;
+  --lamp-glow: rgba(168, 101, 8, 0.12);
+  --accrual: #0b6b56;
+  --night-shade: #cfcbe0;
+  --focus: #6e4104;
+  color-scheme: light;
+}

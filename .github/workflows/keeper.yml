@@ -1,0 +1,35 @@
+name: keeper
+
+# Every 10 minutes: repay buffer debt from parked positions, park idle agent cash in spUSDG,
+# refill the buffer when below target, and fund queued withdrawals. Needs the KEEPER_PRIVATE_KEY secret.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keeper
+  cancel-in-progress: false
+
+jobs:
+  keeper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: Keeper pass
+        env:
+          KEEPER_PRIVATE_KEY: ${{ secrets.KEEPER_PRIVATE_KEY }}
+          KEEPER_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+          NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS: "0xCa7D38A833BFaCBE22E787f967552A78b07C1c77"
+          NEXT_PUBLIC_ALLOCATOR_ADDRESS: "0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd"
+          NEXT_PUBLIC_BUFFER_ADDRESS: "0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D"
+          KEEPER_ADAPTER: "0xAf7f74801C2b439831feef6D1b4d39B4Ce717B66"
+          NEXT_PUBLIC_DEPLOY_BLOCK: "102271358"
+        run: |
+          if [ -z "$KEEPER_PRIVATE_KEY" ]; then echo "KEEPER_PRIVATE_KEY secret is not set; skipping."; exit 0; fi
+          bash ops/keeper.sh

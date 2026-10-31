@@ -1,0 +1,90 @@
+name: deploy-mainnet
+
+# Manual only. Deploys the protocol to Robinhood Chain mainnet from contracts/script/Deploy.s.sol.
+# The deployer key lives in the repository secret DEPLOYER_PRIVATE_KEY and never leaves GitHub.
+on:
+  workflow_dispatch:
+    inputs:
+      broadcast:
+        description: "Type DEPLOY to broadcast. Anything else runs a dry run only."
+        required: true
+        default: "dry-run"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      # Robinhood Chain mainnet and USDG (Paxos integrator docs)
+      NEXT_PUBLIC_CHAIN_ID: "4663"
+      RPC_URL: https://rpc.mainnet.chain.robinhood.com
+      NEXT_PUBLIC_USDG_ADDRESS: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+      # Roles. Admin proposes and executes timelock operations and can pause.
+      PAUSER_MULTISIG_ADDRESS: "0x350FE5BA04D18EF8137d801ad905829774c653E3"
+      KEEPER_ADDRESS: "0xc1FC86EbC84A11B78A5Ae08D6Ad60CD5748394Ac"
+      EXPECTED_DEPLOYER: "0x32AA18844DEe5cb6B597Ef24642bC7Bf87a5F66C"
+      # Parameters
+      TIMELOCK_DELAY_SECONDS: "86400"          # 1 day
+      SETTLEMENT_FEE_BPS: "10"                 # 0.10%, hard maximum 1.00%
+      WITHDRAW_QUEUE_THRESHOLD_BPS: "8000"     # queue withdrawals above 80% utilization
+      BUFFER_TARGET_BPS: "2000"                # keep 20% of the buffer liquid
+      # Asset: Spark Savings USDG (ERC-4626). The adapter constructor reverts unless asset() is USDG.
+      REFERENCE_ASSET_ADDRESS: "0xde770c84FE66E063336b31737cFE9790f18c4087"
+      # Guarded launch without an audit: caps forced to 50,000 USDG or less by the script.
+      BUFFER_DEPOSIT_CAP: "50000000000"
+      ASSET_CAP: "50000000000"
+      UNAUDITED_LAUNCH_ACK: "I accept that unaudited contracts will hold user funds"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Tests
+        working-directory: contracts
+        run: forge test
+
+      - name: Check deployer key and balance
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+        run: |
+          if [ -z "$DEPLOYER_PRIVATE_KEY" ]; then echo "Add the DEPLOYER_PRIVATE_KEY repository secret first."; exit 1; fi
+          ADDR=$(cast wallet address --private-key "$DEPLOYER_PRIVATE_KEY")
+          if [ "$(echo $ADDR | tr A-F a-f)" != "$(echo $EXPECTED_DEPLOYER | tr A-F a-f)" ]; then
+            echo "The secret belongs to $ADDR, not the expected deployer $EXPECTED_DEPLOYER."; exit 1
+          fi
+          test "$(cast chain-id --rpc-url $RPC_URL)" = "$NEXT_PUBLIC_CHAIN_ID" || { echo "RPC is not chain $NEXT_PUBLIC_CHAIN_ID"; exit 1; }
+          echo "Deployer $ADDR balance: $(cast balance $ADDR --rpc-url $RPC_URL --ether) ETH"
+          echo "USDG decimals: $(cast call $NEXT_PUBLIC_USDG_ADDRESS 'decimals()(uint8)' --rpc-url $RPC_URL)"
+          echo "spUSDG asset(): $(cast call $REFERENCE_ASSET_ADDRESS 'asset()(address)' --rpc-url $RPC_URL)"
+
+      - name: Deploy (dry run)
+        if: ${{ inputs.broadcast != 'DEPLOY' }}
+        working-directory: contracts
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+        run: mkdir -p deployments && forge script script/Deploy.s.sol --tc Deploy --rpc-url "$RPC_URL"
+
+      - name: Deploy (broadcast)
+        if: ${{ inputs.broadcast == 'DEPLOY' }}
+        working-directory: contracts
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+        run: |
+          mkdir -p deployments
+          forge script script/Deploy.s.sol --tc Deploy --rpc-url "$RPC_URL" --broadcast --slow
+          echo "## Deployment" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat deployments/$NEXT_PUBLIC_CHAIN_ID.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat deployments/$NEXT_PUBLIC_CHAIN_ID.json
+
+      - name: Save deployment
+        if: ${{ inputs.broadcast == 'DEPLOY' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-${{ env.NEXT_PUBLIC_CHAIN_ID }}
+          path: |
+            contracts/deployments/
+            contracts/broadcast/

@@ -1,0 +1,9 @@
+node_modules
+__pycache__
+contracts/out
+contracts/cache
+contracts/broadcast
+web/preview/dist
+web/preview/shots
+.env
+.env.local

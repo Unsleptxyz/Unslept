@@ -1,0 +1,64 @@
+name: record-deployment
+
+# Copies the addresses from a deploy-mainnet run into contracts/deployments/ on main,
+# so the website, indexer and keeper can be configured from the repository.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "deploy-mainnet run ID"
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/download-artifact@v4
+        with:
+          name: deployment-4663
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifact
+      - name: Commit addresses
+        run: |
+          mkdir -p contracts/deployments
+          cp artifact/deployments/4663.json contracts/deployments/4663.json
+          RUNFILE=$(ls artifact/broadcast/Deploy.s.sol/4663/run-latest.json)
+          BLOCK=$(python3 -c "import json;r=json.load(open('$RUNFILE'))['receipts'];print(min(int(x['blockNumber'],16) for x in r))")
+          echo "$BLOCK" > contracts/deployments/4663.block
+          RPC=https://rpc.mainnet.chain.robinhood.com
+          j() { python3 -c "import json;print(json.load(open('contracts/deployments/4663.json'))['$1'])"; }
+          ADMIN=0x350FE5BA04D18EF8137d801ad905829774c653E3; DEPLOYER=0x32AA18844DEe5cb6B597Ef24642bC7Bf87a5F66C; KEEPER=0xc1FC86EbC84A11B78A5Ae08D6Ad60CD5748394Ac
+          TL=$(j timelock); BUF=$(j buffer); RT=$(j settlementRouter); AL=$(j allocator); FA=$(j agentAccountFactory); FEE=$(j feeModule); AD=$(j adapter)
+          role() { cast call $1 "hasRole(bytes32,address)(bool)" $2 $3 --rpc-url $RPC; }
+          PAUSER=$(cast keccak "PAUSER_ROLE"); ROUTER=$(cast keccak "ROUTER_ROLE"); ALLOC=$(cast keccak "ALLOCATOR_ROLE"); KEEP=$(cast keccak "KEEPER_ROLE")
+          PROPOSER=$(cast keccak "PROPOSER_ROLE"); EXECUTOR=$(cast keccak "EXECUTOR_ROLE")
+          {
+            echo "deployBlock $BLOCK"
+            for c in $BUF $RT $AL $FA; do echo "admin(timelock) $c $(role $c 0x0000000000000000000000000000000000000000000000000000000000000000 $TL)"; echo "admin(deployer) $c $(role $c 0x0000000000000000000000000000000000000000000000000000000000000000 $DEPLOYER)"; done
+            for c in $BUF $RT $AL; do echo "pauser(admin) $c $(role $c $PAUSER $ADMIN)"; done
+            echo "buffer router role $(role $BUF $ROUTER $RT)"
+            echo "buffer allocator role $(role $BUF $ALLOC $AL)"
+            echo "allocator keeper $(role $AL $KEEP $KEEPER)"
+            echo "timelock proposer(admin) $(role $TL $PROPOSER $ADMIN)"
+            echo "timelock executor(admin) $(role $TL $EXECUTOR $ADMIN)"
+            echo "timelock delay $(cast call $TL 'getMinDelay()(uint256)' --rpc-url $RPC)"
+            echo "feeModule owner $(cast call $FEE 'owner()(address)' --rpc-url $RPC) fee $(cast call $FEE 'feeBps()(uint16)' --rpc-url $RPC)"
+            echo "buffer depositCap $(cast call $BUF 'depositCap()(uint256)' --rpc-url $RPC) asset $(cast call $BUF 'asset()(address)' --rpc-url $RPC)"
+            echo "adapter registered $(cast call $AL 'isAdapter(address)(bool)' $AD --rpc-url $RPC) cap $(cast call $AL 'capOf(address)(uint256)' $AD --rpc-url $RPC)"
+            echo "adapter position $(cast call $AD 'position()(address)' --rpc-url $RPC) owner $(cast call $AD 'owner()(address)' --rpc-url $RPC)"
+            echo "factory router $(cast call $FA 'router()(address)' --rpc-url $RPC) allocator $(cast call $FA 'allocator()(address)' --rpc-url $RPC)"
+            echo "router buffer $(cast call $RT 'buffer()(address)' --rpc-url $RPC)"
+          } > contracts/deployments/4663.checks.txt
+          cat contracts/deployments/4663.json contracts/deployments/4663.checks.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add contracts/deployments/
+          git commit -m "Record mainnet deployment addresses (run ${{ inputs.run_id }})" || echo "No change"
+          git push

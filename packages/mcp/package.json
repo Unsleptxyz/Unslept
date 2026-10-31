@@ -1,0 +1,38 @@
+{
+  "name": "@unslept/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for paying x402 requests from an Unslept agent account.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "unslept-mcp": "dist/bin.js"
+  },
+  "main": "./dist/server.js",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@unslept/sdk": "file:../sdk-ts",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Unsleptxyz/Unslept.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://unslept-o29g.vercel.app/docs"
+}

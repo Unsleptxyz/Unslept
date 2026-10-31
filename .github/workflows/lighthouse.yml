@@ -1,0 +1,52 @@
+name: lighthouse
+
+# Runs Lighthouse (mobile) against the live site and commits the scores to ops/lighthouse.txt.
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: "Site base URL"
+        default: "https://unslept-o29g.vercel.app"
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit
+        shell: bash {0}
+        run: |
+          npm i -g lighthouse@12 >/dev/null 2>&1
+          mkdir -p ops/lh
+          BASE="${{ inputs.base }}"
+          for p in / /app /docs /docs/x402 /risk /terms /privacy; do curl -s -o /dev/null "$BASE$p"; curl -s -o /dev/null "$BASE$p"; done
+          {
+            echo "# Lighthouse (mobile, default throttling). $(date -u +%FT%TZ)"
+            echo "# Warm-up requests first. Home is audited 3 times (run-to-run variance); use the median."
+            echo "# path perf a11y best-practices seo"
+            for p in / / / /app /docs /docs/x402 /risk /terms /privacy; do
+              f="ops/lh/$(echo "$p" | tr '/' '_' | sed 's/^_*$/root/').json"
+              lighthouse "$BASE$p" --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="$f" >/dev/null 2>&1
+              node -e '
+                const r=require(process.argv[1]),c=r.categories,s=k=>Math.round((c[k]?.score??0)*100);
+                const bad=Object.values(r.audits).filter(a=>a.score!==null&&a.score<0.9&&a.scoreDisplayMode!=="informative"&&a.scoreDisplayMode!=="notApplicable").map(a=>a.id).slice(0,12);
+                const det=["errors-in-console","color-contrast"].flatMap(id=>(r.audits[id]?.details?.items??[]).slice(0,5).map(i=>"    "+id+": "+JSON.stringify({src:i.source,url:i.sourceLocation?.url??i.url,desc:i.description,node:i.node?.snippet,expl:i.node?.explanation}).slice(0,400)));
+                console.log(process.argv[2],s("performance"),s("accessibility"),s("best-practices"),s("seo"),"| lcp="+r.audits["largest-contentful-paint"].displayValue,"cls="+r.audits["cumulative-layout-shift"].displayValue,"tbt="+r.audits["total-blocking-time"].displayValue,"| below 90:",bad.join(","));
+                if(det.length)console.log(det.join("\n"));
+              ' "$PWD/$f" "$p" || echo "$p failed"
+            done
+          } > ops/lighthouse.txt
+          rm -rf ops/lh
+          cat ops/lighthouse.txt
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add ops/lighthouse.txt
+          git commit -m "Record Lighthouse scores" || exit 0
+          git pull --rebase && git push

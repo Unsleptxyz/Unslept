@@ -1,0 +1,38 @@
+name: monitor
+
+# Every 15 minutes: protocol health checks (pause, utilization, liquidity, stale price, timelock operations,
+# write-offs). Alerts go to OPS_WEBHOOK_URL (Slack or Discord compatible) when that secret is set.
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-save tsx@4
+        working-directory: monitor
+      - name: Monitor pass
+        working-directory: monitor
+        env:
+          MONITOR_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+          NEXT_PUBLIC_BUFFER_ADDRESS: "0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D"
+          NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS: "0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b"
+          NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS: "0xCa7D38A833BFaCBE22E787f967552A78b07C1c77"
+          TIMELOCK_ADDRESS: "0x2A407119d55e5cca2D51Cacc78000D49FeEcE777"
+          MONITOR_ADAPTERS: ""
+          WITHDRAW_QUEUE_THRESHOLD_BPS: "8000"
+          OPS_MIN_AVAILABLE_USDG: "0"
+          MONITOR_LOOKBACK_BLOCKS: "20000"
+          OPS_WEBHOOK_URL: ${{ secrets.OPS_WEBHOOK_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node --import tsx src/monitor.ts

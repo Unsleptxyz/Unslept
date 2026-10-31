@@ -1,0 +1,11 @@
+{
+  "name": "unslept-monitor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx src/monitor.ts",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "devDependencies": { "tsx": "^4.19.0", "@types/node": "^22.0.0" },
+  "engines": { "node": ">=20" }
+}

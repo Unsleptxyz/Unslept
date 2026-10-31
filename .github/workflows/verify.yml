@@ -1,0 +1,82 @@
+name: verify-contracts
+
+# Publishes the source of every mainnet contract on the Robinhood Chain explorer (Blockscout).
+# Constructor arguments are rebuilt from the deployment parameters in deploy.yml.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      RPC: https://rpc.mainnet.chain.robinhood.com
+      ADMIN: "0x350FE5BA04D18EF8137d801ad905829774c653E3"
+      DEPLOYER: "0x32AA18844DEe5cb6B597Ef24642bC7Bf87a5F66C"
+      USDG: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+      SPUSDG: "0xde770c84FE66E063336b31737cFE9790f18c4087"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: Build
+        working-directory: contracts
+        run: forge build
+      - name: Verify
+        working-directory: contracts
+        shell: bash {0}
+        run: |
+          exec > >(tee /tmp/verify.log) 2>&1
+          set -x
+          j() { python3 -c "import json;print(json.load(open('deployments/4663.json'))['$1'])"; }
+          TL=$(j timelock); FEE=$(j feeModule); FA=$(j agentAccountFactory); BUF=$(j buffer); RT=$(j settlementRouter); AL=$(j allocator); AD=$(j adapter)
+          IMPL=$(cast call $FA "implementation()(address)" --rpc-url $RPC)
+          ok=0; fail=0
+          curl -sS -o /dev/null -w "probe blockscout %{http_code}\n" "https://robinhoodchain.blockscout.com/api/v2/stats" || true
+          curl -sS https://sourcify.dev/server/chains | python3 -c "import json,sys;print('sourcify chain 4663:',[c for c in json.load(sys.stdin) if c.get('chainId')==4663])" || true
+          v() {
+            local addr=$1 contract=$2 args=$3
+            for URL in https://robinhoodchain.blockscout.com/api/ https://explorer.chain.robinhood.com/api/; do
+              if forge verify-contract "$addr" "$contract" --chain-id 4663 --rpc-url $RPC --verifier blockscout --verifier-url "$URL" \
+                   ${args:+--constructor-args $args} --watch; then echo "VERIFIED $contract $addr via $URL"; ok=$((ok+1)); return; fi
+            done
+            if forge verify-contract "$addr" "$contract" --chain-id 4663 --rpc-url $RPC --verifier sourcify \
+                 ${args:+--constructor-args $args}; then echo "VERIFIED $contract $addr via sourcify"; ok=$((ok+1)); return; fi
+            echo "FAILED $contract $addr"; fail=$((fail+1))
+          }
+          v $TL lib/openzeppelin-contracts/contracts/governance/TimelockController.sol:TimelockController \
+            $(cast abi-encode "c(uint256,address[],address[],address)" 86400 "[$ADMIN]" "[$ADMIN]" 0x0000000000000000000000000000000000000000)
+          v $FEE src/FeeModule.sol:FeeModule $(cast abi-encode "c(address,uint16)" $TL 10)
+          v $FA src/AgentAccountFactory.sol:AgentAccountFactory $(cast abi-encode "c(address,address)" $DEPLOYER $USDG)
+          v $IMPL src/AgentAccount.sol:AgentAccount ""
+          v $BUF src/UnsleptBuffer.sol:UnsleptBuffer \
+            $(cast abi-encode "c(address,string,string,address,address,uint256,uint16)" $USDG "Unslept Buffer" "usBUF" $DEPLOYER $ADMIN 50000000000 8000)
+          v $RT src/SettlementRouter.sol:SettlementRouter $(cast abi-encode "c(address,address,address,address,address)" $DEPLOYER $ADMIN $FA $FEE $BUF)
+          v $AL src/Allocator.sol:Allocator $(cast abi-encode "c(address,address,address,uint16)" $DEPLOYER $ADMIN $FA 2000)
+          v $AD src/adapters/ERC4626Adapter.sol:ERC4626Adapter \
+            $(cast abi-encode "c(address,address,address,address,uint256,uint256)" $TL $USDG $SPUSDG 0x0000000000000000000000000000000000000000 0 50000000000)
+          echo "verified=$ok failed=$fail"
+          echo "verified=$ok failed=$fail" >> $GITHUB_STEP_SUMMARY
+          echo "$fail" > /tmp/fail
+          sleep 60
+          {
+            echo "# Source verification, Robinhood Chain mainnet (4663)"
+            echo "# Verified via Sourcify; Blockscout reads Sourcify matches. Checked $(date -u +%FT%TZ)"
+            for a in $TL $FEE $FA $IMPL $BUF $RT $AL $AD; do
+              m=$(curl -sS "https://sourcify.dev/server/v2/contract/4663/$a" | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('match'),d.get('creationMatch'),d.get('runtimeMatch'))" 2>/dev/null)
+              echo "$a match=$m"
+            done
+            grep -aE "^(VERIFIED|FAILED)" /tmp/verify.log
+          } > deployments/4663.verify.txt
+          cat deployments/4663.verify.txt
+      - name: Commit results
+        if: always()
+        run: |
+          sleep 2
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add contracts/deployments/4663.verify.txt
+          git commit -m "Record explorer verification results" || exit 0
+          git pull --rebase && git push
+      - name: Fail if any verification failed
+        run: test "$(cat /tmp/fail 2>/dev/null || echo 1)" = "0"

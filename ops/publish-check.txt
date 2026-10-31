@@ -1,0 +1,13 @@
+# Publish check 2026-10-31T09:08:45Z
+sdk-ts build+test ok
+npm notice Tarball Contents
+npm notice package size: 16.9 kB
+npm notice total files: 17
+mcp build+test ok
+npm notice package size: 5.5 kB
+npm notice total files: 7
+sdk-py build+test ok: unslept-0.1.0-py3-none-any.whl unslept-0.1.0.tar.gz 
+npm @unslept/sdk: TAKEN or exists (200)
+npm @unslept/mcp: TAKEN or exists (200)
+npm org unslept lookup: 200
+pypi unslept: TAKEN or exists (200)

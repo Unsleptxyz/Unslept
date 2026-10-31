@@ -1,0 +1,18 @@
+name: index
+
+# Every 10 minutes: run the indexer (new events + buffer snapshot), then low-balance webhook alerts.
+on:
+  schedule:
+    - cron: "3,13,23,33,43,53 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: curl -fsS --max-time 90 https://unslept-o29g.vercel.app/api/cron/index
+      - run: curl -fsS --max-time 90 https://unslept-o29g.vercel.app/api/cron/alerts

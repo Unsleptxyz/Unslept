@@ -1,0 +1,12 @@
+# Lighthouse (mobile, default throttling). 2026-10-31T08:25:09Z
+# Warm-up requests first. Home is audited 3 times (run-to-run variance); use the median.
+# path perf a11y best-practices seo
+/ 76 100 100 100 | lcp=2.8 s cls=0.001 tbt=800 ms | below 90: largest-contentful-paint,total-blocking-time,max-potential-fid,mainthread-work-breakdown,largest-contentful-paint-element,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/ 99 100 100 100 | lcp=2.2 s cls=0 tbt=60 ms | below 90: unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/ 99 100 100 100 | lcp=2.2 s cls=0.001 tbt=60 ms | below 90: unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/app 96 100 100 60 | lcp=2.2 s cls=0.001 tbt=190 ms | below 90: max-potential-fid,unused-javascript,legacy-javascript,is-crawlable,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/docs 98 100 100 100 | lcp=2.2 s cls=0.001 tbt=70 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/docs/x402 100 100 100 100 | lcp=1.8 s cls=0.001 tbt=10 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/risk 98 100 100 100 | lcp=2.2 s cls=0.001 tbt=70 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/terms 99 100 100 100 | lcp=2.2 s cls=0.001 tbt=40 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/privacy 99 100 100 100 | lcp=2.2 s cls=0.001 tbt=60 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight

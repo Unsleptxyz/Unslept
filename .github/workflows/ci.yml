@@ -1,0 +1,49 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: forge test
+        working-directory: contracts
+
+  packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: npm install && npm test && npx tsc -p tsconfig.json --noEmit
+        working-directory: packages/sdk-ts
+      - run: npm install --no-save tsx typescript @types/node && node --import tsx --test test/*.test.ts
+        working-directory: packages/mcp
+      - run: python -m unittest discover -s tests
+        working-directory: packages/sdk-py
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+        working-directory: packages/sdk-ts
+      - run: ./scripts/e2e.sh
+        env:
+          TSX_IMPORT: ${{ github.workspace }}/packages/sdk-ts/node_modules/tsx/dist/esm/index.mjs
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # Google Fonts downloads during the build occasionally fail; retry once before failing.
+      - run: npm install && npm run typecheck && (npm run build || npm run build) && npm run copy-check
+        working-directory: web

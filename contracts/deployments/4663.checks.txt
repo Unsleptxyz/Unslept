@@ -1,0 +1,24 @@
+deployBlock 102271358
+admin(timelock) 0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D true
+admin(deployer) 0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D false
+admin(timelock) 0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b true
+admin(deployer) 0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b false
+admin(timelock) 0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd true
+admin(deployer) 0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd false
+admin(timelock) 0xCa7D38A833BFaCBE22E787f967552A78b07C1c77 true
+admin(deployer) 0xCa7D38A833BFaCBE22E787f967552A78b07C1c77 false
+pauser(admin) 0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D true
+pauser(admin) 0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b true
+pauser(admin) 0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd true
+buffer router role true
+buffer allocator role true
+allocator keeper true
+timelock proposer(admin) true
+timelock executor(admin) true
+timelock delay 86400 [8.64e4]
+feeModule owner 0x2A407119d55e5cca2D51Cacc78000D49FeEcE777 fee 10
+buffer depositCap 50000000000 [5e10] asset 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168
+adapter registered true cap 50000000000 [5e10]
+adapter position 0xde770c84FE66E063336b31737cFE9790f18c4087 owner 0x2A407119d55e5cca2D51Cacc78000D49FeEcE777
+factory router 0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b allocator 0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd
+router buffer 0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D
