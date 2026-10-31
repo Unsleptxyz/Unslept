@@ -1,8 +1,7 @@
-# Solana program test 2026-10-31T16:02:01Z
+# Solana program test 2026-10-31T16:04:12Z
 All program id declarations are synced.
 Please rebuild the program to update the generated artifacts.
 build exit 1
-[1m[31merror[0m[1m:[0m failed to parse manifest at `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/block-buffer-0.12.1/Cargo.toml`
 Found a 'test' script in the Anchor.toml. Running it as a test suite!
 Running test suite: "/home/runner/work/Unslept/Unslept/solana/Anchor.toml"
-Unable to get latest blockhash. Test validator does not look started. Check ".anchor/test-ledger/test-ledger-log.txt" for errors. Consider increasing [test.startup_wait] in Anchor.toml.
+Error: Failed to spawn `surfpool`: No such file or directory (os error 2)
