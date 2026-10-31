@@ -1,0 +1,41 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="fonts.css"><style>
+html,body{margin:0;width:1500px;height:500px;background:#07080b;overflow:hidden}
+.sky{position:absolute;inset:0;background:
+  radial-gradient(40% 70% at 78% 18%, rgba(236,237,241,.07), transparent 70%),
+  radial-gradient(55% 60% at 50% 105%, rgba(242,169,59,.10), transparent 70%),
+  linear-gradient(180deg,#06070a 0%,#0a0b0f 70%,#07080b 100%)}
+#city{position:absolute;left:0;right:0;bottom:0;width:1500px;height:230px}
+.moon{position:absolute;right:250px;top:62px;width:44px;height:44px;border-radius:50%;
+  background:radial-gradient(circle at 40% 40%,#f4f2fa,#cfd1da 60%,#b9bcc7);box-shadow:0 0 60px 18px rgba(236,237,241,.10)}
+.copy{position:absolute;left:0;right:0;top:118px;text-align:center}
+h1{margin:0;font-family:"Instrument Serif",serif;font-weight:400;font-size:84px;line-height:1;letter-spacing:-.01em;color:#ededf0}
+h1 em{color:#f2a93b}
+p{margin:22px 0 0;font-family:"Inter",sans-serif;font-size:21px;color:#9a9fab;letter-spacing:.005em}
+.fade{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,transparent,#07080b)}
+</style></head><body>
+<div class="sky"></div><div class="moon"></div>
+<svg id="city" viewBox="0 0 1500 230" preserveAspectRatio="none"></svg>
+<div class="fade"></div>
+<div class="copy"><h1>Your agent&rsquo;s money, <em>unslept.</em></h1>
+<p>Yield-bearing x402 payments for AI agents, on Robinhood Chain</p></div>
+<script>
+let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
+const svg=document.getElementById('city');let out='';
+for(let layer=0;layer<2;layer++){
+  let x=-10;const base=layer?0.55:1, fill=layer?'#0d0e12':'#101116';
+  while(x<1510){
+    const w=26+r()*54, h=(40+r()*150)*base+ (layer?0:20);
+    const y=230-h;
+    out+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${fill}"/>`;
+    if(!layer){
+      for(let wy=y+8;wy<226;wy+=11){for(let wx=x+5;wx<x+w-6;wx+=9){
+        const k=r(); if(k>0.86){const warm=r()>0.12;
+          out+=`<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="3.2" height="4.6" fill="${warm?'#f2a93b':'#dfe2ea'}" opacity="${(0.35+r()*0.55).toFixed(2)}"/>`;}}}
+    }
+    x+=w+(r()*6);
+  }
+  if(layer===1) svg.insertAdjacentHTML('beforeend',out),out='';
+}
+svg.insertAdjacentHTML('beforeend',out);
+</script></body></html>
