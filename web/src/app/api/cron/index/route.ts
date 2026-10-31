@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createPublicClient, http, parseAbiItem } from "viem";
-import { addresses, chain, deployBlock } from "@/lib/web3";
+import { createPublicClient, parseAbiItem } from "viem";
+import { addresses, appTransport, chain, deployBlock } from "@/lib/web3";
 
 /**
  * Lightweight indexer. Each call reads new SettlementRouter and factory events since the last indexed block,
@@ -47,7 +47,7 @@ export async function GET() {
   if (!chain || !secret || !process.env.SUPABASE_URL || !process.env.SUPABASE_PUBLISHABLE_KEY) {
     return NextResponse.json({ error: "Indexer is not configured." }, { status: 503 });
   }
-  const client = createPublicClient({ chain, transport: http() });
+  const client = createPublicClient({ chain, transport: appTransport() });
   const adapters = (process.env.INDEXER_ADAPTERS ?? "").split(",").map((s) => s.trim()).filter(Boolean) as `0x${string}`[];
 
   const last = BigInt((await rpc("un_index_last_block", {})) ?? 0);

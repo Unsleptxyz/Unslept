@@ -24,7 +24,7 @@ jobs:
       - name: Keeper pass
         env:
           KEEPER_PRIVATE_KEY: ${{ secrets.KEEPER_PRIVATE_KEY }}
-          KEEPER_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+          KEEPER_RPC_URL: ${{ secrets.ROBINHOOD_RPC_URL || 'https://rpc.mainnet.chain.robinhood.com' }}
           NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS: "0xCa7D38A833BFaCBE22E787f967552A78b07C1c77"
           NEXT_PUBLIC_ALLOCATOR_ADDRESS: "0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd"
           NEXT_PUBLIC_BUFFER_ADDRESS: "0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D"

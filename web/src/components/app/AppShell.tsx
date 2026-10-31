@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Brand } from "@/components/SiteChrome";
@@ -37,10 +38,10 @@ export function AppShell({ children, configured }: { children: ReactNode; config
         </div>
         <nav aria-label="App" className="app-nav">
           {nav.map((n) => (
-            <a key={n.href} href={n.href} aria-current={path === n.href ? "page" : undefined}>
+            <Link key={n.href} href={n.href} aria-current={path === n.href ? "page" : undefined}>
               <NavIcon d={n.icon} />
               <span>{n.label}</span>
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="app-sidebar__foot">
@@ -69,9 +70,9 @@ export function AppShell({ children, configured }: { children: ReactNode; config
         </header>
         <nav aria-label="App sections" className="app-tabs">
           {nav.map((n) => (
-            <a key={n.href} href={n.href} aria-current={path === n.href ? "page" : undefined}>
+            <Link key={n.href} href={n.href} aria-current={path === n.href ? "page" : undefined}>
               {n.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <main id="app-main" className="app-main">

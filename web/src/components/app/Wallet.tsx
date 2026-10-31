@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { chain, privyAppId } from "@/lib/web3";
@@ -82,8 +82,16 @@ function InjectedConnectButton() {
 
 /** Shows children only when the wallet is connected to the configured chain. */
 export function NetworkGuard({ children }: { children: ReactNode }) {
-  const { isConnected, chainId } = useAccount();
+  const { isConnected, chainId, address } = useAccount();
   const { switchChain, isPending, error } = useSwitchChain();
+  // Ask the wallet to switch once per connected address, so the user is not sent through the button on every visit.
+  const asked = useRef<string | undefined>(undefined);
+  const wrongChain = !!chain && isConnected && chainId !== chain.id;
+  useEffect(() => {
+    if (!wrongChain || !address || asked.current === address) return;
+    asked.current = address;
+    switchChain({ chainId: chain!.id });
+  }, [wrongChain, address, switchChain]);
   if (!isConnected) {
     return (
       <div className="app-empty">

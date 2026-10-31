@@ -1,4 +1,4 @@
-import { createConfig, http } from "wagmi";
+import { createConfig, fallback, http } from "wagmi";
 import { injected } from "@wagmi/core";
 import { defineChain, type Abi } from "viem";
 import agentAccountAbi from "@/abi/AgentAccount.json";
@@ -16,6 +16,7 @@ const env = {
   chainId: process.env.NEXT_PUBLIC_CHAIN_ID,
   chainName: process.env.NEXT_PUBLIC_CHAIN_NAME || "Robinhood Chain",
   rpcUrl: process.env.NEXT_PUBLIC_RPC_URL,
+  appRpcUrl: process.env.NEXT_PUBLIC_APP_RPC_URL,
   explorerUrl: process.env.NEXT_PUBLIC_EXPLORER_URL,
   usdg: process.env.NEXT_PUBLIC_USDG_ADDRESS,
   factory: process.env.NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS,
@@ -82,12 +83,20 @@ export const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || undefined;
 
 export const rpcUrl = env.rpcUrl;
 
+/**
+ * Transport for the app's own reads and receipts: the dedicated RPC first (NEXT_PUBLIC_APP_RPC_URL), then the public
+ * RPC if it fails. Wallets are only ever given the public RPC, through the chain definition above.
+ */
+export function appTransport() {
+  return env.appRpcUrl ? fallback([http(env.appRpcUrl), http(env.rpcUrl)]) : http(env.rpcUrl);
+}
+
 /** Plain wagmi config with the injected browser wallet. Used when Privy is not configured. */
 export const wagmiConfig = chain
   ? createConfig({
       chains: [chain],
       connectors: [injected()],
-      transports: { [chain.id]: http(env.rpcUrl) },
+      transports: { [chain.id]: appTransport() },
       ssr: true,
     })
   : undefined;

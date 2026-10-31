@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createPublicClient, http, verifyMessage } from "viem";
+import { createPublicClient, verifyMessage } from "viem";
 import { dbConfigured, dbRpc, deliverOnce, type Webhook } from "@/lib/server-db";
-import { abis, chain } from "@/lib/web3";
+import { abis, appTransport, chain } from "@/lib/web3";
 
 /**
  * Policy-violation reports from the SDK (option `reportUrl`). The agent signer signs the report, the server
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const at = Date.parse(r.at);
   if (!Number.isFinite(at) || Math.abs(Date.now() - at) > 5 * 60 * 1000) return NextResponse.json({ error: "Report is too old." }, { status: 400 });
 
-  const client = createPublicClient({ chain, transport: http() });
+  const client = createPublicClient({ chain, transport: appTransport() });
   const account = r.account as `0x${string}`;
   const [signer, owner] = (await Promise.all([
     client.readContract({ address: account, abi: abis.agentAccount, functionName: "agentSigner" }),

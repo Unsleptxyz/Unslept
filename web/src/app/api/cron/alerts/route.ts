@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createPublicClient, http, parseAbi } from "viem";
+import { createPublicClient, parseAbi } from "viem";
 import { dbConfigured, dbRpc, deliverOnce, type Webhook } from "@/lib/server-db";
-import { addresses, chain } from "@/lib/web3";
+import { addresses, appTransport, chain } from "@/lib/web3";
 
 /**
  * Low-balance alerts. For each webhook subscribed to low_balance, checks the owner's agent accounts and
@@ -24,7 +24,7 @@ export async function GET() {
   if (!chain || !dbConfigured() || !addresses.factory) {
     return NextResponse.json({ error: "Alerts are not configured." }, { status: 503 });
   }
-  const client = createPublicClient({ chain, transport: http() });
+  const client = createPublicClient({ chain, transport: appTransport() });
   const hooks = await dbRpc<Webhook[]>("un_webhooks_for", { p_event: "low_balance" });
   const day = new Date().toISOString().slice(0, 10);
   let checked = 0;

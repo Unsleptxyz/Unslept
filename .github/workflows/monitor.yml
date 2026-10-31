@@ -30,7 +30,7 @@ jobs:
       - name: Monitor pass
         working-directory: monitor
         env:
-          MONITOR_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+          MONITOR_RPC_URL: ${{ secrets.ROBINHOOD_RPC_URL || 'https://rpc.mainnet.chain.robinhood.com' }}
           NEXT_PUBLIC_BUFFER_ADDRESS: "0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D"
           NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS: "0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b"
           NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS: "0xCa7D38A833BFaCBE22E787f967552A78b07C1c77"

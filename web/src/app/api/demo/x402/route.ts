@@ -1,8 +1,8 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { createPublicClient, decodeEventLog, http, parseAbiItem } from "viem";
+import { createPublicClient, decodeEventLog, parseAbiItem } from "viem";
 import { dbConfigured, dbRpc } from "@/lib/server-db";
-import { addresses, chain } from "@/lib/web3";
+import { addresses, appTransport, chain } from "@/lib/web3";
 
 /**
  * Live x402 v2 demo endpoint on Robinhood Chain mainnet.
@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
   const idState = checkPaymentId(cfg.secret, paymentId);
   if (idState !== "ok") return fail(idState === "expired" ? "payment_id_expired" : "unknown_payment_id");
 
-  const client = createPublicClient({ chain: cfg.chain, transport: http() });
+  const client = createPublicClient({ chain: cfg.chain, transport: appTransport() });
   const receipt = await client.getTransactionReceipt({ hash: tx as `0x${string}` }).catch(() => undefined);
   if (!receipt || receipt.status !== "success") return fail("transaction_not_successful");
 
