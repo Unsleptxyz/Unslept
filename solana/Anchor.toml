@@ -3,10 +3,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-unslept = "7pq53ZQ8JRCaPoorjfnuCmMFDQEeEgDMnE1D92gA3t2W"
+unslept = "HbAgL4w8R9D8RUEuK4rJknK5Vn8rBusfRtfTnFcYieue"
 
 [programs.devnet]
-unslept = "7pq53ZQ8JRCaPoorjfnuCmMFDQEeEgDMnE1D92gA3t2W"
+unslept = "HbAgL4w8R9D8RUEuK4rJknK5Vn8rBusfRtfTnFcYieue"
+
+[programs.mainnet]
+unslept = "HbAgL4w8R9D8RUEuK4rJknK5Vn8rBusfRtfTnFcYieue"
 
 [provider]
 cluster = "localnet"
