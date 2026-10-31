@@ -50,7 +50,8 @@ jobs:
           {
             echo "# Solana program test $(date -u +%FT%TZ)"
             anchor keys sync 2>&1 | tail -2
-            anchor build > /tmp/build.log 2>&1; echo "build exit $?"; grep -E "^error|error\[|Finished|failed" /tmp/build.log | head -40
+            anchor build > /tmp/build.log 2>&1; echo "build exit $?"; grep -vE "^\s*(Compiling|Downloaded|Downloading|Updating|Locking|Adding)" /tmp/build.log | tail -60
+            anchor test --help 2>&1 | grep -iE "validator|surfpool|legacy" | head
             anchor test --skip-build 2>&1 | grep -vE "^\s*$" | tail -80
           } > $out 2>&1
           code=$?
