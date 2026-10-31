@@ -1,0 +1,22 @@
+[package]
+name = "unslept"
+version = "0.1.0"
+description = "Unslept: yield-aware x402 payment accounts for AI agents on Solana"
+edition = "2021"
+license = "BUSL-1.1"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "unslept"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+anchor-spl = "0.31.1"

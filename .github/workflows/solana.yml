@@ -1,0 +1,59 @@
+name: solana
+
+# Builds the Anchor program and runs its test suite on a local validator. Results go to ops/solana-test.txt.
+on:
+  push:
+    paths: ["solana/**", ".github/workflows/solana.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.local/share/solana
+            solana/target
+          key: solana-${{ hashFiles('solana/Cargo.lock', 'solana/**/Cargo.toml') }}
+          restore-keys: solana-
+      - name: Install Solana and Anchor
+        shell: bash
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.21/install)" > /dev/null
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+          npm install -g @coral-xyz/anchor-cli@0.31.1 > /dev/null
+      - name: Build and test
+        working-directory: solana
+        shell: bash {0}
+        run: |
+          mkdir -p ../ops; out=../ops/solana-test.txt
+          solana --version; anchor --version
+          solana-keygen new --no-bip39-passphrase --silent --force -o ~/.config/solana/id.json > /dev/null
+          npm install --no-audit --no-fund > /dev/null 2>&1
+          {
+            echo "# Solana program test $(date -u +%FT%TZ)"
+            anchor keys sync 2>&1 | tail -2
+            anchor build 2>&1 | grep -E "error|warning: unused|Finished|^error" | tail -40
+            anchor test --skip-build 2>&1 | grep -vE "^\s*$" | tail -80
+          } > $out 2>&1
+          code=$?
+          cat $out
+          grep -q "passing" $out && ! grep -qE "[0-9]+ failing" $out
+      - name: Commit result
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git checkout -- solana/Anchor.toml solana/programs 2>/dev/null || true
+          git add ops/solana-test.txt && git commit -q -m "ops: solana test result" && git pull -q --rebase && git push -q || echo "nothing to commit"
