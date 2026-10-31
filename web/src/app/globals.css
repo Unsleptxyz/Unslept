@@ -4,6 +4,7 @@
 @import "../styles/site.css";
 @import "../styles/content.css";
 @import "../styles/app.css";
+@import "../styles/refine.css";
 
 /* Expose the tokens to Tailwind utilities for the app screens. */
 @theme inline {

@@ -39,7 +39,7 @@ export interface CityOptions {
   lowPower: boolean;
 }
 
-const NIGHT = new Color("#05081a");
+const NIGHT = new Color("#07080b");
 
 // Small deterministic PRNG so the skyline is the same on every visit.
 function rng(seed: number) {
@@ -104,7 +104,7 @@ const buildingFragment = /* glsl */ `
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
   void main() {
-    vec3 base = mix(vec3(0.030, 0.045, 0.105), vec3(0.060, 0.085, 0.185), clamp(vLocal.y / 18.0, 0.0, 1.0));
+    vec3 base = mix(vec3(0.028, 0.030, 0.038), vec3(0.055, 0.058, 0.072), clamp(vLocal.y / 18.0, 0.0, 1.0));
     vec3 color = base;
     float side = 1.0 - abs(vNormal.y);
     if (side > 0.5) {
@@ -121,14 +121,14 @@ const buildingFragment = /* glsl */ `
       float lit = step(0.80, h) + step(0.965, h2) * step(h, 0.80);
       lit = clamp(lit, 0.0, 1.0) * inWin * topMargin;
       vec3 warm = vec3(1.0, 0.70, 0.30);
-      vec3 cool = vec3(0.72, 0.80, 1.0);
+      vec3 cool = vec3(0.82, 0.85, 0.92);
       vec3 win = mix(warm, cool, step(0.93, hash(cell * 1.7 + vSeed)));
       float flicker = 0.85 + 0.15 * sin(uTime * 2.0 + h * 40.0);
       color = mix(color, win * (0.9 * flicker), lit);
       // Faint edge light so silhouettes read against the sky.
-      color += vec3(0.05, 0.07, 0.14) * smoothstep(0.0, 0.2, vLocal.y / max(vHeight, 0.01)) * 0.4;
+      color += vec3(0.06, 0.062, 0.075) * smoothstep(0.0, 0.2, vLocal.y / max(vHeight, 0.01)) * 0.4;
     } else if (vNormal.y > 0.5) {
-      color = vec3(0.045, 0.06, 0.13);
+      color = vec3(0.04, 0.042, 0.05);
     }
     float fog = smoothstep(uFogNear, uFogFar, vDepth);
     gl_FragColor = vec4(mix(color, uFog, fog), 1.0);
@@ -189,7 +189,7 @@ export function startCity(canvas: HTMLCanvasElement, opts: CityOptions): () => v
   scene.add(buildings);
 
   // Ground
-  const ground = new Mesh(new PlaneGeometry(400, 400), new MeshBasicMaterial({ color: "#04061a" }));
+  const ground = new Mesh(new PlaneGeometry(400, 400), new MeshBasicMaterial({ color: "#060709" }));
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
 
@@ -226,7 +226,7 @@ export function startCity(canvas: HTMLCanvasElement, opts: CityOptions): () => v
   starGeo.setAttribute("position", new BufferAttribute(starPos, 3));
   const stars = new Points(
     starGeo,
-    new PointsMaterial({ size: 0.7, color: "#cfd6ff", transparent: true, opacity: 0.75, depthWrite: false, fog: false, sizeAttenuation: true }),
+    new PointsMaterial({ size: 0.7, color: "#dfe2ea", transparent: true, opacity: 0.55, depthWrite: false, fog: false, sizeAttenuation: true }),
   );
   scene.add(stars);
 

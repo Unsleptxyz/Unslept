@@ -1,40 +1,40 @@
 /*
- * Unslept design tokens. Night shift, refined.
+ * Unslept design tokens. Night shift, quiet edition: neutral near-black, thin type, amber as a single accent.
  * One dark theme by design: the brand lives at night. Contrast is checked against AA on every surface.
  */
 
 :root {
   /* Palette */
-  --night-0: #05081a;
-  --night-1: #080d22;
-  --night-2: #0c132d;
-  --night-3: #111a3a;
-  --night-4: #17224a;
+  --night-0: #07080b;
+  --night-1: #0b0c10;
+  --night-2: #101115;
+  --night-3: #15171c;
+  --night-4: #1c1e24;
   --sodium: #f2a93b;
   --sodium-hi: #ffc66e;
   --sodium-deep: #c27b12;
-  --moon: #eceaf4;
-  --overcast: #8f98bd;
+  --moon: #ededf0;
+  --overcast: #9a9fab;
   --teal: #4fd1b5;
   --rose: #ff8a8a;
 
   /* Semantic */
   --bg: var(--night-0);
   --bg-raised: var(--night-1);
-  --surface: rgba(17, 26, 58, 0.62);
+  --surface: rgba(255, 255, 255, 0.015);
   --surface-solid: var(--night-2);
-  --surface-2: rgba(23, 34, 74, 0.72);
-  --surface-hover: rgba(30, 44, 92, 0.75);
-  --line: rgba(160, 172, 224, 0.13);
-  --line-strong: rgba(160, 172, 224, 0.24);
+  --surface-2: rgba(255, 255, 255, 0.03);
+  --surface-hover: rgba(255, 255, 255, 0.045);
+  --line: rgba(255, 255, 255, 0.075);
+  --line-strong: rgba(255, 255, 255, 0.14);
   --fg: var(--moon);
-  --fg-2: #c4c9e0;
+  --fg-2: #b4b8c2;
   --muted: var(--overcast);
   --lamp: var(--sodium);
   --lamp-strong: var(--sodium-hi);
   --lamp-ink: #170f02;
-  --lamp-soft: rgba(242, 169, 59, 0.12);
-  --lamp-glow: rgba(242, 169, 59, 0.28);
+  --lamp-soft: rgba(242, 169, 59, 0.08);
+  --lamp-glow: rgba(242, 169, 59, 0.0);
   --accrual: var(--teal);
   --danger: var(--rose);
   --focus: var(--sodium-hi);
@@ -49,12 +49,12 @@
 
   --text-xs: 0.8125rem;
   --text-s: 0.9375rem;
-  --text-m: 1.0625rem;
-  --text-l: 1.25rem;
-  --text-xl: clamp(1.5rem, 1.25rem + 0.9vw, 1.875rem);
-  --display-s: clamp(2rem, 1.5rem + 2vw, 3rem);
-  --display-m: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
-  --display-l: clamp(3.25rem, 1.8rem + 6.2vw, 7.5rem);
+  --text-m: 1rem;
+  --text-l: 1.125rem;
+  --text-xl: clamp(1.3rem, 1.15rem + 0.6vw, 1.6rem);
+  --display-s: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  --display-m: clamp(2.1rem, 1.5rem + 2.4vw, 3.5rem);
+  --display-l: clamp(2.75rem, 1.7rem + 4vw, 5.25rem);
 
   /* Kept aliases */
   --step--1: var(--text-s);
@@ -66,18 +66,18 @@
 
   /* Space, shape, depth */
   --gutter: clamp(1.25rem, 0.5rem + 3.2vw, 3.5rem);
-  --section: clamp(5rem, 3rem + 8vw, 10rem);
-  --max: 78rem;
+  --section: clamp(6rem, 3.5rem + 9vw, 12rem);
+  --max: 72rem;
   --max-narrow: 46rem;
-  --measure: 68ch;
+  --measure: 62ch;
   --radius-xs: 6px;
   --radius-s: 10px;
   --radius-m: 16px;
-  --radius-l: 24px;
-  --radius-xl: 32px;
-  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.6);
-  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 60px -24px rgba(0, 0, 0, 0.75);
-  --shadow-lamp: 0 10px 40px -10px var(--lamp-glow);
+  --radius-l: 18px;
+  --radius-xl: 22px;
+  --shadow-1: none;
+  --shadow-2: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
+  --shadow-lamp: none;
   --blur: saturate(160%) blur(16px);
 
   /* Motion */

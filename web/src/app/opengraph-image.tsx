@@ -38,7 +38,7 @@ export default async function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "64px 72px",
-          background: "linear-gradient(165deg, #05081a 0%, #0c132d 60%, #111a3a 100%)",
+          background: "linear-gradient(165deg, #07080b 0%, #111317 60%, #16181d 100%)",
           color: "#eceaf4",
           fontFamily: "Inter",
           position: "relative",
@@ -57,7 +57,7 @@ export default async function OpengraphImage() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <svg viewBox="0 0 32 32" width="64" height="64">
-            <rect width="32" height="32" rx="8" fill="#111a3a" />
+            <rect width="32" height="32" rx="8" fill="#16181d" />
             <path d="M10.1 9v6.9a5.9 5.9 0 0 0 11.8 0V9" fill="none" stroke="#f2a93b" strokeWidth="3.2" strokeLinecap="round" />
             <circle cx="16" cy="12.1" r="2.1" fill="#f2a93b" />
           </svg>

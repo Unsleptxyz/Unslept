@@ -19,7 +19,6 @@ const inter = localFont({
   src: [
     { path: "../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2", weight: "400" },
     { path: "../../node_modules/@fontsource/inter/files/inter-latin-500-normal.woff2", weight: "500" },
-    { path: "../../node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2", weight: "600" },
   ],
   variable: "--font-inter",
   display: "swap",
@@ -46,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#05081a",
+  themeColor: "#07080b",
   colorScheme: "dark",
 };
 
