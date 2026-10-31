@@ -1,0 +1,65 @@
+name: ref-shots
+
+# Screenshots external websites for design reference. Results are force-pushed to the "ref-screens" branch.
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "Comma-separated URLs"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Screenshots
+        shell: bash {0}
+        run: |
+          mkdir -p ref && cd ref
+          npm init -y > /dev/null && npm install --no-save playwright@1 > /dev/null 2>&1 && npx playwright install --with-deps chromium > /dev/null 2>&1
+          cat > shoot.mjs <<'JS'
+          import { chromium } from "playwright";
+          import { writeFileSync } from "node:fs";
+          const urls = process.argv[2].split(",").map((s) => s.trim()).filter(Boolean);
+          const b = await chromium.launch();
+          const log = [];
+          for (const [w, h, tag] of [[1440, 900, "d"], [390, 844, "m"]]) {
+            const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: tag === "m" ? 2 : 1, userAgent: tag === "m" ? "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1" : undefined });
+            for (const u of urls) {
+              const name = tag + "_" + new URL(u).hostname.replace(/^www\./, "").replace(/[^a-z0-9]+/gi, "-");
+              const p = await ctx.newPage();
+              try {
+                const r = await p.goto(u, { waitUntil: "domcontentloaded", timeout: 40000 });
+                await p.waitForTimeout(5000);
+                const n = tag === "d" ? 4 : 3;
+                for (let k = 0; k < n; k++) {
+                  await p.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), k * h);
+                  await p.waitForTimeout(1500);
+                  await p.screenshot({ path: `${name}_${k}.png` });
+                }
+                log.push(`${name}: ${r?.status()} ${await p.title()}`);
+              } catch (e) { log.push(`${name}: FAILED ${String(e).slice(0, 200)}`); }
+              await p.close();
+            }
+            await ctx.close();
+          }
+          await b.close();
+          writeFileSync("log.txt", log.join("\n") + "\n");
+          JS
+          node shoot.mjs "${{ inputs.urls }}"
+          cat log.txt
+          rm -rf node_modules package*.json shoot.mjs
+      - name: Publish
+        run: |
+          cd ref
+          git init -q -b ref-screens
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "Reference screenshots"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ref-screens
