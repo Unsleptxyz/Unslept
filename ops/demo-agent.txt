@@ -1,7 +1,7 @@
-# Demo agent 2026-10-31T15:05:22Z action=check
+# Demo agent 2026-10-31T15:05:52Z action=create
 agent_account=0x1D3162ED192955D5af1e07A9a3d1Df466023ad71
-agent_deployed=no
-owner=0x32AA18844DEe5cb6B597Ef24642bC7Bf87a5F66C eth=0.016225305835482000 usdg_atomic=0
+agent_deployed=yes
+owner=0x32AA18844DEe5cb6B597Ef24642bC7Bf87a5F66C eth=0.016220218134074000 usdg_atomic=0
 signer=0xc1FC86EbC84A11B78A5Ae08D6Ad60CD5748394Ac eth=0.000604696705444000 usdg_atomic=0
 agent usdg_atomic=0
 policy=perCall 20000, daily 1000000
