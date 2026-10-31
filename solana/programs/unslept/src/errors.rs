@@ -44,4 +44,12 @@ pub enum UnsleptError {
     WrongMint,
     #[msg("Arithmetic overflow.")]
     Overflow,
+    #[msg("The yield reserve is already set.")]
+    YieldReserveAlreadySet,
+    #[msg("No yield reserve is configured.")]
+    YieldReserveNotSet,
+    #[msg("Only the owner or the keeper can do this.")]
+    NotOwnerOrKeeper,
+    #[msg("Not enough yield position.")]
+    InsufficientPosition,
 }

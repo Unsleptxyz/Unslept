@@ -41,6 +41,8 @@ pub fn initialize(ctx: Context<Initialize>, params: Params) -> Result<()> {
     c.bump = ctx.bumps.config;
     c.vault_bump = ctx.bumps.buffer_vault;
     c.share_mint_bump = ctx.bumps.share_mint;
+    c.yield_reserve = Pubkey::default();
+    c.yield_ctoken_mint = Pubkey::default();
     Ok(())
 }
 
@@ -119,5 +121,14 @@ pub struct SetPaused<'info> {
 /// Pausing blocks new deposits and payments. Withdrawals and debt repayment always stay open.
 pub fn set_paused(ctx: Context<SetPaused>, paused: bool) -> Result<()> {
     ctx.accounts.config.paused = paused;
+    Ok(())
+}
+
+/// Points agent yield positions at one Kamino reserve. Can only be set once, so existing positions never change venue.
+pub fn set_yield_reserve(ctx: Context<AdminOnly>, reserve: Pubkey, ctoken_mint: Pubkey) -> Result<()> {
+    let c = &mut ctx.accounts.config;
+    require!(c.yield_reserve == Pubkey::default(), UnsleptError::YieldReserveAlreadySet);
+    c.yield_reserve = reserve;
+    c.yield_ctoken_mint = ctoken_mint;
     Ok(())
 }

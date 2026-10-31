@@ -50,3 +50,18 @@ pub struct ParamsProposed {
 pub struct ParamsApplied {
     pub params: crate::state::Params,
 }
+
+#[event]
+pub struct YieldDeposited {
+    pub agent: Pubkey,
+    pub amount: u64,
+    pub ctokens: u64,
+}
+
+#[event]
+pub struct YieldRedeemed {
+    pub agent: Pubkey,
+    pub ctokens: u64,
+    pub received: u64,
+    pub repaid: u64,
+}

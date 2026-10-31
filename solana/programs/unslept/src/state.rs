@@ -7,6 +7,9 @@ pub const MAX_ALLOWLIST: usize = 8;
 pub const PAYMENT_RECORD_TTL: i64 = 24 * 60 * 60;
 /// Share of an agent's yield position that may back buffer debt.
 pub const COLLATERAL_BPS: u64 = 9_500;
+/// Kamino Lend program (same id on mainnet and devnet).
+pub const KLEND_PROGRAM_ID: Pubkey = pubkey!("KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD");
+pub const INSTRUCTIONS_SYSVAR_ID: Pubkey = pubkey!("Sysvar1nstructions1111111111111111111111111");
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default, InitSpace, PartialEq, Eq, Debug)]
 pub struct Params {
@@ -33,6 +36,10 @@ pub struct Config {
     pub bump: u8,
     pub vault_bump: u8,
     pub share_mint_bump: u8,
+    /// Kamino reserve that holds agent yield positions. Set once by the admin.
+    pub yield_reserve: Pubkey,
+    /// Collateral (cToken) mint of that reserve.
+    pub yield_ctoken_mint: Pubkey,
 }
 
 #[account]

@@ -38,6 +38,9 @@ pub mod unslept {
     pub fn set_paused(ctx: Context<SetPaused>, paused: bool) -> Result<()> {
         instructions::admin::set_paused(ctx, paused)
     }
+    pub fn set_yield_reserve(ctx: Context<AdminOnly>, reserve: Pubkey, ctoken_mint: Pubkey) -> Result<()> {
+        instructions::admin::set_yield_reserve(ctx, reserve, ctoken_mint)
+    }
 
     // Buffer
     pub fn buffer_deposit(ctx: Context<BufferAction>, assets: u64) -> Result<()> {
@@ -71,6 +74,14 @@ pub mod unslept {
     }
     pub fn repay_debt(ctx: Context<RepayDebt>) -> Result<()> {
         instructions::agent::repay_debt(ctx)
+    }
+
+    // Yield (Kamino)
+    pub fn yield_deposit(ctx: Context<YieldDeposit>, amount: u64) -> Result<()> {
+        instructions::kamino::yield_deposit(ctx, amount)
+    }
+    pub fn yield_redeem(ctx: Context<YieldRedeem>, ctokens: u64) -> Result<()> {
+        instructions::kamino::yield_redeem(ctx, ctokens)
     }
 
     // Payments
