@@ -1,66 +1,66 @@
-# Solana program test 2026-10-31T16:12:52Z
+# Solana program test 2026-10-31T16:18:15Z
 All program id declarations are synced.
 Please rebuild the program to update the generated artifacts.
 build exit 0
 [1m[92m   Compiling[0m spl-discriminator v0.5.2
+[1m[92m   Compiling[0m solana-epoch-schedule v3.4.0
 [1m[92m   Compiling[0m solana-slot-history v3.2.0
+[1m[92m   Compiling[0m solana-last-restart-slot v3.2.0
 [1m[92m   Compiling[0m solana-epoch-rewards v3.2.0
 [1m[92m   Compiling[0m solana-rent v3.1.0
-[1m[92m   Compiling[0m solana-epoch-schedule v3.4.0
-[1m[92m   Compiling[0m solana-last-restart-slot v3.2.0
 [1m[92m   Compiling[0m solana-slot-hashes v3.2.0
-[1m[92m   Compiling[0m solana-serialize-utils v3.1.2
 [1m[92m   Compiling[0m aho-corasick v1.1.5
+[1m[92m   Compiling[0m solana-serialize-utils v3.1.2
+[1m[92m   Compiling[0m regex-syntax v0.8.11
 [1m[92m   Compiling[0m unicode-segmentation v1.13.3
 [1m[92m   Compiling[0m bitflags v2.13.2
-[1m[92m   Compiling[0m regex-syntax v0.8.11
 [1m[92m   Compiling[0m solana-instructions-sysvar v3.0.1
 [1m[92m   Compiling[0m heck v0.3.3
 [1m[92m   Compiling[0m solana-sysvar v3.1.1
-[1m[92m   Compiling[0m anchor-lang-idl-spec v0.1.0
 [1m[92m   Compiling[0m regex-automata v0.4.18
+[1m[92m   Compiling[0m anchor-lang-idl-spec v0.1.0
+[1m[92m   Compiling[0m spl-pod v0.7.4
 [1m[92m   Compiling[0m solana-program-pack v3.1.0
 [1m[92m   Compiling[0m anchor-lang-idl v0.1.4
-[1m[92m   Compiling[0m spl-pod v0.7.4
 [1m[92m   Compiling[0m anchor-attribute-error v1.2.2
 [1m[92m   Compiling[0m spl-type-length-value v0.9.1
 [1m[92m   Compiling[0m solana-system-interface v2.0.0
 [1m[92m   Compiling[0m solana-system-interface v3.3.0
+[1m[92m   Compiling[0m regex v1.13.1
 [1m[92m   Compiling[0m solana-curve25519 v3.1.14
 [1m[92m   Compiling[0m solana-cpi v3.1.0
-[1m[92m   Compiling[0m regex v1.13.1
 [1m[92m   Compiling[0m solana-stable-layout v3.0.1
 [1m[92m   Compiling[0m solana-borsh v3.0.2
 [1m[92m   Compiling[0m serde_bytes v0.11.19
-[1m[92m   Compiling[0m arrayref v0.3.9
 [1m[92m   Compiling[0m keccak-const v0.2.0
-[1m[92m   Compiling[0m const-crypto v0.3.0
+[1m[92m   Compiling[0m arrayref v0.3.9
 [1m[92m   Compiling[0m solana-loader-v3-interface v6.1.1
+[1m[92m   Compiling[0m const-crypto v0.3.0
 [1m[92m   Compiling[0m spl-token-metadata-interface v0.8.0
-[1m[92m   Compiling[0m anchor-attribute-program v1.2.2
 [1m[92m   Compiling[0m solana-invoke v0.5.1
-[1m[92m   Compiling[0m spl-token-confidential-transfer-proof-extraction v0.5.1
 [1m[92m   Compiling[0m solana-stake-interface v2.0.2
+[1m[92m   Compiling[0m anchor-attribute-program v1.2.2
+[1m[92m   Compiling[0m spl-token-confidential-transfer-proof-extraction v0.5.1
 [1m[92m   Compiling[0m anchor-lang-error v1.2.2
 [1m[92m   Compiling[0m spl-token-confidential-transfer-proof-generation v0.5.1
-[1m[92m   Compiling[0m anchor-attribute-account v1.2.2
-[1m[92m   Compiling[0m anchor-attribute-constant v1.2.2
 [1m[92m   Compiling[0m anchor-derive-serde v1.2.2
 [1m[92m   Compiling[0m anchor-attribute-event v1.2.2
 [1m[92m   Compiling[0m anchor-derive-accounts v1.2.2
+[1m[92m   Compiling[0m anchor-attribute-account v1.2.2
+[1m[92m   Compiling[0m anchor-attribute-constant v1.2.2
 [1m[92m   Compiling[0m spl-token-group-interface v0.7.2
 [1m[92m   Compiling[0m solana-feature-gate-interface v3.1.0
-[1m[92m   Compiling[0m anchor-derive-space v1.2.2
 [1m[92m   Compiling[0m anchor-attribute-access-control v1.2.2
+[1m[92m   Compiling[0m anchor-derive-space v1.2.2
 [1m[92m   Compiling[0m base64 v0.21.7
 [1m[92m   Compiling[0m solana-define-syscall v3.0.0
 [1m[92m   Compiling[0m spl-token-2022-interface v2.1.0
 [1m[92m   Compiling[0m spl-token-interface v2.0.0
-[1m[92m   Compiling[0m spl-associated-token-account-interface v2.0.0
 [1m[92m   Compiling[0m anchor-lang v1.2.2
+[1m[92m   Compiling[0m spl-associated-token-account-interface v2.0.0
 [1m[92m   Compiling[0m anchor-spl v1.2.2
 [1m[92m   Compiling[0m unslept v0.1.0 (/home/runner/work/Unslept/Unslept/solana/programs/unslept)
-[1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 28.16s
+[1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 34.92s
 [1m[92m     Running[0m unittests src/lib.rs (/home/runner/work/Unslept/Unslept/solana/target/debug/deps/unslept-b10f48fe981526a6)
       --skip-local-validator
           Flag to skip starting a local validator, if the configured cluster url is a localnet
@@ -70,20 +70,83 @@ build exit 0
           - surfpool: Use Surfpool validator (default)
           - legacy:   Use Solana test validator
           [default: surfpool]
-Found a 'test' script in the Anchor.toml. Running it as a test suite!
-Running test suite: "/home/runner/work/Unslept/Unslept/solana/Anchor.toml"
- Exception during run: file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:2
-import { Program, BN } from "@anchor-lang/core";
-                  ^^
-SyntaxError: Named export 'BN' not found. The requested module '@anchor-lang/core' is a CommonJS module, which may not support all module.exports as named exports.
-CommonJS modules can always be imported via the default export, for example using:
-import pkg from '@anchor-lang/core';
-const { Program, BN } = pkg;
-    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
-    at ModuleJob.run (node:internal/modules/esm/module_job:335:5)
-    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
-    at formattedImport (/home/runner/work/Unslept/Unslept/solana/node_modules/mocha/lib/nodejs/esm-utils.js:9:14)
-    at Object.exports.requireOrImport (/home/runner/work/Unslept/Unslept/solana/node_modules/mocha/lib/nodejs/esm-utils.js:42:28)
-    at Object.exports.loadFilesAsync (/home/runner/work/Unslept/Unslept/solana/node_modules/mocha/lib/nodejs/esm-utils.js:100:20)
-    at singleRun (/home/runner/work/Unslept/Unslept/solana/node_modules/mocha/lib/cli/run-helpers.js:162:3)
-    at Object.exports.handler (/home/runner/work/Unslept/Unslept/solana/node_modules/mocha/lib/cli/run.js:375:5)
+    ✔ refuses deposits above the cap (806ms)
+    ✔ creates an agent account with a policy (405ms)
+    1) refuses a payment the agent cannot cover
+    2) settles a payment from the buffer and repays it from the agent in the same transaction
+    3) never accepts the same payment ID twice
+    4) enforces the per-call cap
+    5) enforces the daily cap
+    6) enforces the payee allowlist
+    7) only the agent signer can pay
+    8) pauses: payments stop, buffer withdrawals stay open
+    9) lets the owner withdraw and revoke
+    ✔ a stranger cannot change the agent policy
+  5 passing (10s)
+  9 failing
+  1) unslept
+       refuses a payment the agent cannot cover:
+     AssertionError: expected 'Simulation failed. \nMessage: Transac…' to include 'InsufficientCollateral'
+      at expectError (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:70:71)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:126:5)
+  2) unslept
+       settles a payment from the buffer and repays it from the agent in the same transaction:
+     Simulation failed. 
+Message: Transaction simulation failed: Error processing Instruction 0: Program failed to complete. 
+Logs: 
+[
+  "Program 3PY8mVRWkHpRkazD4mbgawUd6vz5iw5vYEnyAY2mrksj invoke [1]",
+  "Program log: Instruction: Pay",
+  "Program 3PY8mVRWkHpRkazD4mbgawUd6vz5iw5vYEnyAY2mrksj consumed 3138 of 200000 compute units",
+  "Program 3PY8mVRWkHpRkazD4mbgawUd6vz5iw5vYEnyAY2mrksj failed: Access violation in stack frame 5 at address 0x200005d60 of size 8"
+]. 
+Catch the `SendTransactionError` and call `getLogs()` on it for full details.
+  3) unslept
+       never accepts the same payment ID twice:
+     Simulation failed. 
+Message: Transaction simulation failed: Error processing Instruction 0: Program failed to complete. 
+Logs: 
+[
+  "Program 3PY8mVRWkHpRkazD4mbgawUd6vz5iw5vYEnyAY2mrksj invoke [1]",
+  "Program log: Instruction: Pay",
+  "Program 3PY8mVRWkHpRkazD4mbgawUd6vz5iw5vYEnyAY2mrksj consumed 3138 of 200000 compute units",
+  "Program 3PY8mVRWkHpRkazD4mbgawUd6vz5iw5vYEnyAY2mrksj failed: Access violation in stack frame 5 at address 0x200005d60 of size 8"
+]. 
+Catch the `SendTransactionError` and call `getLogs()` on it for full details.
+  4) unslept
+       enforces the per-call cap:
+     AssertionError: expected 'Simulation failed. \nMessage: Transac…' to include 'PerCallCapExceeded'
+      at expectError (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:70:71)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:160:5)
+  5) unslept
+       enforces the daily cap:
+     AssertionError: expected 'Simulation failed. \nMessage: Transac…' to include 'DailyCapExceeded'
+      at expectError (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:70:71)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:165:5)
+  6) unslept
+       enforces the payee allowlist:
+     AssertionError: expected 'Simulation failed. \nMessage: Transac…' to include 'PayeeNotAllowed'
+      at expectError (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:70:71)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:172:5)
+  7) unslept
+       only the agent signer can pay:
+     AssertionError: expected 'Simulation failed. \nMessage: Transac…' to include 'NotSigner'
+      at expectError (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:70:71)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:181:5)
+  8) unslept
+       pauses: payments stop, buffer withdrawals stay open:
+     AssertionError: expected 'Simulation failed. \nMessage: Transac…' to include 'ProtocolPaused'
+      at expectError (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:70:71)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:193:5)
+  9) unslept
+       lets the owner withdraw and revoke:
+     AssertionError: expected 'Simulation failed. \nMessage: Transac…' to include 'NotSigner'
+      at expectError (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:70:71)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts:208:5)
