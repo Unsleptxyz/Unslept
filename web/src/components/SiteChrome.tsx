@@ -6,9 +6,6 @@ export interface ChromeLinks {
   xUrl?: string;
 }
 
-export const DISCLAIMER =
-  "Unslept is experimental software in a guarded launch. Yields are variable and not guaranteed, and you can lose money. Tokenized assets may be unavailable in your jurisdiction. Nothing on this site is investment, legal or tax advice.";
-
 /** The U-moon mark: a U that is also a crescent moon, holding one coin. */
 export function Mark({ size = 28, tile = false }: { size?: number; tile?: boolean }) {
   return (
@@ -108,10 +105,6 @@ export function SiteFooter({ docsUrl, githubUrl, xUrl }: ChromeLinks) {
             <p className="site-footer__tagline">
               Idle agent money, kept working. x402 payments, settled the instant they are due.
             </p>
-            <p className="pill site-footer__status">
-              <span className="pill__dot" aria-hidden="true" />
-              Live on Robinhood Chain mainnet, guarded launch
-            </p>
           </div>
           <nav aria-label="Product" className="site-footer__col">
             <h2>Product</h2>
@@ -141,7 +134,6 @@ export function SiteFooter({ docsUrl, githubUrl, xUrl }: ChromeLinks) {
           Unslept
         </p>
         <div className="site-footer__bottom">
-          <p className="site-footer__disclaimer">{DISCLAIMER}</p>
           <p className="site-footer__copy">SDKs and MCP server released under the MIT license.</p>
         </div>
       </div>

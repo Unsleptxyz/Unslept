@@ -39,12 +39,6 @@ export function Hero({ docsUrl }: { docsUrl: string }) {
     <section className="hero" aria-labelledby="hero-title">
       <NightCity />
       <div className="hero__inner">
-        <a className="pill hero__pill" href="/risk">
-          <span className="pill__dot" aria-hidden="true" />
-          Live on Robinhood Chain mainnet
-          <span className="hero__pill-sep" aria-hidden="true" />
-          <span className="hero__pill-note">Guarded launch</span>
-        </a>
         <h1 id="hero-title" className="display hero__title">
           Your agent&apos;s money, <em>unslept.</em>
         </h1>
