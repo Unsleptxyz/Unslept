@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/Unsleptxyz/Unslept/security/advisories/new
+    about: Report security issues privately.
+  - name: Documentation
+    url: https://unslept-o29g.vercel.app/docs
+    about: Quickstarts, SDK reference and x402 details.
