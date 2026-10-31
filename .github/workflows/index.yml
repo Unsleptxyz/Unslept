@@ -14,5 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - run: curl -fsS --max-time 90 https://unslept.xyz/api/cron/index
-      - run: curl -fsS --max-time 90 https://unslept.xyz/api/cron/alerts
+      - run: curl -fsS --max-time 90 https://www.unslept.xyz/api/cron/index
+      - run: curl -fsS --max-time 90 https://www.unslept.xyz/api/cron/alerts

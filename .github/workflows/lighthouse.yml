@@ -6,7 +6,7 @@ on:
     inputs:
       base:
         description: "Site base URL"
-        default: "https://unslept.xyz"
+        default: "https://www.unslept.xyz"
 
 permissions:
   contents: write

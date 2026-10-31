@@ -12,7 +12,7 @@ license = { text = "MIT" }
 dependencies = []
 
 [project.urls]
-Homepage = "https://unslept.xyz/docs"
+Homepage = "https://www.unslept.xyz/docs"
 Source = "https://github.com/Unsleptxyz/Unslept"
 
 [project.optional-dependencies]
