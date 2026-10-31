@@ -1,20 +1,19 @@
-# Mainnet fork test 2026-10-31T09:22:24Z, block 102448115
+# Mainnet fork test 2026-10-31T09:26:14Z, block 102450245
 
 Ran 4 tests for test/fork/MainnetFork.t.sol:MainnetForkTest
-[FAIL: InsufficientCollateral(190190000 [1.901e8], 1000000 [1e6])] test_fork_bufferParksAndRefills() (block: 102448157) (gas: 1936698)
+[PASS] test_fork_bufferParksAndRefills() (gas: 2923385)
+Logs:
+  depositor shares: 1000000000000000
+  instantly redeemable shares: 398119773563259
+
 [PASS] test_fork_exactModeFundsSigner() (gas: 1324768)
-[FAIL: assertion failed: 40063622 !~= 39941001 (max delta: 3997, real delta: 122621)] test_fork_fullAgentFlow() (block: 102448157) (gas: 3271684)
+[PASS] test_fork_fullAgentFlow() (gas: 2844826)
+Logs:
+  owner received (atomic USDG): 40063623
+  spUSDG yield over 30 days (atomic USDG): 122622
+  fees paid (atomic USDG): 59999
+
 [PASS] test_fork_policyEnforcedOnMainnet() (gas: 1533066)
-Suite result: FAILED. 2 passed; 2 failed; 0 skipped; finished in 4.88s (7.35s CPU time)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 1.64s (2.56s CPU time)
 
-Ran 1 test suite in 4.89s (4.88s CPU time): 2 tests passed, 2 failed, 0 skipped (4 total tests)
-
-Failing tests:
-Encountered 2 failing tests in test/fork/MainnetFork.t.sol:MainnetForkTest
-[FAIL: InsufficientCollateral(190190000 [1.901e8], 1000000 [1e6])] test_fork_bufferParksAndRefills() (block: 102448157) (gas: 1936698)
-[FAIL: assertion failed: 40063622 !~= 39941001 (max delta: 3997, real delta: 122621)] test_fork_fullAgentFlow() (block: 102448157) (gas: 3271684)
-
-Encountered a total of 2 failing tests, 2 tests succeeded
-
-Tip: Run `forge test --rerun` to retry only the 2 failed tests
-Tip: Run `forge test --debug --match-test <TEST_NAME>` to inspect one failing test in the debugger
+Ran 1 test suite in 1.64s (1.64s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
