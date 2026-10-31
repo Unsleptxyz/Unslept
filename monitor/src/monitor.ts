@@ -256,6 +256,40 @@ export async function sendOps(cfg: MonitorConfig, alerts: Alert[], seen: Set<str
   return fresh;
 }
 
+/**
+ * Opens one GitHub issue per new alert (label "ops-alert"). GitHub notifies repository watchers by email and in
+ * the GitHub app. Deduped by alert key against all existing ops-alert issues, so a condition is reported once.
+ * Needs GITHUB_TOKEN (issues: write) and GITHUB_REPOSITORY, both provided by GitHub Actions.
+ */
+export async function sendGithubIssues(alerts: Alert[], env = process.env, f: typeof fetch = fetch): Promise<Alert[]> {
+  const token = env.GITHUB_TOKEN?.trim();
+  const repo = env.GITHUB_REPOSITORY?.trim();
+  if (!token || !repo || alerts.length === 0) return [];
+  const api = `https://api.github.com/repos/${repo}`;
+  const headers = { authorization: `Bearer ${token}`, accept: "application/vnd.github+json", "content-type": "application/json" };
+  const existing = new Set<string>();
+  for (let page = 1; page <= 5; page++) {
+    const r = await f(`${api}/issues?labels=ops-alert&state=all&per_page=100&page=${page}`, { headers });
+    if (!r.ok) throw new Error(`GitHub issues list answered ${r.status}`);
+    const items = (await r.json()) as { body?: string | null }[];
+    for (const it of items) {
+      const m = /^Alert key: `([^`]+)`/m.exec(it.body ?? "");
+      if (m) existing.add(m[1]);
+    }
+    if (items.length < 100) break;
+  }
+  const opened: Alert[] = [];
+  for (const a of alerts) {
+    if (existing.has(a.key)) continue;
+    const label = a.severity === "critical" ? "CRITICAL" : a.severity === "warning" ? "Warning" : "Info";
+    const title = `[${label}] ${a.text.split(". ")[0].slice(0, 120)}`;
+    const body = `${a.text}\n\nSeverity: ${a.severity}\nDetected: ${new Date().toISOString()}\n\nAlert key: \`${a.key}\`\n\nClose this issue once it is handled. The same condition is not reported again.`;
+    const r = await f(`${api}/issues`, { method: "POST", headers, body: JSON.stringify({ title, body, labels: ["ops-alert", a.severity] }) });
+    if (r.ok) opened.push(a);
+  }
+  return opened;
+}
+
 export function configFromEnv(env = process.env): MonitorConfig {
   const need = (k: string) => {
     const v = env[k]?.trim();
@@ -286,7 +320,15 @@ export function configFromEnv(env = process.env): MonitorConfig {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const cfg = configFromEnv();
   const alerts = await protocolChecks(cfg);
+  if (process.env.MONITOR_TEST_ALERT === "true") {
+    alerts.push({
+      key: `test:${new Date().toISOString().slice(0, 16)}`,
+      severity: "info",
+      text: "Test alert. Protocol monitoring is connected and alerts reach this repository. You can close this issue.",
+    });
+  }
   const fresh = await sendOps(cfg, alerts, new Set());
+  const issues = await sendGithubIssues(alerts);
   const sent = await userAlerts(cfg);
-  console.log(JSON.stringify({ protocolAlerts: fresh.length, userAlertsSent: sent }));
+  console.log(JSON.stringify({ protocolAlerts: alerts.length, webhookSent: fresh.length, issuesOpened: issues.length, userAlertsSent: sent }));
 }

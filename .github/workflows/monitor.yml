@@ -1,14 +1,21 @@
 name: monitor
 
 # Every 15 minutes: protocol health checks (pause, utilization, liquidity, stale price, timelock operations,
-# write-offs). Alerts go to OPS_WEBHOOK_URL (Slack or Discord compatible) when that secret is set.
+# write-offs). Each new alert opens a GitHub issue labelled "ops-alert" (GitHub notifies watchers by email and app),
+# and also goes to OPS_WEBHOOK_URL (Slack or Discord compatible) when that secret is set.
 on:
   schedule:
     - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
+    inputs:
+      test_alert:
+        description: "Send a test alert"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   monitor:
@@ -28,11 +35,14 @@ jobs:
           NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS: "0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b"
           NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS: "0xCa7D38A833BFaCBE22E787f967552A78b07C1c77"
           TIMELOCK_ADDRESS: "0x2A407119d55e5cca2D51Cacc78000D49FeEcE777"
-          MONITOR_ADAPTERS: ""
+          MONITOR_ADAPTERS: "0xAf7f74801C2b439831feef6D1b4d39B4Ce717B66"
+          ORACLE_MAX_STALENESS_SECONDS: "86400"
           WITHDRAW_QUEUE_THRESHOLD_BPS: "8000"
           OPS_MIN_AVAILABLE_USDG: "0"
           MONITOR_LOOKBACK_BLOCKS: "20000"
           OPS_WEBHOOK_URL: ${{ secrets.OPS_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MONITOR_TEST_ALERT: ${{ inputs.test_alert || 'false' }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node --import tsx src/monitor.ts
