@@ -1,11 +1,47 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { usePrivy } from "@privy-io/react-auth";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
-import { chain } from "@/lib/web3";
+import { chain, privyAppId } from "@/lib/web3";
 import { shortAddr } from "@/lib/format";
 
 export function ConnectButton() {
+  return privyAppId ? <PrivyConnectButton /> : <InjectedConnectButton />;
+}
+
+/** Connect through Privy: browser and mobile wallets, WalletConnect, or an email login with an embedded wallet. */
+function PrivyConnectButton() {
+  const { ready, authenticated, login, logout } = usePrivy();
+  const { address, isConnected } = useAccount();
+
+  if (ready && authenticated && isConnected) {
+    return (
+      <div className="wallet">
+        <span className="wallet__addr num" title={address}>
+          {shortAddr(address)}
+        </span>
+        <button type="button" className="btn btn--ghost btn--small" onClick={() => void logout()}>
+          Disconnect
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="wallet">
+      <button type="button" className="btn btn--primary btn--small" disabled={!ready || authenticated} onClick={() => login()}>
+        {!ready || authenticated ? "Connecting" : "Connect wallet"}
+      </button>
+      {ready && authenticated ? (
+        <button type="button" className="btn btn--ghost btn--small" onClick={() => void logout()}>
+          Cancel
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function InjectedConnectButton() {
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending, error } = useConnect();
   const { disconnect } = useDisconnect();
@@ -52,7 +88,11 @@ export function NetworkGuard({ children }: { children: ReactNode }) {
     return (
       <div className="app-empty">
         <h2>Connect a wallet to continue</h2>
-        <p>Unslept works with standard EVM wallets. Connect one to see your agents, buffer deposits and treasury.</p>
+        <p>
+          {privyAppId
+            ? "Connect a browser or mobile wallet, or continue with email, to see your agents, buffer deposits and treasury."
+            : "Unslept works with standard EVM wallets. Connect one to see your agents, buffer deposits and treasury."}
+        </p>
         <ConnectButton />
       </div>
     );

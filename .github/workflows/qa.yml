@@ -34,6 +34,8 @@ jobs:
       NEXT_PUBLIC_ADAPTER_ADDRESS: "0xAf7f74801C2b439831feef6D1b4d39B4Ce717B66"
       NEXT_PUBLIC_ASSET_VAULT_ADDRESS: "0xde770c84FE66E063336b31737cFE9790f18c4087"
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+      NEXT_PUBLIC_X_URL: https://x.com/Unsleptxyz
+      NEXT_PUBLIC_PRIVY_APP_ID: cmudyp5x100240ck2rd5rvkcd
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

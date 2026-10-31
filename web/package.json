@@ -22,7 +22,9 @@
     "@fontsource/ibm-plex-mono": "^5.1.0",
     "@fontsource/instrument-serif": "^5.1.0",
     "@fontsource/inter": "^5.1.0",
-    "three": "^0.170.0"
+    "three": "^0.170.0",
+    "@privy-io/react-auth": "^3.0.0",
+    "@privy-io/wagmi": "^2.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",

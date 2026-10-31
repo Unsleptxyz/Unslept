@@ -54,6 +54,11 @@ export default function PrivacyPage() {
             run and protect the service.
           </li>
           <li>
+            <strong>Wallet sign-in.</strong> The app connects wallets through Privy. Privy receives your wallet address, and
+            your email address if you choose to sign in with email, in order to connect you and, for email sign-in, to
+            create an embedded wallet for you. Privy handles this under its own privacy policy.
+          </li>
+          <li>
             <strong>Usage and performance metrics.</strong> We use Vercel Web Analytics and Speed Insights to count page
             views and measure page speed. They do not use cookies or advertising identifiers, and the data is aggregated so
             individual visitors are not identified.
@@ -76,6 +81,7 @@ export default function PrivacyPage() {
         <h2>Processors</h2>
         <ul>
           <li>Vercel hosts the website and its server functions, and provides the aggregated usage and speed metrics.</li>
+          <li>Privy handles wallet connection and email sign-in for the app.</li>
           <li>Supabase stores the waitlist, webhook settings, delivery records and indexed chain data.</li>
           <li>GitHub runs scheduled jobs and hosts the project&apos;s code.</li>
         </ul>
