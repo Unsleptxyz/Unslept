@@ -1,17 +1,7 @@
 whoami: unslept
 == @unslept/sdk@0.1.0
-with provenance failed:
-npm notice 634B dist/errors.d.ts
-npm notice 633B dist/errors.js
-npm error code E422
-npm error 422 Unprocessable Entity - PUT https://registry.npmjs.org/@unslept%2fsdk - Error verifying sigstore provenance bundle: Unsupported GitHub Actions source repository visibility: "private". Only public source repositories are supported when publishing with provenance.
-npm error A complete log of this run can be found in: /home/runner/.npm/_logs/2026-10-31T09_01_37_899Z-debug-0.log
-published (without provenance)
+already published
 == @unslept/mcp@0.1.0
-with provenance failed:
-npm warn publish npm auto-corrected some errors in your package.json when publishing.  Please run "npm pkg fix" to address these errors.
-npm warn publish errors corrected:
-npm error code E422
-npm error 422 Unprocessable Entity - PUT https://registry.npmjs.org/@unslept%2fmcp - Error verifying sigstore provenance bundle: Unsupported GitHub Actions source repository visibility: "private". Only public source repositories are supported when publishing with provenance.
-npm error A complete log of this run can be found in: /home/runner/.npm/_logs/2026-10-31T09_01_41_989Z-debug-0.log
-published (without provenance)
+already published
+== @unslept/pay@0.1.0
+published (with provenance)
