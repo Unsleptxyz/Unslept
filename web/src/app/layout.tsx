@@ -52,6 +52,10 @@ export const viewport: Viewport = {
 /** Marks the document as JavaScript-enabled before paint, so progressive enhancements never flash. */
 const bootstrap = `document.documentElement.classList.add('js');`;
 
+/** Vercel Web Analytics and Speed Insights, cookieless. Loaded after the page is idle and only on Vercel builds. */
+const onVercel = process.env.VERCEL === "1";
+const metricsQueue = `window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.si=window.si||function(){(window.siq=window.siq||[]).push(arguments)};`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${instrument.variable} ${inter.variable} ${plexMono.variable}`} suppressHydrationWarning>
@@ -60,6 +64,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {bootstrap}
         </Script>
         {children}
+        {onVercel ? (
+          <>
+            <Script id="vercel-metrics" strategy="afterInteractive">
+              {metricsQueue}
+            </Script>
+            <Script src="/_vercel/insights/script.js" strategy="lazyOnload" />
+            <Script src="/_vercel/speed-insights/script.js" strategy="lazyOnload" />
+          </>
+        ) : null}
       </body>
     </html>
   );

@@ -53,6 +53,11 @@ export default function PrivacyPage() {
             <strong>Server logs.</strong> Our hosting provider keeps short-lived request logs, which include IP addresses, to
             run and protect the service.
           </li>
+          <li>
+            <strong>Usage and performance metrics.</strong> We use Vercel Web Analytics and Speed Insights to count page
+            views and measure page speed. They do not use cookies or advertising identifiers, and the data is aggregated so
+            individual visitors are not identified.
+          </li>
         </ul>
 
         <h2>What we do not collect</h2>
@@ -70,7 +75,7 @@ export default function PrivacyPage() {
 
         <h2>Processors</h2>
         <ul>
-          <li>Vercel hosts the website and its server functions.</li>
+          <li>Vercel hosts the website and its server functions, and provides the aggregated usage and speed metrics.</li>
           <li>Supabase stores the waitlist, webhook settings, delivery records and indexed chain data.</li>
           <li>GitHub runs scheduled jobs and hosts the project&apos;s code.</li>
         </ul>
