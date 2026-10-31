@@ -10,15 +10,15 @@ pub struct BufferAction<'info> {
     #[account(mut)]
     pub depositor: Signer<'info>,
     #[account(mut, seeds = [b"config"], bump = config.bump)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
     #[account(mut, seeds = [b"buffer_vault"], bump = config.vault_bump)]
-    pub buffer_vault: Account<'info, TokenAccount>,
+    pub buffer_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut, seeds = [b"share_mint"], bump = config.share_mint_bump)]
-    pub share_mint: Account<'info, Mint>,
+    pub share_mint: Box<Account<'info, Mint>>,
     #[account(mut, token::mint = config.usdc_mint, token::authority = depositor)]
-    pub depositor_usdc: Account<'info, TokenAccount>,
+    pub depositor_usdc: Box<Account<'info, TokenAccount>>,
     #[account(mut, token::mint = share_mint, token::authority = depositor)]
-    pub depositor_shares: Account<'info, TokenAccount>,
+    pub depositor_shares: Box<Account<'info, TokenAccount>>,
     pub token_program: Program<'info, Token>,
 }
 

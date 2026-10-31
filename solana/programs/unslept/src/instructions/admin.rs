@@ -9,19 +9,19 @@ use crate::state::*;
 pub struct Initialize<'info> {
     #[account(mut)]
     pub admin: Signer<'info>,
-    pub usdc_mint: Account<'info, Mint>,
+    pub usdc_mint: Box<Account<'info, Mint>>,
     #[account(init, payer = admin, space = 8 + Config::INIT_SPACE, seeds = [b"config"], bump)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
     #[account(
         init, payer = admin, seeds = [b"buffer_vault"], bump,
         token::mint = usdc_mint, token::authority = config,
     )]
-    pub buffer_vault: Account<'info, TokenAccount>,
+    pub buffer_vault: Box<Account<'info, TokenAccount>>,
     #[account(
         init, payer = admin, seeds = [b"share_mint"], bump,
         mint::decimals = usdc_mint.decimals, mint::authority = config,
     )]
-    pub share_mint: Account<'info, Mint>,
+    pub share_mint: Box<Account<'info, Mint>>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -48,7 +48,7 @@ pub fn initialize(ctx: Context<Initialize>, params: Params) -> Result<()> {
 pub struct AdminOnly<'info> {
     pub admin: Signer<'info>,
     #[account(mut, seeds = [b"config"], bump = config.bump, has_one = admin @ UnsleptError::NotAdmin)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
 }
 
 /// Parameter changes wait 24 hours, so depositors and agents can react before they apply.
@@ -77,7 +77,7 @@ pub fn propose_admin(ctx: Context<AdminOnly>, new_admin: Pubkey) -> Result<()> {
 #[derive(Accounts)]
 pub struct ApplyParams<'info> {
     #[account(mut, seeds = [b"config"], bump = config.bump)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
 }
 
 /// Anyone can apply a pending change once its delay has passed.
@@ -96,7 +96,7 @@ pub fn apply_params(ctx: Context<ApplyParams>) -> Result<()> {
 pub struct AcceptAdmin<'info> {
     pub new_admin: Signer<'info>,
     #[account(mut, seeds = [b"config"], bump = config.bump, constraint = config.pending_admin == new_admin.key() @ UnsleptError::NotAdmin)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
 }
 
 pub fn accept_admin(ctx: Context<AcceptAdmin>) -> Result<()> {
@@ -113,7 +113,7 @@ pub struct SetPaused<'info> {
         mut, seeds = [b"config"], bump = config.bump,
         constraint = authority.key() == config.admin || authority.key() == config.params.pauser @ UnsleptError::NotPauser,
     )]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
 }
 
 /// Pausing blocks new deposits and payments. Withdrawals and debt repayment always stay open.

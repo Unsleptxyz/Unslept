@@ -11,19 +11,19 @@ pub struct CreateAgent<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
     #[account(seeds = [b"config"], bump = config.bump)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
     #[account(address = config.usdc_mint @ UnsleptError::WrongMint)]
-    pub usdc_mint: Account<'info, Mint>,
+    pub usdc_mint: Box<Account<'info, Mint>>,
     #[account(
         init, payer = owner, space = 8 + Agent::INIT_SPACE,
         seeds = [b"agent", owner.key().as_ref(), &agent_id.to_le_bytes()], bump,
     )]
-    pub agent: Account<'info, Agent>,
+    pub agent: Box<Account<'info, Agent>>,
     #[account(
         init, payer = owner, seeds = [b"agent_vault", agent.key().as_ref()], bump,
         token::mint = usdc_mint, token::authority = agent,
     )]
-    pub agent_vault: Account<'info, TokenAccount>,
+    pub agent_vault: Box<Account<'info, TokenAccount>>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -55,7 +55,7 @@ pub fn create_agent(ctx: Context<CreateAgent>, agent_id: u64, signer: Pubkey, pe
 pub struct OwnerOnly<'info> {
     pub owner: Signer<'info>,
     #[account(mut, has_one = owner @ UnsleptError::NotOwner)]
-    pub agent: Account<'info, Agent>,
+    pub agent: Box<Account<'info, Agent>>,
 }
 
 pub fn set_policy(ctx: Context<OwnerOnly>, per_call_cap: u64, daily_cap: u64) -> Result<()> {
@@ -99,11 +99,11 @@ pub fn set_allowlist(ctx: Context<OwnerOnly>, payees: Vec<Pubkey>) -> Result<()>
 pub struct AgentWithdraw<'info> {
     pub owner: Signer<'info>,
     #[account(mut, has_one = owner @ UnsleptError::NotOwner)]
-    pub agent: Account<'info, Agent>,
+    pub agent: Box<Account<'info, Agent>>,
     #[account(mut, seeds = [b"agent_vault", agent.key().as_ref()], bump = agent.vault_bump)]
-    pub agent_vault: Account<'info, TokenAccount>,
+    pub agent_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut, token::mint = agent_vault.mint)]
-    pub destination: Account<'info, TokenAccount>,
+    pub destination: Box<Account<'info, TokenAccount>>,
     pub token_program: Program<'info, Token>,
 }
 
@@ -127,13 +127,13 @@ pub fn agent_withdraw(ctx: Context<AgentWithdraw>, amount: u64) -> Result<()> {
 #[derive(Accounts)]
 pub struct RepayDebt<'info> {
     #[account(mut, seeds = [b"config"], bump = config.bump)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
     #[account(mut)]
-    pub agent: Account<'info, Agent>,
+    pub agent: Box<Account<'info, Agent>>,
     #[account(mut, seeds = [b"agent_vault", agent.key().as_ref()], bump = agent.vault_bump)]
-    pub agent_vault: Account<'info, TokenAccount>,
+    pub agent_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut, seeds = [b"buffer_vault"], bump = config.vault_bump)]
-    pub buffer_vault: Account<'info, TokenAccount>,
+    pub buffer_vault: Box<Account<'info, TokenAccount>>,
     pub token_program: Program<'info, Token>,
 }
 

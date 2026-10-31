@@ -39,22 +39,22 @@ pub struct Pay<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
     #[account(mut, seeds = [b"config"], bump = config.bump)]
-    pub config: Account<'info, Config>,
+    pub config: Box<Account<'info, Config>>,
     #[account(mut, constraint = agent.signer == signer.key() @ UnsleptError::NotSigner)]
-    pub agent: Account<'info, Agent>,
+    pub agent: Box<Account<'info, Agent>>,
     #[account(mut, seeds = [b"agent_vault", agent.key().as_ref()], bump = agent.vault_bump)]
-    pub agent_vault: Account<'info, TokenAccount>,
+    pub agent_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut, seeds = [b"buffer_vault"], bump = config.vault_bump)]
-    pub buffer_vault: Account<'info, TokenAccount>,
+    pub buffer_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut, address = config.params.treasury, token::mint = config.usdc_mint)]
-    pub treasury: Account<'info, TokenAccount>,
+    pub treasury: Box<Account<'info, TokenAccount>>,
     #[account(mut, token::mint = config.usdc_mint)]
-    pub payee_token: Account<'info, TokenAccount>,
+    pub payee_token: Box<Account<'info, TokenAccount>>,
     #[account(
         init, payer = signer, space = 8 + Payment::INIT_SPACE,
         seeds = [b"payment", payment_id.as_ref()], bump,
     )]
-    pub payment: Account<'info, Payment>,
+    pub payment: Box<Account<'info, Payment>>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
 }
@@ -146,7 +146,7 @@ pub struct ClosePayment<'info> {
     #[account(mut, address = payment.rent_payer)]
     pub rent_payer: UncheckedAccount<'info>,
     #[account(mut, close = rent_payer)]
-    pub payment: Account<'info, Payment>,
+    pub payment: Box<Account<'info, Payment>>,
 }
 
 /// Anyone can close a payment record 24 hours after settlement; the rent returns to whoever paid it.
