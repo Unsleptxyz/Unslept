@@ -115,7 +115,7 @@ pub fn agent_withdraw(ctx: Context<AgentWithdraw>, amount: u64) -> Result<()> {
     let id = a.agent.agent_id.to_le_bytes();
     let seeds: &[&[u8]] = &[b"agent", a.agent.owner.as_ref(), &id, &[a.agent.bump]];
     token::transfer(
-        CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {
+        CpiContext::new_with_signer(a.token_program.key(), Transfer {
             from: a.agent_vault.to_account_info(),
             to: a.destination.to_account_info(),
             authority: a.agent.to_account_info(),

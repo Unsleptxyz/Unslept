@@ -21,7 +21,7 @@ pub fn repay_from_vault<'info>(
     let id = agent.agent_id.to_le_bytes();
     let seeds: &[&[u8]] = &[b"agent", agent.owner.as_ref(), &id, &[agent.bump]];
     token::transfer(
-        CpiContext::new_with_signer(token_program.to_account_info(), Transfer {
+        CpiContext::new_with_signer(token_program.key(), Transfer {
             from: agent_vault.to_account_info(),
             to: buffer_vault.to_account_info(),
             authority: agent.to_account_info(),
@@ -83,7 +83,7 @@ pub fn pay(ctx: Context<Pay>, payment_id: [u8; 32], amount: u64, endpoint_hash: 
     // 1. The buffer pays the merchant.
     let cseeds: &[&[u8]] = &[b"config", &[a.config.bump]];
     token::transfer(
-        CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {
+        CpiContext::new_with_signer(a.token_program.key(), Transfer {
             from: a.buffer_vault.to_account_info(),
             to: a.payee_token.to_account_info(),
             authority: a.config.to_account_info(),
@@ -98,7 +98,7 @@ pub fn pay(ctx: Context<Pay>, payment_id: [u8; 32], amount: u64, endpoint_hash: 
         let id = a.agent.agent_id.to_le_bytes();
         let aseeds: &[&[u8]] = &[b"agent", a.agent.owner.as_ref(), &id, &[a.agent.bump]];
         token::transfer(
-            CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {
+            CpiContext::new_with_signer(a.token_program.key(), Transfer {
                 from: a.agent_vault.to_account_info(),
                 to: a.treasury.to_account_info(),
                 authority: a.agent.to_account_info(),

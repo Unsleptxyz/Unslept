@@ -44,7 +44,7 @@ pub fn deposit(ctx: Context<BufferAction>, assets: u64) -> Result<()> {
     require!(shares > 0, UnsleptError::ZeroAmount);
 
     token::transfer(
-        CpiContext::new(a.token_program.to_account_info(), Transfer {
+        CpiContext::new(a.token_program.key(), Transfer {
             from: a.depositor_usdc.to_account_info(),
             to: a.buffer_vault.to_account_info(),
             authority: a.depositor.to_account_info(),
@@ -53,7 +53,7 @@ pub fn deposit(ctx: Context<BufferAction>, assets: u64) -> Result<()> {
     )?;
     let seeds: &[&[u8]] = &[b"config", &[a.config.bump]];
     token::mint_to(
-        CpiContext::new_with_signer(a.token_program.to_account_info(), MintTo {
+        CpiContext::new_with_signer(a.token_program.key(), MintTo {
             mint: a.share_mint.to_account_info(),
             to: a.depositor_shares.to_account_info(),
             authority: a.config.to_account_info(),
@@ -74,7 +74,7 @@ pub fn withdraw(ctx: Context<BufferAction>, shares: u64) -> Result<()> {
     require!(assets <= a.buffer_vault.amount, UnsleptError::InsufficientLiquidity);
 
     token::burn(
-        CpiContext::new(a.token_program.to_account_info(), Burn {
+        CpiContext::new(a.token_program.key(), Burn {
             mint: a.share_mint.to_account_info(),
             from: a.depositor_shares.to_account_info(),
             authority: a.depositor.to_account_info(),
@@ -83,7 +83,7 @@ pub fn withdraw(ctx: Context<BufferAction>, shares: u64) -> Result<()> {
     )?;
     let seeds: &[&[u8]] = &[b"config", &[a.config.bump]];
     token::transfer(
-        CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {
+        CpiContext::new_with_signer(a.token_program.key(), Transfer {
             from: a.buffer_vault.to_account_info(),
             to: a.depositor_usdc.to_account_info(),
             authority: a.config.to_account_info(),
