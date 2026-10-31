@@ -236,7 +236,6 @@ function FlowDiagram() {
         <path id="e1" d="M170 110 H330" />
         <path id="e2" d="M470 110 H630" />
         <path id="e3" d="M770 110 H860" />
-        <path id="e4" d="M560 60 C 560 30, 400 30, 400 60" />
         <path id="e5" d="M400 160 C 400 200, 700 200, 700 160" className="flow__edge--slow" />
       </g>
       <g className="flow__pulses">

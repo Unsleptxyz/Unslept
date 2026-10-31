@@ -23,7 +23,7 @@
 }
 .site-header[data-scrolled="true"],
 .site-header:not([data-scrolled]) {
-  background: rgba(5, 8, 26, 0.72);
+  background: rgba(5, 8, 26, 0.88);
   backdrop-filter: var(--blur);
   -webkit-backdrop-filter: var(--blur);
   border-bottom-color: var(--line);
@@ -170,7 +170,7 @@
 
 .site-footer {
   position: relative;
-  margin-top: var(--section);
+  margin-top: calc(var(--section) * 0.4);
   border-top: 1px solid var(--line);
   background: linear-gradient(180deg, transparent, rgba(12, 19, 45, 0.6));
   overflow: hidden;
@@ -196,6 +196,7 @@
 }
 .site-footer__status {
   justify-self: start;
+  white-space: nowrap;
 }
 .site-footer__col {
   display: grid;
@@ -428,12 +429,17 @@ a.footer-link:hover {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(70% 55% at 75% 30%, rgba(40, 58, 130, 0.35), transparent 70%),
-    linear-gradient(180deg, #060a1f 0%, #0a1230 55%, #05081a 100%);
-  transition: opacity 1600ms var(--ease-out);
+    radial-gradient(60% 40% at 70% 62%, rgba(60, 82, 180, 0.32), transparent 70%),
+    radial-gradient(40% 30% at 85% 70%, rgba(242, 169, 59, 0.1), transparent 70%),
+    linear-gradient(180deg, #04071a 0%, #0a1232 58%, #05081a 100%);
 }
-.nightcity[data-ready="true"] .nightcity__poster {
+.nightcity[data-ready="true"] .nightcity__skyline,
+.nightcity[data-ready="true"] .nightcity__moon {
   opacity: 0;
+}
+.nightcity__skyline,
+.nightcity__moon {
+  transition: opacity 1600ms var(--ease-out);
 }
 .nightcity__moon {
   position: absolute;
@@ -648,7 +654,11 @@ a.footer-link:hover {
 }
 .flow__svg {
   width: 100%;
+  min-width: 640px;
   height: auto;
+}
+.flow {
+  overflow-x: auto;
 }
 .flow__edges path {
   fill: none;
@@ -933,6 +943,13 @@ a.footer-link:hover {
   gap: clamp(2rem, 1rem + 4vw, 4.5rem);
   align-items: start;
 }
+.problem__grid > *,
+.clock__grid > *,
+.developers__grid > *,
+.faq__grid > *,
+.closing__panel > * {
+  min-width: 0;
+}
 .developers__intro .section-head {
   margin-bottom: 2rem;
 }
@@ -1059,7 +1076,7 @@ a.footer-link:hover {
   display: inline-block;
   width: 0.55rem;
   height: 0.55rem;
-  margin-right: 0.55rem;
+  margin-right: 2.9rem;
   border-radius: 50%;
   background: var(--lamp);
   box-shadow:

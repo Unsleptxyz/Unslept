@@ -75,6 +75,14 @@
 .prose li {
   max-width: var(--measure);
 }
+.prose > *,
+.prose li,
+.steps__item,
+.steps__body,
+.steps__body > *,
+.docs__body > * {
+  min-width: 0;
+}
 
 /* Blocks */
 .callout {

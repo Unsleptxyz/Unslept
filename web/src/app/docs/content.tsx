@@ -63,7 +63,7 @@ export const docs: DocPage[] = [
         </p>
         <h2>The problem</h2>
         <p>
-          Agents increasingly pay for what they use, one request at a time, through the x402 standard: an API answers
+          Agents increasingly pay for what they use, one request at a time, through the x402 standard: an API answers{" "}
           <code>402 Payment Required</code> with a price, the agent pays, and the request goes through. To do that, an agent
           has to keep a balance on hand. Most of the time that balance is simply waiting, often for hours between two
           payments, and it earns nothing while it waits.

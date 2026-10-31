@@ -136,9 +136,9 @@ const buildingFragment = /* glsl */ `
 `;
 
 export function startCity(canvas: HTMLCanvasElement, opts: CityOptions): () => void {
-  const renderer = new WebGLRenderer({ canvas, antialias: !opts.lowPower, alpha: false, powerPreference: "high-performance" });
+  const renderer = new WebGLRenderer({ canvas, antialias: !opts.lowPower, alpha: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, opts.lowPower ? 1 : 1.75));
-  renderer.setClearColor(NIGHT, 1);
+  renderer.setClearColor(NIGHT, 0); // the CSS sky gradient shows through
 
   const scene = new Scene();
   scene.fog = new Fog(NIGHT, 30, 110);
@@ -237,20 +237,6 @@ export function startCity(canvas: HTMLCanvasElement, opts: CityOptions): () => v
   moon.position.set(-58, 62, -150);
   moon.scale.set(46, 46, 1);
   scene.add(moon);
-
-  // A low horizon glow so the skyline reads against the sky.
-  const horizon = new Sprite(
-    new SpriteMaterial({ map: glowTexture("rgba(70,92,190,0.55)", "rgba(40,56,140,0.22)"), transparent: true, depthWrite: false, fog: false }),
-  );
-  horizon.position.set(0, 6, -95);
-  horizon.scale.set(260, 70, 1);
-  scene.add(horizon);
-  const ember = new Sprite(
-    new SpriteMaterial({ map: glowTexture("rgba(242,169,59,0.35)", "rgba(242,169,59,0.08)"), transparent: true, depthWrite: false, fog: false, blending: AdditiveBlending }),
-  );
-  ember.position.set(18, 2, -70);
-  ember.scale.set(120, 30, 1);
-  scene.add(ember);
 
   // Payment streams
   const tops = positions.filter((p) => p.h > 6);
