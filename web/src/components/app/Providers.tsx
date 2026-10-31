@@ -1,17 +1,23 @@
 "use client";
 
 import { PrivyProvider } from "@privy-io/react-auth";
-import { WagmiProvider as PrivyWagmiProvider } from "@privy-io/wagmi";
+import { createConfig as createPrivyConfig, WagmiProvider as PrivyWagmiProvider } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { WagmiProvider } from "wagmi";
-import { chain, privyAppId, wagmiConfig } from "@/lib/web3";
+import { http, WagmiProvider } from "wagmi";
+import { chain, privyAppId, rpcUrl, wagmiConfig } from "@/lib/web3";
+
+/** wagmi config for the Privy path. Built here so server code that imports web3.ts never loads Privy. */
+const privyWagmiConfig =
+  chain && privyAppId
+    ? createPrivyConfig({ chains: [chain], transports: { [chain.id]: http(rpcUrl) }, ssr: true })
+    : undefined;
 
 export function Providers({ children }: { children: ReactNode }) {
   const [qc] = useState(() => new QueryClient({ defaultOptions: { queries: { refetchInterval: 15_000, staleTime: 5_000 } } }));
   if (!wagmiConfig || !chain) return <>{children}</>;
 
-  if (privyAppId) {
+  if (privyAppId && privyWagmiConfig) {
     return (
       <PrivyProvider
         appId={privyAppId}
@@ -30,7 +36,7 @@ export function Providers({ children }: { children: ReactNode }) {
         }}
       >
         <QueryClientProvider client={qc}>
-          <PrivyWagmiProvider config={wagmiConfig}>{children}</PrivyWagmiProvider>
+          <PrivyWagmiProvider config={privyWagmiConfig}>{children}</PrivyWagmiProvider>
         </QueryClientProvider>
       </PrivyProvider>
     );

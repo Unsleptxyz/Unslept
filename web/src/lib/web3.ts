@@ -1,5 +1,4 @@
 import { createConfig, http } from "wagmi";
-import { createConfig as createPrivyConfig } from "@privy-io/wagmi";
 import { injected } from "@wagmi/core";
 import { defineChain, type Abi } from "viem";
 import agentAccountAbi from "@/abi/AgentAccount.json";
@@ -81,19 +80,16 @@ export const abis = {
 /** Privy app ID (public). When set, wallets connect through Privy; otherwise through the injected browser wallet. */
 export const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || undefined;
 
+export const rpcUrl = env.rpcUrl;
+
+/** Plain wagmi config with the injected browser wallet. Used when Privy is not configured. */
 export const wagmiConfig = chain
-  ? privyAppId
-    ? createPrivyConfig({
-        chains: [chain],
-        transports: { [chain.id]: http(env.rpcUrl) },
-        ssr: true,
-      })
-    : createConfig({
-        chains: [chain],
-        connectors: [injected()],
-        transports: { [chain.id]: http(env.rpcUrl) },
-        ssr: true,
-      })
+  ? createConfig({
+      chains: [chain],
+      connectors: [injected()],
+      transports: { [chain.id]: http(env.rpcUrl) },
+      ssr: true,
+    })
   : undefined;
 
 export function txUrl(hash: string): string | undefined {
