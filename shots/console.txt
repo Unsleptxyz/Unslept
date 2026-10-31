@@ -1,0 +1,8 @@
+desktop_home: HTTP 200
+desktop_directory: HTTP 200
+desktop_pay: HTTP 200
+desktop_templates: HTTP 200
+mobile_home: HTTP 200
+mobile_directory: HTTP 200
+mobile_pay: HTTP 200
+mobile_templates: HTTP 200

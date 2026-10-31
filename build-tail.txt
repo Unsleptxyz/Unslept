@@ -1,0 +1,143 @@
+
+> unslept-web@0.1.0 build
+> next build
+
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+   ▲ Next.js 15.5.28
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings in 54s
+
+./node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+Module not found: Can't resolve '@react-native-async-storage/async-storage' in '/home/runner/work/Unslept/Unslept/web/node_modules/@metamask/sdk/dist/browser/es'
+
+Import trace for requested module:
+./node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+./node_modules/@wagmi/connectors/dist/esm/metaMask.js
+./node_modules/@wagmi/connectors/dist/esm/exports/index.js
+./node_modules/wagmi/dist/esm/exports/connectors.js
+./node_modules/@privy-io/wagmi/dist/esm/index.mjs
+./src/components/app/Providers.tsx
+
+./node_modules/@privy-io/react-auth/dist/esm/index-CaWn8tEz.mjs
+Module not found: Can't resolve '@farcaster/mini-app-solana' in '/home/runner/work/Unslept/Unslept/web/node_modules/@privy-io/react-auth/dist/esm'
+
+Import trace for requested module:
+./node_modules/@privy-io/react-auth/dist/esm/index-CaWn8tEz.mjs
+./node_modules/@privy-io/react-auth/dist/esm/index.mjs
+./src/components/app/Providers.tsx
+
+./node_modules/viem/node_modules/ox/_esm/tempo/internal/virtualMasterPool.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/viem/node_modules/ox/_esm/tempo/internal/virtualMasterPool.js
+./node_modules/viem/node_modules/ox/_esm/tempo/VirtualMaster.js
+./node_modules/viem/node_modules/ox/_esm/tempo/index.js
+./node_modules/viem/_esm/tempo/chainConfig.js
+./node_modules/viem/_esm/chains/definitions/tempo.js
+./node_modules/viem/_esm/chains/index.js
+./node_modules/x402/dist/esm/chunk-3EQVFRKV.mjs
+./node_modules/x402/dist/esm/client/index.mjs
+./node_modules/@privy-io/react-auth/dist/esm/index-CaWn8tEz.mjs
+./node_modules/@privy-io/react-auth/dist/esm/index.mjs
+./src/components/app/Providers.tsx
+
+./node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+Module not found: Can't resolve '@react-native-async-storage/async-storage' in '/home/runner/work/Unslept/Unslept/web/node_modules/@metamask/sdk/dist/browser/es'
+
+Import trace for requested module:
+./node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+./node_modules/@wagmi/connectors/dist/esm/metaMask.js
+./node_modules/@wagmi/connectors/dist/esm/exports/index.js
+./node_modules/wagmi/dist/esm/exports/connectors.js
+./node_modules/@privy-io/wagmi/dist/esm/index.mjs
+./src/components/app/Providers.tsx
+
+./node_modules/viem/node_modules/ox/_esm/tempo/internal/virtualMasterPool.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/viem/node_modules/ox/_esm/tempo/internal/virtualMasterPool.js
+./node_modules/viem/node_modules/ox/_esm/tempo/VirtualMaster.js
+./node_modules/viem/node_modules/ox/_esm/tempo/index.js
+./node_modules/viem/_esm/tempo/chainConfig.js
+./node_modules/viem/_esm/chains/definitions/tempoDevnet.js
+./node_modules/viem/_esm/chains/index.js
+./node_modules/x402/dist/esm/chunk-3EQVFRKV.mjs
+./node_modules/x402/dist/esm/client/index.mjs
+./node_modules/@privy-io/react-auth/dist/esm/index-CaWn8tEz.mjs
+./node_modules/@privy-io/react-auth/dist/esm/index.mjs
+./src/components/app/Providers.tsx
+
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/50) ...
+   Generating static pages (12/50) 
+   Generating static pages (24/50) 
+   Generating static pages (37/50) 
+ ✓ Generating static pages (50/50)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS  Revalidate  Expire
+┌ ○ /                                    1.21 kB         110 kB         30s      1y
+├ ○ /_not-found                            154 B         105 kB
+├ ƒ /api/alerts                            455 B         224 kB
+├ ƒ /api/cron/alerts                       455 B         224 kB
+├ ƒ /api/cron/index                        455 B         224 kB
+├ ƒ /api/demo/x402                         455 B         224 kB
+├ ○ /api/directory                         455 B         224 kB          1m      1y
+├ ƒ /api/directory/submit                  455 B         224 kB
+├ ƒ /api/eligibility                       154 B         105 kB
+├ ○ /api/feed                              154 B         105 kB         15s      1y
+├ ○ /api/stats                             154 B         105 kB         30s      1y
+├ ƒ /api/waitlist                          154 B         105 kB
+├ ƒ /api/webhooks                          154 B         105 kB
+├ ○ /app                                   178 B         224 kB
+├ ○ /app/agents                            187 B         234 kB
+├ ○ /app/buffer                          5.33 kB         230 kB
+├ ○ /app/developers                      5.93 kB         231 kB
+├ ○ /app/settings                        1.46 kB         117 kB
+├ ○ /app/treasury                          826 B         234 kB
+├ ○ /apple-icon                            154 B         105 kB
+├ ○ /developers                            204 B         109 kB
+├ ○ /directory                           3.53 kB         227 kB          1m      1y
+├ ○ /docs                                1.84 kB         107 kB
+├ ● /docs/[slug]                         1.84 kB         107 kB
+├   ├ /docs/quickstart
+├   ├ /docs/concepts
+├   ├ /docs/quickstart-typescript
+├   └ [+11 more paths]
+├ ○ /how-it-works                          204 B         109 kB
+├ ○ /icon.svg                                0 B            0 B
+├ ○ /opengraph-image                       154 B         105 kB
+├ ○ /pay                                 2.17 kB         107 kB
+├ ○ /privacy                             1.85 kB         107 kB
+├ ○ /risk                                1.85 kB         107 kB
+├ ○ /security                              204 B         109 kB
+├ ○ /templates                           1.61 kB         106 kB
+├ ○ /terms                               1.85 kB         107 kB
+├ ○ /token                                 204 B         109 kB          1m      1y
+├ ○ /twitter-image                         154 B         105 kB
+└ ● /waitlist/[outcome]                  1.21 kB         106 kB
+    ├ /waitlist/joined
+    ├ /waitlist/already
+    ├ /waitlist/invalid-email
+    └ [+2 more paths]
++ First Load JS shared by all             105 kB
+  ├ chunks/1255-f7f6b6890db76c97.js      46.1 kB
+  ├ chunks/4bd1b696-182b6b13bdad92e3.js  54.2 kB
+  └ other shared chunks (total)          4.37 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
