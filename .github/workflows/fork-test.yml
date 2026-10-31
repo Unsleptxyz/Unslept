@@ -1,0 +1,31 @@
+name: fork-test
+
+# Runs the full Unslept flow against the live Robinhood Chain mainnet contracts on a local fork.
+# No real funds move. Results are committed to ops/fork-test.txt.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fork:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: Fork test
+        working-directory: contracts
+        shell: bash {0}
+        env:
+          FORK_RPC: https://rpc.mainnet.chain.robinhood.com
+        run: |
+          mkdir -p ../ops
+          { echo "# Mainnet fork test $(date -u +%FT%TZ), block $(cast block-number --rpc-url $FORK_RPC)"; forge test --match-path "test/fork/*" -vv 2>&1 | grep -vE "^Compiling|^Solc|^Compiler run" | tail -60; } > ../ops/fork-test.txt
+          cat ../ops/fork-test.txt
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add ops/fork-test.txt; git commit -m "Record mainnet fork test" || exit 0
+          git pull --rebase && git push
