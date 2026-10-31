@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Scope. This license covers the contents of this repository, including the web application, the SDKs, the MCP
-server, the monitor, scripts, tests and documentation. Smart contract sources under contracts/src are published so
-that anyone can review them and reproduce the verified bytecode deployed on Robinhood Chain; each of those files
-keeps the SPDX license identifier it was deployed and verified with. Changing those identifiers would change the
-compiled metadata and break the exact-match verification of the live contracts.

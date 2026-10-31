@@ -148,4 +148,4 @@ Conventions this codebase keeps:
 ## License
 
 [MIT](LICENSE). Smart contract sources in `contracts/src` keep the SPDX identifier they were deployed and verified
-with; see [LICENSE](LICENSE) for details.
+with; see [NOTICE](NOTICE).
