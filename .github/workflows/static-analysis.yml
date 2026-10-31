@@ -26,7 +26,13 @@ jobs:
           pip install --quiet slither-analyzer solc-select
           forge build > /dev/null
           mkdir -p ../ops
-          { echo "# Slither $(date -u +%FT%TZ)"; slither . --filter-paths "lib/|test/|script/" --exclude-informational --exclude-optimization 2>&1 | tail -200; } > ../ops/slither.txt
+          {
+            echo "# Slither $(date -u +%FT%TZ)"
+            echo "## Medium and high impact (full)"
+            slither . --filter-paths "lib/|test/|script/" --exclude-low --exclude-informational --exclude-optimization 2>&1 | grep -v "^INFO:Slither" || true
+            echo; echo "## All findings excluding informational, by detector"
+            slither . --filter-paths "lib/|test/|script/" --exclude-informational --exclude-optimization 2>&1 | grep -o "#[a-z0-9-]*$" | sort | uniq -c | sort -rn
+          } > ../ops/slither.txt
           cat ../ops/slither.txt | tail -40
       - name: Commit
         run: |
