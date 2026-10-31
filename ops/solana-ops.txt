@@ -1,0 +1,5 @@
+# solana-ops keys on devnet 2026-10-31T23:54:04Z
+keys: {"program":"HbAgL4w8R9D8RUEuK4rJknK5Vn8rBusfRtfTnFcYieue","deployer":"HCdAT1i8DC1FKwsKsaKtpnLwzqWjjuLFSGMMpFyVxvv1","keeper":"5UwLn5mb4zx6JM62E28YjvnTwt18LRtDBi3ue3ftKFEC","treasury":"7DNkxPNsu6hYKpwgHsVXgtnR4twnXKEUbffGDsWMM37Z"}
+deployer balance: 0 SOL
+Error: Dynamic program error: No default signer found, run "solana-keygen new -o /home/runner/.config/solana/id.json" to create a new one
+deployer balance after: 0 SOL
