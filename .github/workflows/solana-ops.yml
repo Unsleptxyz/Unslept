@@ -1,0 +1,93 @@
+name: solana-ops
+
+# Solana operations. Keys are derived from DEPLOYER_PRIVATE_KEY (see solana/scripts/derive-keys.mjs); only public
+# keys and results are written to ops/solana-ops.txt.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "keys | deploy | init | status"
+        required: true
+        default: keys
+      cluster:
+        description: "devnet | mainnet"
+        required: true
+        default: devnet
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+      ACTION: ${{ inputs.action }}
+      CLUSTER: ${{ inputs.cluster }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.local/share/solana
+            solana/target
+          key: solana-ops-v1-${{ hashFiles('solana/**/Cargo.toml', 'solana/programs/**/*.rs') }}
+          restore-keys: solana-ops-v1-
+      - name: Install
+        shell: bash
+        run: |
+          for v in v3.0.10 v3.0.6 v3.0.0; do sh -c "$(curl -sSfL https://release.anza.xyz/$v/install)" > /dev/null 2>&1 && break; done
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+          mkdir -p "$HOME/.local/bin"; echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          curl -sSfL -o "$HOME/.local/bin/anchor" https://github.com/solana-foundation/anchor/releases/download/v1.0.0/anchor-1.0.0-x86_64-unknown-linux-gnu || cargo install --git https://github.com/solana-foundation/anchor --tag v1.0.0 anchor-cli --locked --root "$HOME/.local"
+          chmod +x "$HOME/.local/bin/anchor"
+          cd solana && npm install --no-audit --no-fund > /dev/null 2>&1
+      - name: Run
+        working-directory: solana
+        shell: bash {0}
+        run: |
+          mkdir -p ../ops; out=../ops/solana-ops.txt
+          keys=$(node scripts/derive-keys.mjs /tmp/keys)
+          prog=$(echo "$keys" | node -pe 'JSON.parse(require("fs").readFileSync(0)).program')
+          dep=$(echo "$keys" | node -pe 'JSON.parse(require("fs").readFileSync(0)).deployer')
+          if [ "$CLUSTER" = mainnet ]; then RPC=${{ secrets.SOLANA_MAINNET_RPC || 'https://api.mainnet-beta.solana.com' }}; else RPC=https://api.devnet.solana.com; fi
+          {
+            echo "# solana-ops $ACTION on $CLUSTER $(date -u +%FT%TZ)"
+            echo "keys: $keys"
+            echo "deployer balance: $(solana balance -u $RPC $dep 2>&1)"
+            case "$ACTION" in
+              keys|status)
+                solana program show -u $RPC $prog 2>&1 | head -12
+                ;;
+              deploy)
+                if [ "$CLUSTER" = devnet ]; then solana airdrop -u $RPC 2 $dep 2>&1 | tail -1; sleep 5; solana airdrop -u $RPC 2 $dep 2>&1 | tail -1; fi
+                mkdir -p target/deploy && cp /tmp/keys/program.json target/deploy/unslept-keypair.json
+                cargo +stable generate-lockfile > /dev/null 2>&1
+                anchor keys sync 2>&1 | tail -1
+                anchor build > /tmp/build.log 2>&1; echo "build exit $?"; grep -E "^error|warning: unused" /tmp/build.log | head -20
+                ls -la target/deploy/
+                solana program deploy -u $RPC --keypair /tmp/keys/deployer.json --program-id /tmp/keys/program.json \
+                  --with-compute-unit-price 50000 --max-sign-attempts 30 --use-rpc target/deploy/unslept.so 2>&1 | tail -5
+                solana program show -u $RPC $prog 2>&1 | head -12
+                cp target/idl/unslept.json ../ops/solana-idl.json 2>/dev/null; cp target/types/unslept.ts ../ops/solana-types.ts 2>/dev/null
+                ;;
+              init)
+                RPC=$RPC node scripts/init.mjs /tmp/keys "$CLUSTER" 2>&1 | tail -40
+                ;;
+            esac
+            echo "deployer balance after: $(solana balance -u $RPC $dep 2>&1)"
+          } > $out 2>&1
+          cat $out
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git checkout -- solana/Anchor.toml solana/programs 2>/dev/null || true
+          git add ops/solana-ops.txt ops/solana-idl.json ops/solana-types.ts 2>/dev/null; git commit -q -m "ops: solana $ACTION $CLUSTER" && git pull -q --rebase && git push -q || echo "nothing to commit"
