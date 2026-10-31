@@ -1,9 +1,67 @@
-# Solana program test 2026-10-31T16:05:18Z
+# Solana program test 2026-10-31T16:06:36Z
 All program id declarations are synced.
 Please rebuild the program to update the generated artifacts.
 build exit 1
-[2026-10-31T16:05:18.965942605Z WARN  cargo_build_sbf] Package 'unslept' has two crate types defined: cdylib and lib. This setting precludes link-time optimizations (LTO). Use cdylib for programs to be deployed and rlib for packages to be imported by other programs as libraries.
-[2026-10-31T16:05:19.368403804Z ERROR cargo_build_sbf::toolchain] Platform tools v1.52 is incompatible with SBPFv3. Refer to https://github.com/anza-xyz/cargo-build-sbf#sbfpv3-migration for more information. Run `cargo-build-sbf --arch v0` if you wish to use this platform tools version.
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
+
+[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/buffer.rs:77:25[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m77[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new(a.token_program.to_account_info(), Burn {[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:188:12[0m
+
+[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/buffer.rs:86:37[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m86[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
+
+[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:24:37[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m24[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new_with_signer(token_program.to_account_info(), Transfer {[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
+
+[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:86:37[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m86[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
+
+[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:101:41[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m101[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
+
+[0m[1mFor more information about this error, try `rustc --explain E0308`.[0m
+[1m[33mwarning[0m[1m:[0m `unslept` (lib) generated 15 warnings
+[1m[31merror[0m[1m:[0m could not compile `unslept` (lib) due to 8 previous errors; 15 warnings emitted
       --skip-local-validator
           Flag to skip starting a local validator, if the configured cluster url is a localnet
           Flag to keep the local validator running after tests to be able to check the transactions
@@ -14,4 +72,4 @@ build exit 1
           [default: surfpool]
 Found a 'test' script in the Anchor.toml. Running it as a test suite!
 Running test suite: "/home/runner/work/Unslept/Unslept/solana/Anchor.toml"
-Error: Failed to spawn `surfpool`: No such file or directory (os error 2)
+Unable to get latest blockhash. Test validator does not look started. Check ".anchor/test-ledger/test-ledger-log.txt" for errors. Consider increasing [test.startup_wait] in Anchor.toml.
