@@ -376,7 +376,7 @@
   overflow-y: auto;
   padding-bottom: 2rem;
 }
-.docs__menu summary {
+.docs__menu {
   display: none;
 }
 .docs__group {
@@ -530,14 +530,18 @@
     max-height: none;
     padding-bottom: 0;
   }
+  .docs__nav {
+    display: none;
+  }
   .docs__menu {
+    display: block;
     border: 1px solid var(--line-strong);
     border-radius: var(--radius-m);
     background: rgba(12, 19, 45, 0.6);
   }
   .docs__menu summary {
     display: flex;
-    justify-content: space-between;
+    gap: 1rem;
     align-items: center;
     padding: 0.85rem 1rem;
     font-weight: 600;
@@ -546,6 +550,12 @@
   }
   .docs__menu summary::-webkit-details-marker {
     display: none;
+  }
+  .docs__menu-current {
+    margin-left: auto;
+    font-weight: 400;
+    font-size: var(--text-s);
+    color: var(--lamp);
   }
   .docs__menu summary::after {
     content: "";

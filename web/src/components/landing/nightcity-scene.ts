@@ -295,7 +295,12 @@ export function startCity(canvas: HTMLCanvasElement, opts: CityOptions): () => v
   let elapsed = 0;
   const lookAt = new Vector3(0, 5, 0);
 
+  const minFrame = opts.lowPower ? 1000 / 30 : 0; // cap small or weak devices at 30 fps
   const frame = (now: number) => {
+    if (minFrame && now - last < minFrame && running) {
+      raf = requestAnimationFrame(frame);
+      return;
+    }
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     elapsed += dt;

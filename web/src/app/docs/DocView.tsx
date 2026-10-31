@@ -1,8 +1,27 @@
 import { PageShell } from "@/components/PageShell";
-import { FoldOnMobile, Toc } from "@/components/content/Toc";
+import { Toc } from "@/components/content/Toc";
 import { docGroups, docs, type DocPage } from "./content";
 
 const href = (d: DocPage) => (d.slug ? `/docs/${d.slug}` : "/docs");
+
+function DocsNav({ page }: { page: DocPage }) {
+  return (
+    <>
+      {docGroups.map((g) => (
+        <div key={g} className="docs__group">
+          <p className="docs__group-title">{g}</p>
+          {docs
+            .filter((d) => d.group === g)
+            .map((d) => (
+              <a key={d.slug} href={href(d)} aria-current={d.slug === page.slug ? "page" : undefined}>
+                {d.nav ?? d.title}
+              </a>
+            ))}
+        </div>
+      ))}
+    </>
+  );
+}
 
 export function DocView({ page }: { page: DocPage }) {
   const i = docs.findIndex((d) => d.slug === page.slug);
@@ -12,21 +31,16 @@ export function DocView({ page }: { page: DocPage }) {
     <PageShell progress>
       <div className="docs container">
         <aside className="docs__sidebar">
-          <details className="docs__menu" open>
-            <summary>Documentation</summary>
-            <nav aria-label="Documentation">
-              {docGroups.map((g) => (
-                <div key={g} className="docs__group">
-                  <p className="docs__group-title">{g}</p>
-                  {docs
-                    .filter((d) => d.group === g)
-                    .map((d) => (
-                      <a key={d.slug} href={href(d)} aria-current={d.slug === page.slug ? "page" : undefined}>
-                        {d.nav ?? d.title}
-                      </a>
-                    ))}
-                </div>
-              ))}
+          <nav aria-label="Documentation" className="docs__nav">
+            <DocsNav page={page} />
+          </nav>
+          <details className="docs__menu">
+            <summary>
+              <span>Documentation</span>
+              <span className="docs__menu-current">{page.nav ?? page.title}</span>
+            </summary>
+            <nav aria-label="Documentation, mobile">
+              <DocsNav page={page} />
             </nav>
           </details>
         </aside>
@@ -55,7 +69,6 @@ export function DocView({ page }: { page: DocPage }) {
         <aside className="docs__toc">
           <Toc rootId="doc-article" />
         </aside>
-        <FoldOnMobile selector=".docs__menu" />
       </div>
     </PageShell>
   );

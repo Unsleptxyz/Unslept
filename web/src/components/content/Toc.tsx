@@ -87,11 +87,3 @@ export function ReadingProgress() {
   return <div className="reading-progress" aria-hidden="true" />;
 }
 
-/** The docs menu starts open (so it is visible without JavaScript) and folds away on small screens. */
-export function FoldOnMobile({ selector }: { selector: string }) {
-  useEffect(() => {
-    const el = document.querySelector<HTMLDetailsElement>(selector);
-    if (el && window.matchMedia("(max-width: 860px)").matches) el.open = false;
-  }, [selector]);
-  return null;
-}

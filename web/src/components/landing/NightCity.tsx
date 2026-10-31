@@ -16,10 +16,19 @@ export function NightCity() {
     let stop: (() => void) | undefined;
     let cancelled = false;
 
+    // Detect WebGL and whether it is hardware accelerated. Software renderers (SwiftShader, llvmpipe)
+    // draw on the CPU, so the scene renders a single still frame there instead of animating.
+    let software = false;
     const supportsWebGL = (() => {
       try {
         const c = document.createElement("canvas");
-        return Boolean(c.getContext("webgl2") || c.getContext("webgl"));
+        const gl = (c.getContext("webgl2") || c.getContext("webgl")) as WebGLRenderingContext | null;
+        if (!gl) return false;
+        const info = gl.getExtension("WEBGL_debug_renderer_info");
+        const name = String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+        software = /swiftshader|llvmpipe|software|basic render/i.test(name);
+        gl.getExtension("WEBGL_lose_context")?.loseContext();
+        return true;
       } catch {
         return false;
       }
@@ -28,7 +37,7 @@ export function NightCity() {
 
     const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
     if (nav.connection?.saveData) return;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reducedMotion = software || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const lowPower = (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4 || window.innerWidth < 700;
 
     const load = () => {
