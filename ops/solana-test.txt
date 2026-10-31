@@ -1,7 +1,17 @@
-# Solana program test 2026-10-31T16:04:12Z
+# Solana program test 2026-10-31T16:05:18Z
 All program id declarations are synced.
 Please rebuild the program to update the generated artifacts.
 build exit 1
+[2026-10-31T16:05:18.965942605Z WARN  cargo_build_sbf] Package 'unslept' has two crate types defined: cdylib and lib. This setting precludes link-time optimizations (LTO). Use cdylib for programs to be deployed and rlib for packages to be imported by other programs as libraries.
+[2026-10-31T16:05:19.368403804Z ERROR cargo_build_sbf::toolchain] Platform tools v1.52 is incompatible with SBPFv3. Refer to https://github.com/anza-xyz/cargo-build-sbf#sbfpv3-migration for more information. Run `cargo-build-sbf --arch v0` if you wish to use this platform tools version.
+      --skip-local-validator
+          Flag to skip starting a local validator, if the configured cluster url is a localnet
+          Flag to keep the local validator running after tests to be able to check the transactions
+      --validator <VALIDATOR>
+          Validator type to use for local testing
+          - surfpool: Use Surfpool validator (default)
+          - legacy:   Use Solana test validator
+          [default: surfpool]
 Found a 'test' script in the Anchor.toml. Running it as a test suite!
 Running test suite: "/home/runner/work/Unslept/Unslept/solana/Anchor.toml"
 Error: Failed to spawn `surfpool`: No such file or directory (os error 2)
