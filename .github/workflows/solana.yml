@@ -47,10 +47,11 @@ jobs:
           solana --version; anchor --version
           solana-keygen new --no-bip39-passphrase --silent --force -o ~/.config/solana/id.json > /dev/null
           npm install --no-audit --no-fund > /dev/null 2>&1
+          cargo +stable generate-lockfile 2>&1 | tail -3
           {
             echo "# Solana program test $(date -u +%FT%TZ)"
             anchor keys sync 2>&1 | tail -2
-            anchor build 2>&1 | grep -E "error|warning: unused|Finished|^error" | tail -40
+            anchor build > /tmp/build.log 2>&1; echo "build exit $?"; grep -E "^error|error\[|Finished|failed" /tmp/build.log | head -40
             anchor test --skip-build 2>&1 | grep -vE "^\s*$" | tail -80
           } > $out 2>&1
           code=$?

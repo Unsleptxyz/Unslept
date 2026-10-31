@@ -1,0 +1,3 @@
+# Pick dependency versions that build with the Solana platform-tools compiler (see rust-version in the program crate).
+[resolver]
+incompatible-rust-versions = "fallback"
