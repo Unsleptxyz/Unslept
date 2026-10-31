@@ -140,12 +140,11 @@
   display: grid;
   min-width: 15rem;
   padding: 0.5rem;
+  z-index: 2;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-m);
-  background: rgba(8, 13, 34, 0.96);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  box-shadow: var(--shadow-2);
+  background: var(--night-1);
+  box-shadow: var(--shadow-2), 0 0 0 1px rgba(0, 0, 0, 0.4);
   animation: drop var(--dur-2) var(--ease-out);
 }
 .mobile-nav__panel a {
