@@ -1,88 +1,91 @@
 /*
- * Unslept design tokens. Single source of truth for color, type and space.
- * Dark (night shift) is the reference theme. Light is derived from the same
- * palette: Moon paper background, Night ink text, Sodium lamp darkened for AA.
+ * Unslept design tokens. Night shift, refined.
+ * One dark theme by design: the brand lives at night. Contrast is checked against AA on every surface.
  */
 
 :root {
-  /* Palette (brand names) */
-  --night-ink: #0e1630;
-  --late-shift: #18234a;
-  --sodium-lamp: #f2a93b;
-  --moon-paper: #e8e6f0;
-  --overcast: #8a93b8;
-  --accrual-teal: #4fd1b5;
+  /* Palette */
+  --night-0: #05081a;
+  --night-1: #080d22;
+  --night-2: #0c132d;
+  --night-3: #111a3a;
+  --night-4: #17224a;
+  --sodium: #f2a93b;
+  --sodium-hi: #ffc66e;
+  --sodium-deep: #c27b12;
+  --moon: #eceaf4;
+  --overcast: #8f98bd;
+  --teal: #4fd1b5;
+  --rose: #ff8a8a;
 
-  /* Semantic, dark theme */
-  --ink: var(--night-ink);
-  --surface: var(--late-shift);
-  --surface-2: #121c3c;
-  --fg: var(--moon-paper);
+  /* Semantic */
+  --bg: var(--night-0);
+  --bg-raised: var(--night-1);
+  --surface: rgba(17, 26, 58, 0.62);
+  --surface-solid: var(--night-2);
+  --surface-2: rgba(23, 34, 74, 0.72);
+  --surface-hover: rgba(30, 44, 92, 0.75);
+  --line: rgba(160, 172, 224, 0.13);
+  --line-strong: rgba(160, 172, 224, 0.24);
+  --fg: var(--moon);
+  --fg-2: #c4c9e0;
   --muted: var(--overcast);
-  --line: #2a3560;
-  --lamp: var(--sodium-lamp);
-  --lamp-strong: #f6bd67;
-  --lamp-ink: var(--night-ink);
-  --lamp-glow: rgba(242, 169, 59, 0.16);
-  --accrual: var(--accrual-teal);
-  --night-shade: #0a1126;
-  --focus: var(--sodium-lamp);
+  --lamp: var(--sodium);
+  --lamp-strong: var(--sodium-hi);
+  --lamp-ink: #170f02;
+  --lamp-soft: rgba(242, 169, 59, 0.12);
+  --lamp-glow: rgba(242, 169, 59, 0.28);
+  --accrual: var(--teal);
+  --danger: var(--rose);
+  --focus: var(--sodium-hi);
 
   /* Type */
-  --font-display: var(--font-bricolage), "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-plex), "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --step--1: 0.875rem;
-  --step-0: 1.0625rem;
-  --step-1: 1.25rem;
-  --step-2: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
-  --step-3: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
-  --step-4: clamp(3rem, 1.8rem + 5.6vw, 6.25rem);
+  --font-serif: var(--font-instrument), "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-code: var(--font-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Kept for components that still reference the older names */
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
 
-  /* Space and shape */
-  --gutter: clamp(1.25rem, 0.6rem + 3vw, 3rem);
-  --section: clamp(4.5rem, 3rem + 7vw, 9rem);
-  --radius-s: 6px;
-  --radius-m: 12px;
-  --radius-l: 22px;
-  --max: 76rem;
-  --measure: 66ch;
+  --text-xs: 0.8125rem;
+  --text-s: 0.9375rem;
+  --text-m: 1.0625rem;
+  --text-l: 1.25rem;
+  --text-xl: clamp(1.5rem, 1.25rem + 0.9vw, 1.875rem);
+  --display-s: clamp(2rem, 1.5rem + 2vw, 3rem);
+  --display-m: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --display-l: clamp(3.25rem, 1.8rem + 6.2vw, 7.5rem);
+
+  /* Kept aliases */
+  --step--1: var(--text-s);
+  --step-0: var(--text-m);
+  --step-1: var(--text-l);
+  --step-2: var(--text-xl);
+  --step-3: var(--display-s);
+  --step-4: var(--display-l);
+
+  /* Space, shape, depth */
+  --gutter: clamp(1.25rem, 0.5rem + 3.2vw, 3.5rem);
+  --section: clamp(5rem, 3rem + 8vw, 10rem);
+  --max: 78rem;
+  --max-narrow: 46rem;
+  --measure: 68ch;
+  --radius-xs: 6px;
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+  --radius-xl: 32px;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 60px -24px rgba(0, 0, 0, 0.75);
+  --shadow-lamp: 0 10px 40px -10px var(--lamp-glow);
+  --blur: saturate(160%) blur(16px);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 160ms;
+  --dur-2: 320ms;
+  --dur-3: 700ms;
 
   color-scheme: dark;
-}
-
-/* Light theme, derived. Applied by the OS preference unless the user picked dark. */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --ink: var(--moon-paper);
-    --surface: #f5f4fa;
-    --surface-2: #dcd9e8;
-    --fg: var(--night-ink);
-    --muted: #4a5275;
-    --line: #c3c0d6;
-    --lamp: #8f5507;
-    --lamp-strong: #6e4104;
-    --lamp-ink: #ffffff;
-    --lamp-glow: rgba(168, 101, 8, 0.12);
-    --accrual: #0b6b56;
-    --night-shade: #cfcbe0;
-    --focus: #6e4104;
-    color-scheme: light;
-  }
-}
-
-:root[data-theme="light"] {
-  --ink: var(--moon-paper);
-  --surface: #f5f4fa;
-  --surface-2: #dcd9e8;
-  --fg: var(--night-ink);
-  --muted: #4a5275;
-  --line: #c3c0d6;
-  --lamp: #8f5507;
-  --lamp-strong: #6e4104;
-  --lamp-ink: #ffffff;
-  --lamp-glow: rgba(168, 101, 8, 0.12);
-  --accrual: #0b6b56;
-  --night-shade: #cfcbe0;
-  --focus: #6e4104;
-  color-scheme: light;
 }

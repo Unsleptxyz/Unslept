@@ -1,17 +1,28 @@
 import type { Metadata } from "next";
-import { LegalReviewNotice, PageShell } from "@/components/PageShell";
-import { site } from "@/lib/config";
+import { LongformPage } from "@/components/PageShell";
+import { ContactLine, Summary } from "@/components/content/Blocks";
 
 export const metadata: Metadata = { title: "Privacy policy" };
 
 export default function PrivacyPage() {
-  const contact = site.githubUrl ? `${site.githubUrl.replace(/\/$/, "")}/issues` : undefined;
   return (
-    <PageShell>
-      <article className="prose-page">
-        <h1 className="display">Privacy policy</h1>
-        <p className="page-intro">Last updated: 31 October 2026.</p>
-        <LegalReviewNotice />
+    <LongformPage
+      eyebrow="Trust"
+      title="Privacy policy"
+      updated="31 October 2026"
+      intro={<p className="lede">Unslept collects as little as it can. This page lists exactly what is stored, why, where it lives, how long it is kept, and how to have it removed.</p>}
+      summary={
+        <Summary
+          items={[
+            "No accounts, no identity checks, no advertising trackers.",
+            "We store only what you choose to give: a waitlist email, and webhook settings you register.",
+            "Transactions on Robinhood Chain are public by design; we cannot hide or delete them.",
+            "Vercel, Supabase and GitHub process data for us.",
+            "You can ask to see, correct or delete your data at any time.",
+          ]}
+        />
+      }
+    >
 
         <h2>The short version</h2>
         <p>
@@ -61,7 +72,7 @@ export default function PrivacyPage() {
         <ul>
           <li>Vercel hosts the website and its server functions.</li>
           <li>Supabase stores the waitlist, webhook settings, delivery records and indexed chain data.</li>
-          <li>GitHub runs scheduled jobs and hosts the public repository.</li>
+          <li>GitHub runs scheduled jobs and hosts the project&apos;s code.</li>
         </ul>
         <p>These providers may process data in countries other than yours, under their own security and privacy terms.</p>
 
@@ -79,24 +90,12 @@ export default function PrivacyPage() {
         </p>
 
         <h2>Changes</h2>
-        <p>The date at the top shows the current version. The full history is public in the repository.</p>
+        <p>The date at the top shows the current version. Changes are recorded in the project repository.</p>
 
         <h2>Contact</h2>
         <p>
-          {contact ? (
-            <>
-              Use the{" "}
-              <a className="text-link" href={contact}>
-                project&apos;s issue tracker
-              </a>{" "}
-              for general questions. For anything personal, open a private security advisory in the same repository instead
-              of a public issue.
-            </>
-          ) : (
-            "Use the project's public repository for questions."
-          )}
+          <ContactLine />
         </p>
-      </article>
-    </PageShell>
+    </LongformPage>
   );
 }

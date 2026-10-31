@@ -1,22 +1,61 @@
 import { PageShell } from "@/components/PageShell";
-import { docs, type DocPage } from "./content";
+import { FoldOnMobile, Toc } from "@/components/content/Toc";
+import { docGroups, docs, type DocPage } from "./content";
+
+const href = (d: DocPage) => (d.slug ? `/docs/${d.slug}` : "/docs");
 
 export function DocView({ page }: { page: DocPage }) {
+  const i = docs.findIndex((d) => d.slug === page.slug);
+  const prev = i > 0 ? docs[i - 1] : undefined;
+  const next = i >= 0 && i < docs.length - 1 ? docs[i + 1] : undefined;
   return (
-    <PageShell>
-      <div className="docs-layout">
-        <nav aria-label="Documentation" className="docs-nav">
-          {docs.map((d) => (
-            <a key={d.slug} href={d.slug ? `/docs/${d.slug}` : "/docs"} aria-current={d.slug === page.slug ? "page" : undefined}>
-              {d.title}
-            </a>
-          ))}
-        </nav>
-        <article className="prose-page">
-          <h1 className="display">{page.title}</h1>
-          <p className="page-intro">{page.description}</p>
-          <div style={{ marginTop: "2rem" }}>{page.body}</div>
+    <PageShell progress>
+      <div className="docs container">
+        <aside className="docs__sidebar">
+          <details className="docs__menu" open>
+            <summary>Documentation</summary>
+            <nav aria-label="Documentation">
+              {docGroups.map((g) => (
+                <div key={g} className="docs__group">
+                  <p className="docs__group-title">{g}</p>
+                  {docs
+                    .filter((d) => d.group === g)
+                    .map((d) => (
+                      <a key={d.slug} href={href(d)} aria-current={d.slug === page.slug ? "page" : undefined}>
+                        {d.nav ?? d.title}
+                      </a>
+                    ))}
+                </div>
+              ))}
+            </nav>
+          </details>
+        </aside>
+        <article id="doc-article" className="docs__article prose">
+          <p className="eyebrow">{page.group}</p>
+          <h1 className="display docs__title">{page.title}</h1>
+          <p className="docs__desc">{page.description}</p>
+          <div className="docs__body">{page.body}</div>
+          <nav className="docs__pager" aria-label="Pagination">
+            {prev ? (
+              <a href={href(prev)} className="docs__pager-link">
+                <span>Previous</span>
+                {prev.nav ?? prev.title}
+              </a>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <a href={href(next)} className="docs__pager-link docs__pager-link--next">
+                <span>Next</span>
+                {next.nav ?? next.title}
+              </a>
+            ) : null}
+          </nav>
         </article>
+        <aside className="docs__toc">
+          <Toc rootId="doc-article" />
+        </aside>
+        <FoldOnMobile selector=".docs__menu" />
       </div>
     </PageShell>
   );

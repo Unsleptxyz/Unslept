@@ -14,6 +14,7 @@ export const site = {
   docsUrl: read(process.env.NEXT_PUBLIC_DOCS_URL) ?? "/docs",
   githubUrl: read(process.env.NEXT_PUBLIC_GITHUB_URL),
   xUrl: read(process.env.NEXT_PUBLIC_X_URL),
+  contactEmail: read(process.env.NEXT_PUBLIC_CONTACT_EMAIL),
 };
 
 export const chain = {

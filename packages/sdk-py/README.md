@@ -10,10 +10,11 @@ pip install "unslept[web3]"            # add [langchain] for the LangChain tool
 import os
 from eth_account import Account
 from unslept import Unslept
+from unslept.web3_chain import EthAccountSigner
 
 unslept = Unslept(
     agent_account=os.environ["UNSLEPT_AGENT_ACCOUNT"],
-    signer=Account.from_key(os.environ["UNSLEPT_SIGNER_KEY"]),
+    signer=EthAccountSigner(Account.from_key(os.environ["UNSLEPT_SIGNER_KEY"])),
     network="robinhood-chain",
 )
 res = unslept.fetch("https://example.com/paid-resource")

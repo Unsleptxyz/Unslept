@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { highlight } from "@/lib/highlight";
 
 export interface CodeTab {
   label: string;
@@ -80,7 +81,7 @@ export function CodeTabs({ tabs }: { tabs: CodeTab[] }) {
             </button>
           </div>
           <pre>
-            <code>{t.code}</code>
+            <code>{highlight(t.code)}</code>
           </pre>
         </div>
       ))}

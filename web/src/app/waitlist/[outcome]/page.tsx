@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/PageShell";
+import { Mark } from "@/components/SiteChrome";
 
-export const metadata: Metadata = { title: "Waitlist", robots: { index: false } };
+export const metadata: Metadata = { title: "Updates", robots: { index: false } };
 export const dynamicParams = false;
 
 const outcomes = {
   joined: {
-    title: "You are on the waitlist.",
-    body: "We will email you when the app opens. Until then, the docs explain how Unslept works.",
+    title: "You are on the list.",
+    body: "We will email you about releases and the $UNSLEPT launch, nothing else. The app is already live if you want to start now.",
     ok: true,
   },
   already: {
     title: "You are already on the list.",
-    body: "This email joined earlier. There is nothing more to do. We will write when the app opens.",
+    body: "This email joined earlier, so there is nothing more to do. We will write about releases and the $UNSLEPT launch.",
     ok: true,
   },
   "invalid-email": {
@@ -27,7 +28,7 @@ const outcomes = {
     ok: false,
   },
   unavailable: {
-    title: "The waitlist could not be saved.",
+    title: "Your email could not be saved.",
     body: "Storage did not respond. Your details were not stored. Submit the form again in a few minutes.",
     ok: false,
   },
@@ -45,13 +46,17 @@ export default async function WaitlistOutcome({ params }: { params: Promise<{ ou
   const o = outcomes[outcome as Outcome];
   return (
     <PageShell>
-      <section className="prose-page">
-        <h1 className="display">{o.title}</h1>
-        <p className="page-intro">{o.body}</p>
+      <section className="status-page container">
+        <div className="status-page__card card">
+        <span className="status-page__mark" aria-hidden="true">
+          <Mark size={44} />
+        </span>
+        <h1 className="display status-page__title">{o.title}</h1>
+        <p className="status-page__body">{o.body}</p>
         <div className="page-actions">
           {o.ok ? (
-            <a className="btn btn--primary" href="/docs">
-              Read the docs
+            <a className="btn btn--primary" href="/app">
+              Launch app
             </a>
           ) : (
             <a className="btn btn--primary" href="/#waitlist">
@@ -61,6 +66,7 @@ export default async function WaitlistOutcome({ params }: { params: Promise<{ ou
           <a className="btn btn--ghost" href="/">
             Back to home
           </a>
+        </div>
         </div>
       </section>
     </PageShell>

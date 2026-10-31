@@ -1,0 +1,71 @@
+name: qa
+
+# Builds the website, runs it locally, and screenshots every page (desktop and mobile).
+# Results (screenshots, console errors, build log) are force-pushed to the "qa-screens" branch.
+on:
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "Comma-separated paths (empty for the default set)"
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_PUBLIC_DOCS_URL: /docs
+      NEXT_PUBLIC_GITHUB_URL: https://github.com/Unsleptxyz/Unslept
+      NEXT_PUBLIC_CHAIN_ID: "4663"
+      NEXT_PUBLIC_CHAIN_NAME: Robinhood Chain
+      NEXT_PUBLIC_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+      NEXT_PUBLIC_EXPLORER_URL: https://robinhoodchain.blockscout.com
+      NEXT_PUBLIC_USDG_ADDRESS: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+      NEXT_PUBLIC_BUFFER_ADDRESS: "0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D"
+      NEXT_PUBLIC_SETTLEMENT_ROUTER_ADDRESS: "0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b"
+      NEXT_PUBLIC_ALLOCATOR_ADDRESS: "0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd"
+      NEXT_PUBLIC_FEE_MODULE_ADDRESS: "0xacbE1938C5CA8EaeB06C9E5c7c7E3b5d4d75fAEC"
+      NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS: "0xCa7D38A833BFaCBE22E787f967552A78b07C1c77"
+      NEXT_PUBLIC_TIMELOCK_ADDRESS: "0x2A407119d55e5cca2D51Cacc78000D49FeEcE777"
+      NEXT_PUBLIC_DEPLOY_BLOCK: "102271358"
+      NEXT_PUBLIC_ADAPTER_ADDRESS: "0xAf7f74801C2b439831feef6D1b4d39B4Ce717B66"
+      NEXT_PUBLIC_ASSET_VAULT_ADDRESS: "0xde770c84FE66E063336b31737cFE9790f18c4087"
+      NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build
+        working-directory: web
+        shell: bash {0}
+        run: |
+          mkdir -p ../qa
+          npm install --no-audit --no-fund > ../qa/install.txt 2>&1
+          npm run build > ../qa/build.txt 2>&1; echo $? > ../qa/build.code
+          tail -c 20000 ../qa/build.txt > ../qa/build-tail.txt
+          npx tsc --noEmit > ../qa/tsc.txt 2>&1; echo "tsc exit $?" >> ../qa/tsc.txt
+          node scripts/copy-check.mjs > ../qa/copy-check.txt 2>&1; echo "exit $?" >> ../qa/copy-check.txt
+      - name: Screenshots
+        if: always()
+        working-directory: web
+        shell: bash {0}
+        run: |
+          if [ "$(cat ../qa/build.code)" = "0" ]; then
+            (npx next start -p 3000 > ../qa/server.txt 2>&1 &)
+            for i in $(seq 1 30); do curl -s -o /dev/null http://localhost:3000 && break; sleep 2; done
+            npm install --no-save playwright@1 > /dev/null 2>&1 && npx playwright install --with-deps chromium > /dev/null 2>&1
+            QA_PAGES="${{ inputs.pages }}" node scripts/qa-shots.mjs http://localhost:3000 ../qa/shots > ../qa/shots.txt 2>&1
+          fi
+          rm -f ../qa/install.txt ../qa/build.txt
+      - name: Publish results to qa-screens branch
+        if: always()
+        run: |
+          cd qa
+          git init -q -b qa-screens
+          git config user.name "github-actions[bot]"; git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "QA results for ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" qa-screens

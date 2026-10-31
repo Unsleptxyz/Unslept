@@ -1,200 +1,422 @@
 import type { ReactNode } from "react";
 import { MoneyClock } from "./MoneyClock";
 import { CodeTabs, type CodeTab } from "./CodeTabs";
+import { NightCity } from "./NightCity";
+import { CopyCommand, CountUp } from "./Interactive";
+import {
+  IconBolt,
+  IconCheckFile,
+  IconClock,
+  IconCode,
+  IconKey,
+  IconLayers,
+  IconPark,
+  IconPulse,
+  IconRefresh,
+  IconShield,
+  IconSliders,
+  IconWallet,
+} from "./Icons";
+
+function SectionHead({ eyebrow, title, lede, id, align = "left" }: { eyebrow: string; title: ReactNode; lede?: ReactNode; id: string; align?: "left" | "center" }) {
+  return (
+    <header className={`section-head section-head--${align}`} data-reveal>
+      <p className="eyebrow">{eyebrow}</p>
+      <h2 id={id} className="display section-title">
+        {title}
+      </h2>
+      {lede ? <p className="lede">{lede}</p> : null}
+    </header>
+  );
+}
 
 /* ------------------------------------------------------------------ */
-/* 1. Hero                                                             */
+/* Hero                                                                */
 /* ------------------------------------------------------------------ */
 
 export function Hero({ docsUrl }: { docsUrl: string }) {
   return (
     <section className="hero" aria-labelledby="hero-title">
-      <div className="hero__copy">
+      <NightCity />
+      <div className="hero__inner">
+        <a className="pill hero__pill" href="/risk">
+          <span className="pill__dot" aria-hidden="true" />
+          Live on Robinhood Chain mainnet
+          <span className="hero__pill-sep" aria-hidden="true" />
+          <span className="hero__pill-note">Guarded launch</span>
+        </a>
         <h1 id="hero-title" className="display hero__title">
-          Your money, unslept.
+          Your agent&apos;s money, <em>unslept.</em>
         </h1>
         <p className="hero__sub">
-          Every AI agent holds idle cash between payments. Unslept keeps it working in tokenized assets on Robinhood
-          Chain and releases it the instant an x402 payment is due.
+          AI agents keep cash waiting between payments. Unslept parks that balance in tokenized assets and settles
+          every x402 payment the instant it is due, from a shared USDG buffer. The agent never waits for its money.
         </p>
         <div className="hero__actions">
-          <a className="btn btn--primary" href="/app">
+          <a className="btn btn--primary btn--large" href="/app">
             Launch app
           </a>
-          <a className="btn btn--ghost" href={docsUrl}>
-            Read the docs
+          <a className="btn btn--ghost btn--large" href={`${docsUrl}/quickstart`}>
+            Read the quickstart
           </a>
         </div>
+        <ul className="hero__facts" aria-label="Highlights">
+          <li>
+            <IconBolt />
+            Settles in one transaction
+          </li>
+          <li>
+            <IconSliders />
+            Spending limits enforced on chain
+          </li>
+          <li>
+            <IconKey />
+            Non-custodial agent accounts
+          </li>
+        </ul>
       </div>
-      <div className="hero__clock">
-        <MoneyClock />
+      <a className="hero__scroll" href="#problem" aria-label="Scroll to learn more">
+        <span />
+      </a>
+    </section>
+  );
+}
+
+export function BuiltWith() {
+  const items = ["Robinhood Chain", "USDG by Paxos", "Spark Savings", "x402", "ERC-4337", "ERC-4626", "MCP"];
+  return (
+    <section className="built" aria-label="Built with">
+      <p className="built__label">Built on open standards</p>
+      <div className="built__track">
+        <ul className="built__list">
+          {items.map((i) => (
+            <li key={i}>{i}</li>
+          ))}
+        </ul>
+        <ul className="built__list" aria-hidden="true">
+          {items.map((i) => (
+            <li key={i}>{i}</li>
+          ))}
+        </ul>
       </div>
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 2. Problem                                                          */
+/* Problem                                                             */
 /* ------------------------------------------------------------------ */
 
 export function Problem() {
+  const hours = Array.from({ length: 24 }, (_, h) => h);
+  const paid = new Set([3, 9, 10, 16, 21]);
   return (
-    <section className="section problem" aria-labelledby="problem-title">
-      <div className="problem__grid">
-        <h2 id="problem-title" className="display section-title problem__title">
-          Agent money spends most of its life asleep.
-        </h2>
-        <p className="problem__body lede">
-          Agents pay for data, tools and compute through x402. To do it, they keep balances waiting. Waiting balances
-          earn nothing, and across thousands of agents that adds up to a lot of capital doing nothing.
-        </p>
+    <section id="problem" className="section problem" aria-labelledby="problem-title">
+      <div className="container problem__grid">
+        <SectionHead
+          id="problem-title"
+          eyebrow="The problem"
+          title={
+            <>
+              Most agent money spends its life <em>asleep.</em>
+            </>
+          }
+          lede="Agents pay for data, tools and compute per request through x402. To do that, they keep balances on hand. Those balances wait for hours between payments and earn nothing while they wait. Across thousands of agents, that is a lot of capital doing nothing."
+        />
+        <figure className="card day-card" data-reveal>
+          <figcaption className="day-card__title">
+            <span>One agent wallet, one day</span>
+            <span className="muted small num">00:00 to 24:00</span>
+          </figcaption>
+          <div className="day-row">
+            <p className="day-row__label">Ordinary wallet</p>
+            <div className="day-row__bar" aria-hidden="true">
+              {hours.map((h) => (
+                <span key={h} className={paid.has(h) ? "day-cell day-cell--pay" : "day-cell"} />
+              ))}
+            </div>
+            <p className="day-row__note">Brief moments of spending, long stretches of waiting.</p>
+          </div>
+          <div className="day-row">
+            <p className="day-row__label">With Unslept</p>
+            <div className="day-row__bar day-row__bar--working" aria-hidden="true">
+              {hours.map((h) => (
+                <span key={h} className={paid.has(h) ? "day-cell day-cell--pay" : "day-cell day-cell--work"} />
+              ))}
+            </div>
+            <p className="day-row__note">Between payments the balance sits in a tokenized savings position. Payments still settle at once.</p>
+          </div>
+          <div className="day-card__legend" aria-hidden="true">
+            <span>
+              <i className="day-cell day-cell--pay" /> Payment
+            </span>
+            <span>
+              <i className="day-cell" /> Idle
+            </span>
+            <span>
+              <i className="day-cell day-cell--work" /> Working
+            </span>
+          </div>
+        </figure>
       </div>
-      <div className="sleep-strip" aria-hidden="true">
-        {Array.from({ length: 24 }, (_, h) => (
-          <span key={h} className={h % 9 === 4 ? "sleep-strip__hour sleep-strip__hour--paid" : "sleep-strip__hour"} />
-        ))}
-      </div>
-      <p className="sleep-strip__caption">
-        A typical agent balance across a day: brief moments of spending, long stretches of waiting.
-      </p>
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 3. How it works                                                     */
+/* How it works                                                        */
 /* ------------------------------------------------------------------ */
 
-type Node = "Agent wallet" | "Tokenized asset" | "Buffer" | "x402 payee" | "Depositor";
-
-const steps: { title: string; body: string; from: Node; to: Node; back?: boolean }[] = [
+const steps = [
   {
+    icon: <IconPark />,
     title: "Park",
-    body: "Agent balances are automatically allocated into low-risk tokenized assets available on Robinhood Chain, for example a short-duration treasury or money-market style instrument, where available in your jurisdiction.",
-    from: "Agent wallet",
-    to: "Tokenized asset",
+    body: "Idle agent balances move into Spark Savings USDG (spUSDG), a tokenized savings position on Robinhood Chain. A keeper does it automatically. Owners can opt out per account.",
   },
   {
+    icon: <IconBolt />,
     title: "Pay",
-    body: "When the agent hits an x402 paywall, Unslept settles the payment immediately from a shared liquidity buffer, so the agent never waits and never fails a call.",
-    from: "Buffer",
-    to: "x402 payee",
+    body: "When an API answers 402, the SDK checks the agent's on-chain policy and the settlement router pays at once from the buffer, in a single transaction. The agent never waits for an asset to be sold.",
   },
   {
+    icon: <IconRefresh />,
     title: "Rebalance",
-    body: "The buffer is refilled from the agent's parked position in the background.",
-    from: "Tokenized asset",
-    to: "Buffer",
+    body: "In the background, the parked position repays the buffer. Anyone can trigger it, and it can only move an account's funds to settle that same account's debt.",
   },
   {
+    icon: <IconLayers />,
     title: "Earn",
-    body: "Anyone can deposit USDG into the buffer and earn a share of the underlying asset yield plus a small instant-settlement fee paid by agents.",
-    from: "Depositor",
-    to: "Buffer",
-    back: true,
+    body: "Depositors supply the USDG that settles payments. They earn the instant-settlement fee and the buffer's share of asset yield. The rate is variable and can fall to zero.",
   },
 ];
-
-function FlowLine({ from, to, back }: { from: Node; to: Node; back?: boolean }) {
-  return (
-    <svg viewBox="0 0 320 48" className="flow-line" role="img" aria-label={`Funds move from ${from} to ${to}${back ? ", and yield returns" : ""}`}>
-      <circle cx="10" cy="24" r="6" className="flow-line__node" />
-      <circle cx="310" cy="24" r="6" className="flow-line__node flow-line__node--to" />
-      <line x1="22" y1="24" x2="292" y2="24" className="flow-line__track" />
-      <line x1="22" y1="24" x2="292" y2="24" className="flow-line__flow" />
-      <path d="M 286 18 L 296 24 L 286 30" className="flow-line__head" />
-      {back ? <path d="M 292 38 C 220 46, 100 46, 24 38" className="flow-line__return" /> : null}
-    </svg>
-  );
-}
 
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="section how" aria-labelledby="how-title">
-      <h2 id="how-title" className="display section-title">
-        How it works
-      </h2>
-      <ol className="how__steps">
-        {steps.map((s, i) => (
-          <li key={s.title} className="how__step">
-            <span className="how__num num" aria-hidden="true">
-              {i + 1}
-            </span>
-            <div className="how__content">
+      <div className="container">
+        <SectionHead
+          id="how-title"
+          eyebrow="How it works"
+          title={
+            <>
+              Four steps, <em>always on.</em>
+            </>
+          }
+          lede="Unslept separates two jobs that usually fight each other: keeping money ready to pay, and keeping money working. The buffer does the first, tokenized assets do the second."
+        />
+        <ol className="how__steps">
+          {steps.map((s, i) => (
+            <li key={s.title} className="card how__step" data-reveal style={{ ["--reveal-i" as string]: i }}>
+              <div className="how__top">
+                <span className="how__icon">{s.icon}</span>
+                <span className="how__num num">0{i + 1}</span>
+              </div>
               <h3 className="how__title">{s.title}</h3>
               <p>{s.body}</p>
-              <div className="how__flow">
-                <span className="how__node">{s.from}</span>
-                <FlowLine from={s.from} to={s.to} back={s.back} />
-                <span className="how__node how__node--to">{s.to}</span>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ol>
+            </li>
+          ))}
+        </ol>
+        <div className="flow card" data-reveal>
+          <FlowDiagram />
+        </div>
+      </div>
     </section>
   );
 }
 
+function FlowDiagram() {
+  return (
+    <svg viewBox="0 0 1000 220" className="flow__svg" role="img" aria-labelledby="flow-title flow-desc">
+      <title id="flow-title">Payment flow</title>
+      <desc id="flow-desc">
+        The agent asks its account to pay. The router pays the API at once from the buffer. Later, the agent&apos;s parked
+        spUSDG position repays the buffer.
+      </desc>
+      <g className="flow__edges">
+        <path id="e1" d="M170 110 H330" />
+        <path id="e2" d="M470 110 H630" />
+        <path id="e3" d="M770 110 H860" />
+        <path id="e4" d="M560 60 C 560 30, 400 30, 400 60" />
+        <path id="e5" d="M400 160 C 400 200, 700 200, 700 160" className="flow__edge--slow" />
+      </g>
+      <g className="flow__pulses">
+        <circle r="5">
+          <animateMotion dur="2.6s" repeatCount="indefinite" path="M170 110 H330" />
+        </circle>
+        <circle r="5">
+          <animateMotion dur="2.6s" begin="0.9s" repeatCount="indefinite" path="M470 110 H630" />
+        </circle>
+        <circle r="5">
+          <animateMotion dur="2.6s" begin="1.7s" repeatCount="indefinite" path="M770 110 H860" />
+        </circle>
+        <circle r="4" className="flow__pulse--slow">
+          <animateMotion dur="5s" begin="0.4s" repeatCount="indefinite" path="M700 160 C 700 200, 400 200, 400 160" />
+        </circle>
+      </g>
+      <g className="flow__nodes">
+        <g transform="translate(40 75)">
+          <rect width="130" height="70" rx="16" />
+          <text x="65" y="32">AI agent</text>
+          <text x="65" y="52" className="flow__sub">
+            SDK or MCP
+          </text>
+        </g>
+        <g transform="translate(330 60)">
+          <rect width="140" height="100" rx="16" />
+          <text x="70" y="44">Agent account</text>
+          <text x="70" y="64" className="flow__sub">
+            policy on chain
+          </text>
+        </g>
+        <g transform="translate(630 60)" className="flow__node--lamp">
+          <rect width="140" height="100" rx="16" />
+          <text x="70" y="44">USDG buffer</text>
+          <text x="70" y="64" className="flow__sub">
+            pays at once
+          </text>
+        </g>
+        <g transform="translate(860 75)">
+          <rect width="110" height="70" rx="16" />
+          <text x="55" y="32">Paid API</text>
+          <text x="55" y="52" className="flow__sub">
+            x402
+          </text>
+        </g>
+      </g>
+      <text x="550" y="212" className="flow__caption">
+        spUSDG repays the buffer in the background
+      </text>
+    </svg>
+  );
+}
+
 /* ------------------------------------------------------------------ */
-/* 4. Audiences                                                        */
+/* Money clock                                                         */
 /* ------------------------------------------------------------------ */
 
-export function Audiences({ docsUrl }: { docsUrl: string }) {
+export function Clock() {
   return (
-    <section className="section audiences" aria-labelledby="audiences-title">
-      <h2 id="audiences-title" className="display section-title">
-        Built for three kinds of people
-      </h2>
-      <div className="audiences__grid">
-        <article className="audience audience--primary">
-          <h3 className="audience__title">Agent builders</h3>
-          <p>
-            Agent builders and operators get operating balances that earn while they wait, and payments that never
-            fail for lack of liquidity. Spending policies stay on-chain and under your control.
-          </p>
-          <a className="btn btn--primary" href="/app/agents">
-            Connect an agent
-          </a>
-        </article>
-        <article className="audience audience--secondary">
-          <h3 className="audience__title">Depositors</h3>
-          <p>
-            Fund the liquidity buffer and earn from real agent activity. No agent required. The rate is variable.
-          </p>
-          <a className="text-link" href="/app/buffer">
-            Deposit to the buffer
-          </a>
-        </article>
-        <article className="audience audience--tertiary">
-          <h3 className="audience__title">Projects and platforms</h3>
-          <p>
-            Any agent framework can plug in through the SDK or MCP: OpenClaw, Virtuals, LangChain, CrewAI or a
-            custom stack. Project treasuries can park idle funds the same way.
-          </p>
-          <a className="text-link" href={`${docsUrl}/sdk`}>
-            Integrate the SDK
-          </a>
-        </article>
+    <section className="section clock" aria-labelledby="clock-title">
+      <div className="container clock__grid">
+        <div className="clock__visual" data-reveal>
+          <MoneyClock />
+        </div>
+        <div className="clock__copy">
+          <SectionHead
+            id="clock-title"
+            eyebrow="The money clock"
+            title={
+              <>
+                Every hour counts, <em>including the quiet ones.</em>
+              </>
+            }
+            lede="An agent might pay twice in a morning and then wait until the next day. With Unslept, the waiting hours are working hours too. The lit arc never breaks."
+          />
+          <ul className="clock__points" data-reveal>
+            <li>
+              <strong>Liquid when it matters.</strong> The buffer fronts the payment, so a parked balance never makes a call fail.
+            </li>
+            <li>
+              <strong>Working when it does not.</strong> Between payments the balance earns the variable rate of the underlying asset.
+            </li>
+            <li>
+              <strong>Yours throughout.</strong> Owners can pause, revoke or withdraw at any time, including while funds are parked.
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 5. Developers                                                       */
+/* Audiences                                                           */
+/* ------------------------------------------------------------------ */
+
+export function Audiences({ docsUrl }: { docsUrl: string }) {
+  const cards = [
+    {
+      icon: <IconCode />,
+      title: "Agent builders",
+      body: "Give each agent its own account with a per-call cap, a daily cap and an allowlist of APIs it may pay. Fund it once; the balance works between calls and payments never fail for lack of liquidity.",
+      href: "/app/agents",
+      cta: "Create an agent account",
+    },
+    {
+      icon: <IconWallet />,
+      title: "Buffer depositors",
+      body: "Supply the USDG that settles agent payments and earn from real activity: the settlement fee plus the buffer's share of asset yield. No agent required. The rate is variable.",
+      href: "/app/buffer",
+      cta: "Deposit to the buffer",
+    },
+    {
+      icon: <IconLayers />,
+      title: "Platforms and API sellers",
+      body: "Plug any framework in through the SDK or MCP server, or accept x402 payments yourself with the sample endpoint. Project treasuries can park idle funds the same way.",
+      href: `${docsUrl}/x402`,
+      cta: "Accept x402 payments",
+    },
+  ];
+  return (
+    <section className="section audiences" aria-labelledby="audiences-title">
+      <div className="container">
+        <SectionHead
+          id="audiences-title"
+          eyebrow="Who it is for"
+          title={
+            <>
+              Built for everyone <em>in the payment.</em>
+            </>
+          }
+        />
+        <div className="audiences__grid">
+          {cards.map((c, i) => (
+            <article key={c.title} className="card audience" data-reveal style={{ ["--reveal-i" as string]: i }}>
+              <span className="audience__icon">{c.icon}</span>
+              <h3>{c.title}</h3>
+              <p>{c.body}</p>
+              <a className="arrow-link" href={c.href}>
+                {c.cta}
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Developers                                                          */
 /* ------------------------------------------------------------------ */
 
 const sdkCode = `import { Unslept } from "@unslept/sdk";
+import { privateKeyToAccount } from "viem/accounts";
 
 const unslept = new Unslept({
   agentAccount: process.env.UNSLEPT_AGENT_ACCOUNT,
-  signer: agentSigner,
+  signer: privateKeyToAccount(process.env.UNSLEPT_SIGNER_KEY),
   network: "robinhood-chain",
 });
 
-// Drop-in replacement for fetch. Pays x402 paywalls from a balance that is always working.
-const res = await unslept.fetch("https://api.example.com/data");`;
+// A drop-in fetch. On 402 it checks the policy, settles, and retries.
+const res = await unslept.fetch("https://api.example.com/data", undefined, {
+  maxAmount: 50_000n, // 0.05 USDG, never more for this call
+});`;
+
+const pyCode = `import os
+from eth_account import Account
+from unslept import Unslept
+from unslept.web3_chain import EthAccountSigner
+
+unslept = Unslept(
+    agent_account=os.environ["UNSLEPT_AGENT_ACCOUNT"],
+    signer=EthAccountSigner(Account.from_key(os.environ["UNSLEPT_SIGNER_KEY"])),
+    network="robinhood-chain",
+)
+
+res = unslept.fetch("https://api.example.com/data")
+print(res.status, res.text())`;
 
 const mcpCode = `{
   "mcpServers": {
@@ -203,7 +425,7 @@ const mcpCode = `{
       "args": ["-y", "@unslept/mcp"],
       "env": {
         "UNSLEPT_AGENT_ACCOUNT": "<your agent account address>",
-        "UNSLEPT_SIGNER_KEY": "<agent signer key, kept in your secret store>",
+        "UNSLEPT_SIGNER_KEY": "<agent signer key, from your secret store>",
         "UNSLEPT_NETWORK": "robinhood-chain"
       }
     }
@@ -211,41 +433,55 @@ const mcpCode = `{
 }`;
 
 const tabs: CodeTab[] = [
-  { label: "TypeScript SDK", filename: "agent.ts", code: sdkCode },
-  { label: "MCP server", filename: "mcp.json", code: mcpCode },
+  { label: "TypeScript", filename: "agent.ts", code: sdkCode },
+  { label: "Python", filename: "agent.py", code: pyCode },
+  { label: "MCP", filename: "mcp.json", code: mcpCode },
 ];
 
-export function Developers({ docsUrl }: { docsUrl: string }) {
+export function Developers({ docsUrl, siteUrl }: { docsUrl: string; siteUrl?: string }) {
+  const demo = `${(siteUrl ?? "").replace(/\/$/, "")}/api/demo/x402`;
   return (
     <section id="developers" className="section developers" aria-labelledby="dev-title">
-      <div className="developers__intro">
-        <h2 id="dev-title" className="display section-title">
-          One line to stop paying from a sleeping wallet.
-        </h2>
-        <p className="lede">
-          Wrap the fetch call your agent already makes. When a server answers 402, the SDK checks your spending
-          policy, settles from the buffer and retries with the payment attached.
-        </p>
-        <ul className="developers__facts">
-          <li>
-            Methods: <code>fetch</code>, <code>getBalances</code>, <code>getPolicy</code>, <code>setPolicy</code>,{" "}
-            <code>getPayments</code>, <code>onLowBalance</code>
-          </li>
-          <li>MCP tools: pay_x402_request, get_balances, get_payment_history, get_policy</li>
-          <li>Python SDK with a LangChain tool wrapper</li>
-        </ul>
-        <p className="developers__status">The TypeScript SDK, Python SDK and MCP server ship with the first public release.</p>
-        <a className="text-link" href={`${docsUrl}/quickstart`}>
-          Read the quickstart
-        </a>
+      <div className="container developers__grid">
+        <div className="developers__intro">
+          <SectionHead
+            id="dev-title"
+            eyebrow="For developers"
+            title={
+              <>
+                One call to stop paying from <em>a sleeping wallet.</em>
+              </>
+            }
+            lede="Wrap the fetch your agent already makes. When a server answers 402, the SDK checks your spending policy, settles from the buffer and retries with the payment attached."
+          />
+          <div className="developers__installs" data-reveal>
+            <CopyCommand command="npm install @unslept/sdk viem" label="TypeScript" />
+            <CopyCommand command='pip install "unslept[web3]"' label="Python" />
+            <CopyCommand command="npx -y @unslept/mcp" label="MCP" />
+          </div>
+          <div className="demo-callout card" data-reveal>
+            <p className="demo-callout__title">
+              <span className="badge badge--lamp">Live</span> Try a real paid endpoint
+            </p>
+            <p className="muted small">
+              The demo endpoint asks for 0.01 USDG on mainnet and answers with live protocol stats once the payment settles.
+            </p>
+            <code className="demo-callout__code">GET {demo || "/api/demo/x402"}</code>
+            <a className="arrow-link" href={`${docsUrl}/x402`}>
+              How x402 works with Unslept
+            </a>
+          </div>
+        </div>
+        <div className="developers__code" data-reveal>
+          <CodeTabs tabs={tabs} />
+        </div>
       </div>
-      <CodeTabs tabs={tabs} />
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 6. Live network stats                                               */
+/* Live network stats                                                  */
 /* ------------------------------------------------------------------ */
 
 export type NetworkStats =
@@ -262,26 +498,26 @@ export type NetworkStats =
 const statDefs = [
   { key: "tvw", label: "Total value working" },
   { key: "paid", label: "x402 payments settled" },
-  { key: "agents", label: "Connected agents" },
-  { key: "rate", label: "Buffer rate (variable)" },
+  { key: "agents", label: "Agent accounts" },
+  { key: "rate", label: "Buffer rate, variable" },
 ] as const;
-
-const compactUsd = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  notation: "compact",
-  maximumFractionDigits: 2,
-});
-const count = new Intl.NumberFormat("en-US");
 
 function StatsShell({ children, note }: { children: ReactNode; note?: ReactNode }) {
   return (
     <section className="section stats" aria-labelledby="stats-title">
-      <h2 id="stats-title" className="display section-title">
-        Live network stats
-      </h2>
-      {children}
-      {note}
+      <div className="container">
+        <SectionHead
+          id="stats-title"
+          eyebrow="On chain, right now"
+          title={
+            <>
+              The network, <em>live.</em>
+            </>
+          }
+        />
+        {children}
+        {note}
+      </div>
     </section>
   );
 }
@@ -291,7 +527,7 @@ export function StatsSkeleton() {
     <StatsShell>
       <dl className="stats__grid" aria-busy="true">
         {statDefs.map((d) => (
-          <div key={d.key} className="stat">
+          <div key={d.key} className="card stat">
             <dt>{d.label}</dt>
             <dd>
               <span className="skeleton" aria-hidden="true" />
@@ -306,23 +542,42 @@ export function StatsSkeleton() {
 
 export function Stats({ stats }: { stats: NetworkStats }) {
   if (stats.status === "live") {
-    const values: Record<(typeof statDefs)[number]["key"], string> = {
-      tvw: compactUsd.format(stats.totalValueWorkingUsd),
-      paid: count.format(stats.paymentsSettled),
-      agents: count.format(stats.connectedAgents),
-      rate: stats.bufferRateBps === null ? "Not enough history" : `${(stats.bufferRateBps / 100).toFixed(2)}%`,
-    };
     return (
       <StatsShell
-        note={<p className="stats__note">Read from protocol contracts through the indexer. Rates are variable and change with utilization.</p>}
+        note={
+          <p className="stats__note">
+            Read from the protocol contracts by the indexer every few minutes. Rates are variable and change with utilization.{" "}
+            <a className="text-link" href="/docs/contracts">
+              See the contracts
+            </a>
+          </p>
+        }
       >
         <dl className="stats__grid">
-          {statDefs.map((d) => (
-            <div key={d.key} className="stat">
-              <dt>{d.label}</dt>
-              <dd className={d.key === "rate" ? "num stat__value stat__value--yield" : "num stat__value"}>{values[d.key]}</dd>
-            </div>
-          ))}
+          <div className="card stat" data-reveal>
+            <dt>{statDefs[0].label}</dt>
+            <dd className="num stat__value">
+              <CountUp value={stats.totalValueWorkingUsd} format="usd" />
+            </dd>
+          </div>
+          <div className="card stat" data-reveal style={{ ["--reveal-i" as string]: 1 }}>
+            <dt>{statDefs[1].label}</dt>
+            <dd className="num stat__value">
+              <CountUp value={stats.paymentsSettled} format="int" />
+            </dd>
+          </div>
+          <div className="card stat" data-reveal style={{ ["--reveal-i" as string]: 2 }}>
+            <dt>{statDefs[2].label}</dt>
+            <dd className="num stat__value">
+              <CountUp value={stats.connectedAgents} format="int" />
+            </dd>
+          </div>
+          <div className="card stat" data-reveal style={{ ["--reveal-i" as string]: 3 }}>
+            <dt>{statDefs[3].label}</dt>
+            <dd className="num stat__value stat__value--yield">
+              {stats.bufferRateBps === null ? <span className="stat__pending">Not enough history yet</span> : <CountUp value={stats.bufferRateBps / 100} format="pct" />}
+            </dd>
+          </div>
         </dl>
       </StatsShell>
     );
@@ -330,288 +585,285 @@ export function Stats({ stats }: { stats: NetworkStats }) {
 
   const message =
     stats.status === "error"
-      ? "The indexer did not respond. Stats will return when it is reachable again."
-      : "Nothing is live yet. These numbers read from the protocol contracts on Robinhood Chain as soon as they are deployed.";
+      ? "The indexer did not respond. Stats return as soon as it is reachable again."
+      : "Stats read from the protocol contracts on Robinhood Chain as soon as the indexer reports them.";
 
   return (
-    <StatsShell>
-      <div className="stats__empty">
-        <dl className="stats__grid stats__grid--empty">
-          {statDefs.map((d) => (
-            <div key={d.key} className="stat">
-              <dt>{d.label}</dt>
-              <dd className="num stat__value stat__value--empty">
-                <span aria-hidden="true">--</span>
-                <span className="sr-only">Not available yet</span>
-              </dd>
-            </div>
-          ))}
-        </dl>
-        <p className="stats__empty-msg">{message}</p>
-        <a className="btn btn--ghost" href="#waitlist">
-          Join the waitlist
-        </a>
-      </div>
+    <StatsShell note={<p className="stats__note">{message}</p>}>
+      <dl className="stats__grid">
+        {statDefs.map((d) => (
+          <div key={d.key} className="card stat">
+            <dt>{d.label}</dt>
+            <dd className="num stat__value stat__value--empty">
+              <span aria-hidden="true">--</span>
+              <span className="sr-only">Not available</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </StatsShell>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Waitlist (Phase 1)                                                  */
+/* Security                                                            */
 /* ------------------------------------------------------------------ */
 
-export function Waitlist() {
+export function Security() {
+  const facts = [
+    { icon: <IconShield />, title: "Guarded launch", body: "Not yet audited by a third party. Until an audit is published, total buffer deposits and each asset are capped at 50,000 USDG by the contracts." },
+    { icon: <IconClock />, title: "24-hour timelock", body: "Every admin change, from fee levels to new assets, is scheduled on chain a full day before it can take effect. Anyone can watch it coming." },
+    { icon: <IconCheckFile />, title: "Verified source", body: "Every deployed contract matches its published source exactly on Sourcify, so what you read in the repository is what runs." },
+    { icon: <IconSliders />, title: "Policies on chain", body: "Per-call caps, daily caps, payee and domain allowlists are checked by the account contract itself, not by the SDK or a server." },
+    { icon: <IconKey />, title: "Owner always exits", body: "Each agent has its own smart account. The owner can pause, revoke, unwind and withdraw at any time. Unslept never holds your keys." },
+    { icon: <IconPulse />, title: "Watched around the clock", body: "Buffer health, liquidity, price freshness, timelock operations and write-offs are checked every 15 minutes, with alerts on anything new." },
+  ];
   return (
-    <section id="waitlist" className="section waitlist" aria-labelledby="waitlist-title">
-      <div className="waitlist__panel">
-        <div className="waitlist__copy">
-          <h2 id="waitlist-title" className="display section-title">
-            Get early access
-          </h2>
-          <p>
-            Leave an email and, if you have one, the wallet you plan to use. We write when the app opens.
-            Nothing else.
-          </p>
+    <section id="security" className="section security" aria-labelledby="security-title">
+      <div className="container">
+        <SectionHead
+          id="security-title"
+          eyebrow="Security"
+          title={
+            <>
+              Safeguards, <em>stated plainly.</em>
+            </>
+          }
+          lede="No marketing language about safety. These are the controls that exist today, and the risks that remain."
+        />
+        <div className="security__grid">
+          {facts.map((f, i) => (
+            <article key={f.title} className="card security__item" data-reveal style={{ ["--reveal-i" as string]: i % 3 }}>
+              <span className="security__icon">{f.icon}</span>
+              <h3>{f.title}</h3>
+              <p>{f.body}</p>
+            </article>
+          ))}
         </div>
-        <form className="waitlist__form" method="post" action="/api/waitlist">
-          <div className="field">
-            <label htmlFor="wl-email">Email</label>
-            <input id="wl-email" name="email" type="email" required autoComplete="email" inputMode="email" maxLength={254} />
-          </div>
-          <div className="field">
-            <label htmlFor="wl-wallet">
-              Wallet address <span className="field__optional">(optional)</span>
-            </label>
-            <input
-              id="wl-wallet"
-              name="wallet"
-              type="text"
-              autoComplete="off"
-              spellCheck={false}
-              pattern="^0x[a-fA-F0-9]{40}$"
-              placeholder="0x..."
-              aria-describedby="wl-wallet-hint"
-            />
-            <p id="wl-wallet-hint" className="field__hint">
-              An EVM address: 0x followed by 40 hexadecimal characters.
+        <aside className="risk-band" data-reveal>
+          <div>
+            <h3>Risks you take</h3>
+            <p>
+              Smart contract bugs, loss of value in a tokenized asset, a depeg of USDG, slower withdrawals when the buffer is
+              heavily used, and rules that limit access where you live. You can lose money.
             </p>
           </div>
-          <div className="field field--trap" aria-hidden="true">
-            <label htmlFor="wl-company">Company</label>
-            <input id="wl-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
-          </div>
-          <button type="submit" className="btn btn--primary">
-            Join the waitlist
-          </button>
-        </form>
+          <a className="btn btn--ghost" href="/risk">
+            Read the risk disclosure
+          </a>
+        </aside>
       </div>
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 7. $UNSLEPT                                                         */
+/* Token                                                               */
 /* ------------------------------------------------------------------ */
 
 export function Token({ address, ponsUrl, explorerUrl }: { address?: string; ponsUrl?: string; explorerUrl?: string }) {
   return (
     <section id="token" className="section token" aria-labelledby="token-title">
-      <div className="token__head">
-        <h2 id="token-title" className="display section-title">
-          $UNSLEPT
-        </h2>
-        <p className="lede">
-          The protocol token. It launches on Pons, on Robinhood Chain. It does what is listed here and nothing more.
-        </p>
-      </div>
-      <dl className="token__facts">
-        <div>
-          <dt>Ticker</dt>
-          <dd>$UNSLEPT</dd>
-        </div>
-        <div>
-          <dt>Launch venue</dt>
-          <dd>{ponsUrl ? <a className="text-link" href={ponsUrl} rel="noopener noreferrer" target="_blank">Pons, Robinhood Chain</a> : "Pons, Robinhood Chain"}</dd>
-        </div>
-        <div>
-          <dt>Contract</dt>
-          <dd className="num token__address">
-            {address ? (
-              explorerUrl ? (
-                <a className="text-link" href={`${explorerUrl.replace(/\/$/, "")}/address/${address}`} rel="noopener noreferrer" target="_blank">
-                  {address}
-                </a>
-              ) : (
-                address
-              )
-            ) : (
-              "Not launched yet. The address will be published here and on official channels only."
-            )}
-          </dd>
-        </div>
-      </dl>
-      <ul className="token__uses">
-        <li>
-          <h3>Fee discounts</h3>
-          <p>Lower instant-settlement fees for agents, tiered by the amount held or staked.</p>
-        </li>
-        <li>
-          <h3>Staker buffer tier</h3>
-          <p>Stakers can deposit into a higher-fee buffer tier. Its rate is variable like every other tier.</p>
-        </li>
-        <li>
-          <h3>Governance signaling</h3>
-          <p>Signal which tokenized assets and caps the protocol supports. Advisory until a formal governance process exists.</p>
-        </li>
-      </ul>
-      <p className="token__legal">
-        $UNSLEPT is not an investment and carries no claim on protocol revenue. Any form of fee sharing with holders is
-        pending legal review and is not live.
-      </p>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* 8. Security and risk                                                */
-/* ------------------------------------------------------------------ */
-
-export function Security() {
-  return (
-    <section className="section security" aria-labelledby="security-title">
-      <h2 id="security-title" className="display section-title">
-        Security and risk
-      </h2>
-      <div className="security__grid">
-        <div className="security__item security__item--audit">
-          <h3>Audits</h3>
-          <p className="security__status">Not yet audited.</p>
-          <p>
-            An independent audit is planned. Until its report is published here, the buffer and every tokenized
-            asset run under guarded deposit caps enforced by the contracts and the deployment script.
+      <div className="container">
+        <div className="card token__card" data-reveal>
+          <div className="token__glow" aria-hidden="true" />
+          <div className="token__head">
+            <p className="eyebrow">The protocol token</p>
+            <h2 id="token-title" className="display section-title">
+              $UNSLEPT
+            </h2>
+            <p className="lede">It launches on Pons, on Robinhood Chain. It does what is listed here and nothing more.</p>
+          </div>
+          <dl className="token__facts">
+            <div>
+              <dt>Ticker</dt>
+              <dd>$UNSLEPT</dd>
+            </div>
+            <div>
+              <dt>Launch venue</dt>
+              <dd>
+                {ponsUrl ? (
+                  <a className="text-link" href={ponsUrl} rel="noopener noreferrer" target="_blank">
+                    Pons, Robinhood Chain
+                  </a>
+                ) : (
+                  "Pons, Robinhood Chain"
+                )}
+              </dd>
+            </div>
+            <div className="token__contract">
+              <dt>Contract</dt>
+              <dd className="num">
+                {address ? (
+                  explorerUrl ? (
+                    <a className="text-link" href={`${explorerUrl.replace(/\/$/, "")}/address/${address}`} rel="noopener noreferrer" target="_blank">
+                      {address}
+                    </a>
+                  ) : (
+                    address
+                  )
+                ) : (
+                  "Not launched yet. The address will be published here and on official channels only."
+                )}
+              </dd>
+            </div>
+          </dl>
+          <ul className="token__uses">
+            <li>
+              <h3>Fee discounts</h3>
+              <p>Lower instant-settlement fees for agents, tiered by the amount held or staked.</p>
+            </li>
+            <li>
+              <h3>Staker buffer tier</h3>
+              <p>Stakers can deposit into a higher-fee buffer tier. Its rate is variable like every other tier.</p>
+            </li>
+            <li>
+              <h3>Governance signaling</h3>
+              <p>Signal which tokenized assets and caps the protocol supports. Advisory until a formal process exists.</p>
+            </li>
+          </ul>
+          <p className="token__legal">
+            $UNSLEPT is not an investment and carries no claim on protocol revenue. Any fee sharing with holders is pending
+            legal review and is not live.
           </p>
         </div>
-        <div className="security__item">
-          <h3>Non-custodial</h3>
-          <p>
-            Each agent has its own smart account. The operator always keeps withdrawal rights, and Unslept never takes
-            custody of agent funds.
-          </p>
-        </div>
-        <div className="security__item">
-          <h3>Spending policies</h3>
-          <p>
-            Per-call caps, daily caps and payee allowlists are enforced on-chain. Operators can pause or revoke an
-            agent at any time.
-          </p>
-        </div>
-        <div className="security__item">
-          <h3>Protocol safeguards</h3>
-          <p>
-            Emergency pause, parameter changes behind a 24-hour timelock, oracle staleness checks, per-asset caps, and a solvency
-            invariant that keeps the buffer above pending settlements.
-          </p>
-        </div>
-      </div>
-      <div className="risk-summary">
-        <h3>Risks you take</h3>
-        <p>
-          Smart contract bugs, loss of value in a tokenized asset, a depeg of USDG, slower withdrawals when the buffer
-          is heavily used, and regulatory changes that limit access. You can lose money.
-        </p>
-        <a className="text-link" href="/risk">
-          Read the full risk disclosure
-        </a>
       </div>
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 9. FAQ                                                              */
+/* FAQ                                                                 */
 /* ------------------------------------------------------------------ */
 
 const faqs: { q: string; a: ReactNode }[] = [
   {
     q: "What is x402?",
-    a: (
-      <>
-        x402 is an open payment standard built on the HTTP 402 Payment Required status code. A server answers a
-        request with 402 and its payment requirements. The client signs a payment and retries the same request with it
-        attached, and a facilitator verifies and settles the payment on-chain. It lets agents pay for APIs, data and
-        compute per request, without accounts or API keys.
-      </>
-    ),
+    a: "An open payment standard built on the HTTP 402 Payment Required status code. A server answers a request with 402 and its price. The client pays and retries the same request with a proof attached. It lets agents pay for APIs, data and compute per request, without accounts or API keys.",
   },
   {
     q: "Where does the yield come from?",
-    a: (
-      <>
-        From two sources. First, the tokenized assets that idle balances are allocated into, such as short-duration
-        treasury or money-market style instruments where available. Second, the small instant-settlement fee agents
-        pay when the buffer settles an x402 payment for them. Both change over time, so the rate is variable.
-      </>
-    ),
+    a: "From two places. Idle balances sit in Spark Savings USDG, whose rate is set by Spark and changes over time. Buffer depositors also receive the small instant-settlement fee that agents pay. Both move with market conditions, so the rate is variable and can be zero.",
+  },
+  {
+    q: "What happens if the buffer runs low?",
+    a: "Payments larger than the free buffer liquidity fail cleanly with a clear error, and nothing is lost. Anyone can refill the buffer from its parked position, and agents repay their debts from their own parked funds. Depositor withdrawals queue until liquidity returns.",
+  },
+  {
+    q: "Can Unslept move my funds?",
+    a: "No one can take funds out of your agent account except you. The keeper can only move an account's idle cash into a registered asset and back, and the settlement router can only pay payees you allowlisted, within your caps. Admin changes go through a 24-hour timelock.",
   },
   {
     q: "Is my deposit at risk?",
     a: (
       <>
-        Yes. Deposits are exposed to smart contract risk, tokenized asset risk, USDG depeg risk, liquidity risk
-        (withdrawals can queue when utilization is high) and regulatory risk. The contracts are not yet audited.{" "}
+        Yes. Deposits carry smart contract risk, tokenized asset risk, USDG depeg risk, liquidity risk and regulatory risk,
+        and the contracts are not yet audited. Read the{" "}
         <a className="text-link" href="/risk">
-          Read the risk disclosure
+          risk disclosure
         </a>{" "}
         before depositing anything.
       </>
     ),
   },
   {
-    q: "Which countries are supported?",
-    a: (
-      <>
-        Unslept does not ask for identity verification. Some jurisdictions may be blocked from using the app where the law
-        requires it; you can always read the site and the docs. You are responsible for making sure using Unslept is
-        allowed where you live.
-      </>
-    ),
+    q: "Do I need to verify my identity?",
+    a: "No. Unslept does not ask for identity documents. Access may be limited from some countries where the law requires it. You are responsible for making sure using Unslept is allowed where you live.",
   },
   {
-    q: "Which agent frameworks work with Unslept?",
-    a: (
-      <>
-        Any agent that makes HTTP requests. The TypeScript and Python SDKs wrap fetch, the Python SDK includes a
-        LangChain tool, and the MCP server works with MCP-compatible clients. That covers OpenClaw, Virtuals,
-        LangChain, CrewAI and custom stacks.
-      </>
-    ),
-  },
-  {
-    q: "What is $UNSLEPT used for?",
-    a: (
-      <>
-        Fee discounts on instant settlement, access to a higher-fee buffer tier for stakers, and advisory governance
-        signaling on supported assets and caps. It is not an investment.
-      </>
-    ),
+    q: "Which agent frameworks work?",
+    a: "Any agent that makes HTTP requests. The TypeScript and Python SDKs wrap fetch, the Python SDK includes a LangChain tool, and the MCP server works with any MCP client. That covers OpenClaw, Virtuals, LangChain, CrewAI and custom stacks.",
   },
 ];
 
-export function Faq() {
+export function Faq({ docsUrl }: { docsUrl: string }) {
   return (
     <section className="section faq" aria-labelledby="faq-title">
-      <h2 id="faq-title" className="display section-title">
-        Questions
-      </h2>
-      <div className="faq__list">
-        {faqs.map((f) => (
-          <details key={f.q} className="faq__item">
-            <summary>{f.q}</summary>
-            <div className="faq__answer">
-              <p>{f.a}</p>
+      <div className="container faq__grid">
+        <div className="faq__intro">
+          <SectionHead
+            id="faq-title"
+            eyebrow="Questions"
+            title={
+              <>
+                Asked, <em>answered.</em>
+              </>
+            }
+          />
+          <p className="muted" data-reveal>
+            Something missing? The{" "}
+            <a className="text-link" href={docsUrl}>
+              docs
+            </a>{" "}
+            cover every part of the protocol in detail.
+          </p>
+        </div>
+        <div className="faq__list" data-reveal>
+          {faqs.map((f) => (
+            <details key={f.q} className="faq__item">
+              <summary>
+                <span>{f.q}</span>
+                <span className="faq__icon" aria-hidden="true" />
+              </summary>
+              <div className="faq__answer">
+                <p>{f.a}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Closing call to action and updates                                  */
+/* ------------------------------------------------------------------ */
+
+export function Closing({ docsUrl }: { docsUrl: string }) {
+  return (
+    <section id="waitlist" className="section closing" aria-labelledby="closing-title">
+      <div className="container">
+        <div className="closing__panel card" data-reveal>
+          <div className="closing__copy">
+            <h2 id="closing-title" className="display section-title">
+              Put idle agent money <em>to work.</em>
+            </h2>
+            <p className="lede">Create an agent account in a few minutes, or deposit to the buffer and supply the liquidity that settles payments.</p>
+            <div className="hero__actions">
+              <a className="btn btn--primary btn--large" href="/app">
+                Launch app
+              </a>
+              <a className="btn btn--ghost btn--large" href={docsUrl}>
+                Explore the docs
+              </a>
             </div>
-          </details>
-        ))}
+          </div>
+          <form className="closing__form" method="post" action="/api/waitlist">
+            <p className="closing__form-title">Release notes and the $UNSLEPT launch, by email</p>
+            <div className="field">
+              <label htmlFor="wl-email">Email</label>
+              <input id="wl-email" name="email" type="email" required autoComplete="email" inputMode="email" maxLength={254} placeholder="you@example.com" />
+            </div>
+            <div className="field">
+              <label htmlFor="wl-wallet">
+                Wallet address <span className="field__optional">(optional)</span>
+              </label>
+              <input id="wl-wallet" name="wallet" type="text" autoComplete="off" spellCheck={false} pattern="^0x[a-fA-F0-9]{40}$" placeholder="0x..." aria-describedby="wl-wallet-hint" />
+              <p id="wl-wallet-hint" className="field__hint">
+                An EVM address: 0x followed by 40 hexadecimal characters.
+              </p>
+            </div>
+            <div className="field field--trap" aria-hidden="true">
+              <label htmlFor="wl-company">Company</label>
+              <input id="wl-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+            </div>
+            <button type="submit" className="btn btn--primary">
+              Keep me posted
+            </button>
+            <p className="field__hint">We only write about releases, and we never share your address.</p>
+          </form>
+        </div>
       </div>
     </section>
   );
