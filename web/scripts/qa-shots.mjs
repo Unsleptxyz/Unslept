@@ -5,7 +5,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 
 const base = process.argv[2] ?? "http://localhost:3000";
 const out = process.argv[3] ?? "qa";
-const pages = (process.env.QA_PAGES || "/,/docs,/docs/quickstart,/docs/x402,/risk,/terms,/privacy,/app,/app/agents,/app/buffer,/app/developers,/waitlist/joined,/missing-page").split(",");
+const pages = (process.env.QA_PAGES || "/,/how-it-works,/developers,/security,/token,/docs,/docs/quickstart,/risk,/terms,/app,/app/agents,/waitlist/joined,/missing-page").split(",");
 const sizes = [
   { name: "desktop", width: 1440, height: 900 },
   { name: "mobile", width: 390, height: 844 },

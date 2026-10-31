@@ -59,7 +59,7 @@ export default async function WaitlistOutcome({ params }: { params: Promise<{ ou
               Launch app
             </a>
           ) : (
-            <a className="btn btn--primary" href="/#waitlist">
+            <a className="btn btn--primary" href="/#updates">
               Back to the form
             </a>
           )}

@@ -437,12 +437,13 @@ const tabs: CodeTab[] = [
   { label: "MCP", filename: "mcp.json", code: mcpCode },
 ];
 
-export function Developers({ docsUrl, siteUrl }: { docsUrl: string; siteUrl?: string }) {
+export function Developers({ docsUrl, siteUrl, head = true }: { docsUrl: string; siteUrl?: string; head?: boolean }) {
   const demo = `${(siteUrl ?? "").replace(/\/$/, "")}/api/demo/x402`;
   return (
     <section id="developers" className="section developers" aria-labelledby="dev-title">
       <div className="container developers__grid">
         <div className="developers__intro">
+          {head ? (
           <SectionHead
             id="dev-title"
             eyebrow="For developers"
@@ -453,6 +454,7 @@ export function Developers({ docsUrl, siteUrl }: { docsUrl: string; siteUrl?: st
             }
             lede="Wrap the fetch your agent already makes. When a server answers 402, the SDK checks your spending policy, settles from the buffer and retries with the payment attached."
           />
+          ) : null}
           <div className="developers__installs" data-reveal>
             <CopyCommand command="npm install @unslept/sdk viem" label="TypeScript" />
             <CopyCommand command='pip install "unslept[web3]"' label="Python" />
@@ -608,11 +610,11 @@ export function Stats({ stats }: { stats: NetworkStats }) {
 /* Security                                                            */
 /* ------------------------------------------------------------------ */
 
-export function Security() {
+export function Security({ head = true }: { head?: boolean }) {
   const facts = [
     { icon: <IconShield />, title: "Guarded launch", body: "Not yet audited by a third party. Until an audit is published, total buffer deposits and each asset are capped at 50,000 USDG by the contracts." },
     { icon: <IconClock />, title: "24-hour timelock", body: "Every admin change, from fee levels to new assets, is scheduled on chain a full day before it can take effect. Anyone can watch it coming." },
-    { icon: <IconCheckFile />, title: "Verified source", body: "Every deployed contract matches its published source exactly on Sourcify, so what you read in the repository is what runs." },
+    { icon: <IconCheckFile />, title: "Verified source", body: "Every deployed contract matches its published source exactly on Sourcify, so anyone can read the code that actually runs." },
     { icon: <IconSliders />, title: "Policies on chain", body: "Per-call caps, daily caps, payee and domain allowlists are checked by the account contract itself, not by the SDK or a server." },
     { icon: <IconKey />, title: "Owner always exits", body: "Each agent has its own smart account. The owner can pause, revoke, unwind and withdraw at any time. Unslept never holds your keys." },
     { icon: <IconPulse />, title: "Watched around the clock", body: "Buffer health, liquidity, price freshness, timelock operations and write-offs are checked every 15 minutes, with alerts on anything new." },
@@ -620,7 +622,8 @@ export function Security() {
   return (
     <section id="security" className="section security" aria-labelledby="security-title">
       <div className="container">
-        <SectionHead
+        {head ? (
+          <SectionHead
           id="security-title"
           eyebrow="Security"
           title={
@@ -630,6 +633,7 @@ export function Security() {
           }
           lede="No marketing language about safety. These are the controls that exist today, and the risks that remain."
         />
+        ) : null}
         <div className="security__grid">
           {facts.map((f, i) => (
             <article key={f.title} className="card security__item" data-reveal style={{ ["--reveal-i" as string]: i % 3 }}>
@@ -660,13 +664,13 @@ export function Security() {
 /* Token                                                               */
 /* ------------------------------------------------------------------ */
 
-export function Token({ address, ponsUrl, explorerUrl }: { address?: string; ponsUrl?: string; explorerUrl?: string }) {
+export function Token({ address, ponsUrl, explorerUrl, head = true }: { address?: string; ponsUrl?: string; explorerUrl?: string; head?: boolean }) {
   return (
     <section id="token" className="section token" aria-labelledby="token-title">
       <div className="container">
         <div className="card token__card" data-reveal>
           <div className="token__glow" aria-hidden="true" />
-          <div className="token__head">
+          <div className="token__head" hidden={!head}>
             <p className="eyebrow">The protocol token</p>
             <h2 id="token-title" className="display section-title">
               $UNSLEPT
@@ -821,7 +825,7 @@ export function Faq({ docsUrl }: { docsUrl: string }) {
 
 export function Closing({ docsUrl }: { docsUrl: string }) {
   return (
-    <section id="waitlist" className="section closing" aria-labelledby="closing-title">
+    <section id="updates" className="section closing" aria-labelledby="closing-title">
       <div className="container">
         <div className="closing__panel card" data-reveal>
           <div className="closing__copy">

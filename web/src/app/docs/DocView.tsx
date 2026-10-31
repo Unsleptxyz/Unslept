@@ -28,7 +28,7 @@ export function DocView({ page }: { page: DocPage }) {
   const prev = i > 0 ? docs[i - 1] : undefined;
   const next = i >= 0 && i < docs.length - 1 ? docs[i + 1] : undefined;
   return (
-    <PageShell progress>
+    <PageShell progress active="/docs">
       <div className="docs container">
         <aside className="docs__sidebar">
           <nav aria-label="Documentation" className="docs__nav">

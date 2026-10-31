@@ -3,10 +3,10 @@ import { SiteFooter, SiteHeader } from "./SiteChrome";
 import { ReadingProgress, Toc } from "./content/Toc";
 import { site } from "@/lib/config";
 
-export function PageShell({ children, progress = false }: { children: ReactNode; progress?: boolean }) {
+export function PageShell({ children, progress = false, active }: { children: ReactNode; progress?: boolean; active?: string }) {
   return (
     <>
-      <SiteHeader docsUrl={site.docsUrl} />
+      <SiteHeader docsUrl={site.docsUrl} active={active} />
       {progress ? <ReadingProgress /> : null}
       <main id="main">{children}</main>
       <SiteFooter docsUrl={site.docsUrl} githubUrl={site.githubUrl} xUrl={site.xUrl} />

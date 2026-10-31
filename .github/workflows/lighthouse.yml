@@ -25,12 +25,12 @@ jobs:
           npm i -g lighthouse@12 >/dev/null 2>&1
           mkdir -p ops/lh
           BASE="${{ inputs.base }}"
-          for p in / /app /docs /docs/x402 /risk /terms /privacy; do curl -s -o /dev/null "$BASE$p"; curl -s -o /dev/null "$BASE$p"; done
+          for p in / /how-it-works /developers /security /token /app /docs /docs/x402 /risk /terms /privacy; do curl -s -o /dev/null "$BASE$p"; curl -s -o /dev/null "$BASE$p"; done
           {
             echo "# Lighthouse (mobile, default throttling). $(date -u +%FT%TZ)"
             echo "# Warm-up requests first. Home is audited 3 times (run-to-run variance); use the median."
             echo "# path perf a11y best-practices seo"
-            for p in / / / /app /docs /docs/x402 /risk /terms /privacy; do
+            for p in / / / /how-it-works /developers /security /token /app /docs /docs/x402 /risk /terms /privacy; do
               f="ops/lh/$(echo "$p" | tr '/' '_' | sed 's/^_*$/root/').json"
               lighthouse "$BASE$p" --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="$f" >/dev/null 2>&1
               node -e '

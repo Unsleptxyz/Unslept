@@ -30,13 +30,13 @@ export function Brand({ href = "/" }: { href?: string }) {
 }
 
 const nav = [
-  { href: "/#how-it-works", label: "How it works" },
-  { href: "/#developers", label: "Developers" },
-  { href: "/#security", label: "Security" },
-  { href: "/#token", label: "$UNSLEPT" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/developers", label: "Developers" },
+  { href: "/security", label: "Security" },
+  { href: "/token", label: "$UNSLEPT" },
 ];
 
-export function SiteHeader({ docsUrl }: { docsUrl: string }) {
+export function SiteHeader({ docsUrl, active }: { docsUrl: string; active?: string }) {
   return (
     <header className="site-header" data-site-header>
       <HeaderScroll />
@@ -47,11 +47,13 @@ export function SiteHeader({ docsUrl }: { docsUrl: string }) {
         <Brand />
         <nav aria-label="Primary" className="site-nav">
           {nav.map((n) => (
-            <a key={n.href} href={n.href}>
+            <a key={n.href} href={n.href} aria-current={active === n.href ? "page" : undefined}>
               {n.label}
             </a>
           ))}
-          <a href={docsUrl}>Docs</a>
+          <a href={docsUrl} aria-current={active === "/docs" ? "page" : undefined}>
+            Docs
+          </a>
         </nav>
         <div className="site-header__actions">
           <a href="/app" className="btn btn--primary btn--small">
@@ -62,8 +64,11 @@ export function SiteHeader({ docsUrl }: { docsUrl: string }) {
               <span className="mobile-nav__bars" aria-hidden="true" />
             </summary>
             <nav aria-label="Mobile" className="mobile-nav__panel">
+              <a href="/" aria-current={active === "/" ? "page" : undefined}>
+                Home
+              </a>
               {nav.map((n) => (
-                <a key={n.href} href={n.href}>
+                <a key={n.href} href={n.href} aria-current={active === n.href ? "page" : undefined}>
                   {n.label}
                 </a>
               ))}
@@ -110,13 +115,14 @@ export function SiteFooter({ docsUrl, githubUrl, xUrl }: ChromeLinks) {
           </div>
           <nav aria-label="Product" className="site-footer__col">
             <h2>Product</h2>
-            <FooterLink href="/app">App</FooterLink>
-            <FooterLink href="/app/agents">Agents</FooterLink>
-            <FooterLink href="/app/buffer">Buffer</FooterLink>
-            <FooterLink href="/#token">$UNSLEPT</FooterLink>
+            <FooterLink href="/how-it-works">How it works</FooterLink>
+            <FooterLink href="/app">Launch app</FooterLink>
+            <FooterLink href="/app/buffer">Buffer deposits</FooterLink>
+            <FooterLink href="/token">$UNSLEPT</FooterLink>
           </nav>
           <nav aria-label="Developers" className="site-footer__col">
             <h2>Developers</h2>
+            <FooterLink href="/developers">Overview</FooterLink>
             <FooterLink href={docsUrl}>Docs</FooterLink>
             <FooterLink href={`${docsUrl}/quickstart`}>Quickstart</FooterLink>
             <FooterLink href={`${docsUrl}/contracts`}>Contracts</FooterLink>
@@ -124,6 +130,7 @@ export function SiteFooter({ docsUrl, githubUrl, xUrl }: ChromeLinks) {
           </nav>
           <nav aria-label="Legal" className="site-footer__col">
             <h2>Trust</h2>
+            <FooterLink href="/security">Security</FooterLink>
             <FooterLink href="/risk">Risk disclosure</FooterLink>
             <FooterLink href="/terms">Terms</FooterLink>
             <FooterLink href="/privacy">Privacy</FooterLink>
