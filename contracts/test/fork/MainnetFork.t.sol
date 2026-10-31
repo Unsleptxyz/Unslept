@@ -148,8 +148,12 @@ contract MainnetForkTest is Test {
         agent.withdraw(owner_, l);
         vm.stopPrank();
         assertEq(adapter.valueOf(address(agent)), 0, "position fully unwound");
-        assertApproxEqAbs(usdg.balanceOf(owner_), 100 * ONE - (1 * ONE + liquidBefore + 10 * ONE) - fee1 - fee2, 3 + (parked / 1e4));
-        emit log_named_uint("owner received (atomic USDG)", usdg.balanceOf(owner_));
+        uint256 expected = 100 * ONE - (1 * ONE + liquidBefore + 10 * ONE) - fee1 - fee2;
+        uint256 received = usdg.balanceOf(owner_);
+        assertGe(received + 3, expected, "owner gets back at least principal minus payments and fees");
+        assertLe(received, expected + parked / 50, "no more than plausible yield (2% of parked in 30 days)");
+        emit log_named_uint("owner received (atomic USDG)", received);
+        emit log_named_uint("spUSDG yield over 30 days (atomic USDG)", received > expected ? received - expected : 0);
         emit log_named_uint("fees paid (atomic USDG)", fee1 + fee2);
     }
 
@@ -197,16 +201,20 @@ contract MainnetForkTest is Test {
         assertApproxEqAbs(buffer.totalAssets(), total, 2, "parking does not change buffer value");
 
         // A large instant payment drains liquidity below target; anyone can refill from spUSDG.
+        // The agent's collateral sits in spUSDG; the buffer fronts the payment and drops below target.
         AgentAccount agent = _newAgent(500 * ONE, 1_000 * ONE);
-        vm.prank(owner_);
-        agent.setAutoAllocate(false);
-        deal(address(usdg), address(agent), 1 * ONE); // tiny liquid, so the buffer fronts most of it
-        uint256 pay = buffer.available() > 10 * ONE ? buffer.available() - 10 * ONE : buffer.available();
-        if (pay > 500 * ONE) pay = 500 * ONE;
+        deal(address(usdg), address(agent), 400 * ONE);
+        vm.prank(keeper);
+        allocator.allocateAgent(address(agent), address(adapter), 399 * ONE);
+        uint256 pay = buffer.available() - 1 * ONE;
+        if (pay > 300 * ONE) pay = 300 * ONE;
         vm.prank(signer);
         agent.requestPayment(_req(pay, keccak256("b1"), ISettlementRouter.Mode.Direct));
+        assertLt(buffer.available(), buffer.totalAssets() * allocator.bufferTargetBps() / 10_000, "below target");
         uint256 got = allocator.refillBuffer(address(buffer), address(adapter));
         assertGt(got, 0, "refilled from spUSDG");
+        allocator.settleDebt(address(agent));
+        assertEq(buffer.debtOf(address(agent)), 0, "agent debt settled");
 
         // Depositor can still get the value back (instantly or through the queue).
         uint256 shares = buffer.balanceOf(depositor);
