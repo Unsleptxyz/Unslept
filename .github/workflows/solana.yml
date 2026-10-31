@@ -34,6 +34,7 @@ jobs:
           sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.21/install)" > /dev/null
           echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
           npm install -g @coral-xyz/anchor-cli@0.31.1 > /dev/null
+          chmod +x "$(npm root -g)/@coral-xyz/anchor-cli/anchor"
       - name: Build and test
         working-directory: solana
         shell: bash {0}

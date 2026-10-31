@@ -1,15 +1,12 @@
-[toolchain]
-anchor_version = "0.31.1"
-
 [features]
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-unslept = "UNS1epTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+unslept = "7pq53ZQ8JRCaPoorjfnuCmMFDQEeEgDMnE1D92gA3t2W"
 
 [programs.devnet]
-unslept = "UNS1epTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+unslept = "7pq53ZQ8JRCaPoorjfnuCmMFDQEeEgDMnE1D92gA3t2W"
 
 [provider]
 cluster = "localnet"
