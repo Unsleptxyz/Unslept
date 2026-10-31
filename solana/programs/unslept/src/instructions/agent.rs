@@ -138,7 +138,7 @@ pub struct RepayDebt<'info> {
 }
 
 /// Permissionless: moves the agent's liquid USDC back to the buffer until its debt is zero.
-pub fn repay_debt(ctx: Context<RepayDebt>) -> Result<()> {
+pub fn repay_debt(mut ctx: Context<RepayDebt>) -> Result<()> {
     let paid = crate::instructions::pay::repay_from_vault(
         &mut ctx.accounts.agent,
         &mut ctx.accounts.config,

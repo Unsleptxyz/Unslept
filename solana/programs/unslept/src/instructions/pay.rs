@@ -61,7 +61,7 @@ pub struct Pay<'info> {
 
 /// Settles one x402 payment. The buffer pays the merchant at once; the agent repays the buffer from its liquid USDC in
 /// the same transaction, and any remainder stays as debt backed by the agent's yield position.
-pub fn pay(ctx: Context<Pay>, payment_id: [u8; 32], amount: u64, endpoint_hash: [u8; 32]) -> Result<()> {
+pub fn pay(mut ctx: Context<Pay>, payment_id: [u8; 32], amount: u64, endpoint_hash: [u8; 32]) -> Result<()> {
     let clock = Clock::get()?;
     let a = &mut ctx.accounts;
     require!(!a.config.paused, UnsleptError::ProtocolPaused);
