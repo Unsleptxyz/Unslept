@@ -1,6 +1,8 @@
-# Solana program test 2026-10-31T15:58:24Z
-Trying globally installed anchor.
-Could not find globally installed anchor, install with cargo.
-Package binary version is not correct. Expected "anchor-cli 0.31.1", found "anchor-cli 0.31.0".
-Trying globally installed anchor.
-Could not find globally installed anchor, install with cargo.
+# Solana program test 2026-10-31T15:59:41Z
+All program id declarations are synced.
+Please rebuild the program to update the generated artifacts.
+[1m[32m  Downloaded[0m anchor-attribute-error v0.31.2
+[1m[31merror[0m[1m:[0m failed to parse manifest at `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/digest-0.11.3/Cargo.toml`
+Found a 'test' script in the Anchor.toml. Running it as a test suite!
+Running test suite: "/home/runner/work/Unslept/Unslept/solana/Anchor.toml"
+Unable to get latest blockhash. Test validator does not look started. Check ".anchor/test-ledger/test-ledger-log.txt" for errors. Consider increasing [test.startup_wait] in Anchor.toml.
