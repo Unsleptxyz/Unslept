@@ -74,7 +74,7 @@ contract MainnetForkTest is Test {
             amount: amount,
             paymentId: id,
             domain: "",
-            endpoint: "https://unslept-o29g.vercel.app/api/demo/x402",
+            endpoint: "https://unslept.xyz/api/demo/x402",
             mode: mode
         });
     }

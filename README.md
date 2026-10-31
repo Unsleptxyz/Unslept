@@ -12,10 +12,10 @@
 </p>
 
 <p align="center">
-  <a href="https://unslept-o29g.vercel.app">Website</a> ·
-  <a href="https://unslept-o29g.vercel.app/docs">Docs</a> ·
-  <a href="https://unslept-o29g.vercel.app/app">App</a> ·
-  <a href="https://unslept-o29g.vercel.app/risk">Risk disclosure</a>
+  <a href="https://unslept.xyz">Website</a> ·
+  <a href="https://unslept.xyz/docs">Docs</a> ·
+  <a href="https://unslept.xyz/app">App</a> ·
+  <a href="https://unslept.xyz/risk">Risk disclosure</a>
 </p>
 
 ---
@@ -25,7 +25,7 @@ payments. Unslept keeps that balance in tokenized assets while it waits, and pay
 instant they are due from a shared USDG buffer. The agent never waits for an asset to be sold. Every payment stays
 inside a spending policy enforced on chain.
 
-Yield is variable and not guaranteed. See the [risk disclosure](https://unslept-o29g.vercel.app/risk).
+Yield is variable and not guaranteed. See the [risk disclosure](https://unslept.xyz/risk).
 
 ## How it works
 
@@ -69,10 +69,10 @@ const unslept = new Unslept({
 });
 
 // Pays the 402 challenge from the agent account, then retries with the payment proof.
-const res = await unslept.fetch("https://unslept-o29g.vercel.app/api/demo/x402", undefined, { maxAmount: 50_000n });
+const res = await unslept.fetch("https://unslept.xyz/api/demo/x402", undefined, { maxAmount: 50_000n });
 ```
 
-Python, LangChain, CrewAI and MCP quickstarts are in the [docs](https://unslept-o29g.vercel.app/docs).
+Python, LangChain, CrewAI and MCP quickstarts are in the [docs](https://unslept.xyz/docs).
 
 | Package | Install | Use |
 |---|---|---|

@@ -6,7 +6,7 @@ on:
     inputs:
       base:
         description: "Site base URL"
-        default: "https://unslept-o29g.vercel.app"
+        default: "https://unslept.xyz"
 
 permissions:
   contents: write
