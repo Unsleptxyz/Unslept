@@ -1,67 +1,67 @@
-# Solana program test 2026-10-31T16:06:36Z
+# Solana program test 2026-10-31T16:09:33Z
 All program id declarations are synced.
 Please rebuild the program to update the generated artifacts.
 build exit 1
-[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: try referring to `Accounts` crate for guidance on how handle this unexpected cfg[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)[0m
 
-[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/buffer.rs:77:25[0m
+[0m[1m[33mwarning[0m[0m[1m: unexpected `cfg` condition value: `anchor-debug`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:36:10[0m
 [0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;12m77[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new(a.token_program.to_account_info(), Burn {[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
+[0m[1m[38;5;12m36[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m#[derive(Accounts)][0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m          [0m[0m[1m[33m^^^^^^^^[0m
 [0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:188:12[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: try referring to `Accounts` crate for guidance on how handle this unexpected cfg[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)[0m
 
-[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/buffer.rs:86:37[0m
-[0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;12m86[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
-[0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
-
-[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:24:37[0m
-[0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;12m24[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new_with_signer(token_program.to_account_info(), Transfer {[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
-[0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
-
-[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:86:37[0m
-[0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;12m86[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12m|[0m
-[0m   [0m[0m[1m[38;5;12m|[0m[0m         [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
-[0m   [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
-[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
-
-[0m[1m[38;5;9merror[E0308][0m[0m[1m: mismatched types[0m
-[0m   [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:101:41[0m
+[0m[1m[33mwarning[0m[0m[1m: unexpected `cfg` condition value: `anchor-debug`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:143:10[0m
 [0m    [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;12m101[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            CpiContext::new_with_signer(a.token_program.to_account_info(), Transfer {[0m
-[0m    [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[38;5;12m---------------------------[0m[0m [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mexpected `Pubkey`, found `AccountInfo<'_>`[0m
-[0m    [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[38;5;12m|[0m
-[0m    [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[38;5;12marguments to this function are incorrect[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m#[derive(Accounts)][0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m          [0m[0m[1m[33m^^^^^^^^[0m
 [0m    [0m[0m[1m[38;5;12m|[0m
-[0m[1m[38;5;10mnote[0m[0m: associated function defined here[0m
-[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/context.rs:198:12[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: try referring to `Accounts` crate for guidance on how handle this unexpected cfg[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)[0m
 
-[0m[1mFor more information about this error, try `rustc --explain E0308`.[0m
+[0m[1m[33mwarning[0m[0m[1m: unexpected `cfg` condition value: `anchor-debug`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/lib.rs:15:1[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m15[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m#[program][0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[33m^^^^^^^^^^[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: try referring to `program` crate for guidance on how handle this unexpected cfg[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the attribute macro `program` may come from an old version of the `anchor_attribute_program` crate, try updating your dependency with `cargo update -p anchor_attribute_program`[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: this warning originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)[0m
+
+[0m[1m[38;5;9merror[E0596][0m[0m[1m: cannot borrow `ctx.accounts` as mutable, as `ctx` is not declared as mutable[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mprograms/unslept/src/instructions/pay.rs:66:13[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m66[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let a = &mut ctx.accounts;[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcannot borrow as mutable[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;14mhelp[0m[0m: consider changing this to be mutable[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m64[0m[0m [0m[0m[1m[38;5;12m| [0m[0mpub fn pay([0m[0m[38;5;10mmut [0m[0mctx: Context<Pay>, payment_id: [u8; 32], amount: u64, endpoint_hash: [u8; 32]) -> Result<()> {[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m            [0m[0m[38;5;10m+++[0m
+
+[0m[1mFor more information about this error, try `rustc --explain E0596`.[0m
 [1m[33mwarning[0m[1m:[0m `unslept` (lib) generated 15 warnings
-[1m[31merror[0m[1m:[0m could not compile `unslept` (lib) due to 8 previous errors; 15 warnings emitted
+[1m[31merror[0m[1m:[0m could not compile `unslept` (lib) due to 1 previous error; 15 warnings emitted
       --skip-local-validator
           Flag to skip starting a local validator, if the configured cluster url is a localnet
           Flag to keep the local validator running after tests to be able to check the transactions
@@ -73,3 +73,4 @@ build exit 1
 Found a 'test' script in the Anchor.toml. Running it as a test suite!
 Running test suite: "/home/runner/work/Unslept/Unslept/solana/Anchor.toml"
 Unable to get latest blockhash. Test validator does not look started. Check ".anchor/test-ledger/test-ledger-log.txt" for errors. Consider increasing [test.startup_wait] in Anchor.toml.
+Error: program file does not exist: /home/runner/work/Unslept/Unslept/solana/target/deploy/unslept.so
