@@ -1,12 +1,12 @@
-# Lighthouse (mobile, default throttling). 2026-10-31T08:25:09Z
+# Lighthouse (mobile, default throttling). 2026-10-31T10:36:08Z
 # Warm-up requests first. Home is audited 3 times (run-to-run variance); use the median.
 # path perf a11y best-practices seo
-/ 76 100 100 100 | lcp=2.8 s cls=0.001 tbt=800 ms | below 90: largest-contentful-paint,total-blocking-time,max-potential-fid,mainthread-work-breakdown,largest-contentful-paint-element,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/ 99 100 100 100 | lcp=2.2 s cls=0 tbt=60 ms | below 90: unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/ 99 100 100 100 | lcp=2.2 s cls=0.001 tbt=60 ms | below 90: unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/app 96 100 100 60 | lcp=2.2 s cls=0.001 tbt=190 ms | below 90: max-potential-fid,unused-javascript,legacy-javascript,is-crawlable,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/docs 98 100 100 100 | lcp=2.2 s cls=0.001 tbt=70 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/docs/x402 100 100 100 100 | lcp=1.8 s cls=0.001 tbt=10 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/risk 98 100 100 100 | lcp=2.2 s cls=0.001 tbt=70 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/terms 99 100 100 100 | lcp=2.2 s cls=0.001 tbt=40 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
-/privacy 99 100 100 100 | lcp=2.2 s cls=0.001 tbt=60 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/ 61 100 100 100 | lcp=2.7 s cls=0 tbt=3,530 ms | below 90: first-contentful-paint,largest-contentful-paint,speed-index,total-blocking-time,max-potential-fid,interactive,mainthread-work-breakdown,bootup-time,largest-contentful-paint-element,unused-javascript,legacy-javascript,legacy-javascript-insight
+/ 69 100 100 100 | lcp=2.5 s cls=0 tbt=1,420 ms | below 90: speed-index,total-blocking-time,max-potential-fid,interactive,mainthread-work-breakdown,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/ 71 100 100 100 | lcp=2.4 s cls=0 tbt=1,600 ms | below 90: total-blocking-time,max-potential-fid,interactive,mainthread-work-breakdown,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/app 92 100 100 60 | lcp=2.5 s cls=0 tbt=250 ms | below 90: largest-contentful-paint,total-blocking-time,max-potential-fid,largest-contentful-paint-element,render-blocking-resources,unused-javascript,legacy-javascript,is-crawlable,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/docs 75 100 100 100 | lcp=2.3 s cls=0.697 tbt=10 ms | below 90: cumulative-layout-shift,layout-shifts,render-blocking-resources,unused-javascript,legacy-javascript,cls-culprits-insight,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/docs/x402 75 100 100 100 | lcp=2.3 s cls=0.708 tbt=20 ms | below 90: cumulative-layout-shift,layout-shifts,render-blocking-resources,unused-javascript,legacy-javascript,cls-culprits-insight,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/risk 98 100 100 100 | lcp=2.3 s cls=0 tbt=10 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/terms 98 100 100 100 | lcp=2.3 s cls=0 tbt=10 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
+/privacy 98 100 100 100 | lcp=2.3 s cls=0 tbt=20 ms | below 90: render-blocking-resources,unused-javascript,legacy-javascript,legacy-javascript-insight,network-dependency-tree-insight,render-blocking-insight
