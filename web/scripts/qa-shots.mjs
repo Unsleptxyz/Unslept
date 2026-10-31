@@ -23,9 +23,15 @@ for (const s of sizes) {
     const name = `${s.name}${p === "/" ? "_home" : p.replaceAll("/", "_")}`;
     try {
       const r = await page.goto(base + p, { waitUntil: "networkidle", timeout: 45000 });
-      await page.waitForTimeout(2500);
-      await page.screenshot({ path: `${out}/${name}_top.png` });
-      await page.screenshot({ path: `${out}/${name}_full.png`, fullPage: true });
+      await page.waitForTimeout(3000);
+      const total = await page.evaluate(() => document.documentElement.scrollHeight);
+      const step = s.height;
+      const shots = Math.min(Number(process.env.QA_MAX_SHOTS || 12), Math.ceil(total / step));
+      for (let k = 0; k < shots; k++) {
+        await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), k * step);
+        await page.waitForTimeout(k === 0 ? 200 : 1100);
+        await page.screenshot({ path: `${out}/${name}_${String(k).padStart(2, "0")}.png` });
+      }
       log.push(`${name}: HTTP ${r?.status()}${errs.length ? "\n  " + errs.join("\n  ") : ""}`);
     } catch (e) {
       log.push(`${name}: FAILED ${String(e).slice(0, 300)}`);
