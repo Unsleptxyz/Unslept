@@ -7,6 +7,7 @@ import { Keypair, PublicKey, SystemProgram, LAMPORTS_PER_SOL, ComputeBudgetProgr
 import { getOrCreateAssociatedTokenAccount, mintTo, getAccount, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { expect } from "chai";
 import { randomBytes } from "crypto";
+import fs from "fs";
 import type { Unslept } from "../target/types/unslept";
 
 const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
@@ -152,5 +153,10 @@ describe("unslept + kamino (mainnet fork)", () => {
     console.log(`      redeemed ${ctokens / 1e6} cUSDC, ${left / 1e6} USDC left after repaying debt`);
     const c = await program.account.config.fetch(config);
     expect(c.outstandingDebt.toNumber()).to.eq(0);
+  });
+
+  after(() => {
+    // Hand the funded agent to the SDK end-to-end script (scripts/sdk-e2e.ts).
+    fs.writeFileSync(".fork/e2e.json", JSON.stringify({ agent: agent.toBase58(), signer: Array.from(agentSigner.secretKey) }));
   });
 });

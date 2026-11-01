@@ -18,6 +18,7 @@
     "mocha": "^10.0.0",
     "ts-mocha": "^10.0.0",
     "typescript": "^5.6.0",
-    "@types/bn.js": "^5.1.6"
+    "@types/bn.js": "^5.1.6",
+    "tsx": "^4.19.0"
   }
 }
