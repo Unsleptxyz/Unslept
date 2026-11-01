@@ -1,6 +1,6 @@
 # Agent templates
 
-Starting points that run against Unslept on Robinhood Chain mainnet. Each folder has its own README.
+Starting points that run against Unslept on Solana mainnet. Each folder has its own README.
 
 | Template | What it does |
 |---|---|
