@@ -156,7 +156,7 @@ describe("unslept + kamino (mainnet fork)", () => {
   });
 
   after(() => {
-    // Hand the funded agent to the SDK end-to-end script (scripts/sdk-e2e.ts).
+    // Hand the funded agent to the SDK end-to-end script (scripts/sdk-e2e.mts).
     fs.writeFileSync(".fork/e2e.json", JSON.stringify({ agent: agent.toBase58(), signer: Array.from(agentSigner.secretKey) }));
   });
 });

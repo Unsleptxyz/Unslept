@@ -22,7 +22,7 @@ code=$?
 if [ $code -eq 0 ]; then
   echo "## SDK + @unslept/pay end to end"
   (cd ../packages/sdk-ts && npm install --no-audit --no-fund > /dev/null 2>&1)
-  node --import tsx scripts/sdk-e2e.ts; code=$?
+  node --import tsx scripts/sdk-e2e.mts; code=$?
 fi
 kill $VPID 2>/dev/null
 [ $code -ne 0 ] && grep -iE "error|panic" .fork/validator.log | tail -20
