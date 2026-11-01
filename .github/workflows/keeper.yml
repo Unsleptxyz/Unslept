@@ -1,7 +1,8 @@
 name: keeper
 
-# Every 10 minutes: repay buffer debt from parked positions, park idle agent cash in spUSDG,
-# refill the buffer when below target, and fund queued withdrawals. Needs the KEEPER_PRIVATE_KEY secret.
+# Every 10 minutes on Solana: repay agent debt from liquid USDC, redeem just enough of an agent's Kamino position to
+# clear the rest, and close payment records older than 24 hours (rent returns to whoever paid it).
+# The keeper key is derived from DEPLOYER_PRIVATE_KEY; it needs a little SOL for fees.
 on:
   schedule:
     - cron: "*/10 * * * *"
@@ -20,16 +21,16 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Keeper pass
+        working-directory: solana
         env:
-          KEEPER_PRIVATE_KEY: ${{ secrets.KEEPER_PRIVATE_KEY }}
-          KEEPER_RPC_URL: ${{ secrets.ROBINHOOD_RPC_URL || 'https://rpc.mainnet.chain.robinhood.com' }}
-          NEXT_PUBLIC_AGENT_ACCOUNT_FACTORY_ADDRESS: "0xCa7D38A833BFaCBE22E787f967552A78b07C1c77"
-          NEXT_PUBLIC_ALLOCATOR_ADDRESS: "0x5684a28Ef362f1282Eb7ef7e4C154F5e21FEfcfd"
-          NEXT_PUBLIC_BUFFER_ADDRESS: "0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D"
-          KEEPER_ADAPTER: "0xAf7f74801C2b439831feef6D1b4d39B4Ce717B66"
-          NEXT_PUBLIC_DEPLOY_BLOCK: "102271358"
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          RPC: ${{ secrets.SOLANA_MAINNET_RPC || 'https://api.mainnet-beta.solana.com' }}
         run: |
-          if [ -z "$KEEPER_PRIVATE_KEY" ]; then echo "KEEPER_PRIVATE_KEY secret is not set; skipping."; exit 0; fi
-          bash ops/keeper.sh
+          if [ -z "$DEPLOYER_PRIVATE_KEY" ]; then echo "DEPLOYER_PRIVATE_KEY secret is not set; skipping."; exit 0; fi
+          npm install --no-audit --no-fund --no-save @solana/web3.js@1 > /dev/null 2>&1
+          node scripts/derive-keys.mjs /tmp/keys > /dev/null
+          node scripts/keeper.mjs /tmp/keys

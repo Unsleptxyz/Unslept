@@ -1,11 +1,10 @@
+# Robinhood Chain monitor, retired with the move to Solana. Manual runs only.
 name: monitor
 
 # Every 15 minutes: protocol health checks (pause, utilization, liquidity, stale price, timelock operations,
 # write-offs). Each new alert opens a GitHub issue labelled "ops-alert" (GitHub notifies watchers by email and app),
 # and also goes to OPS_WEBHOOK_URL (Slack or Discord compatible) when that secret is set.
 on:
-  schedule:
-    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
     inputs:
       test_alert:
