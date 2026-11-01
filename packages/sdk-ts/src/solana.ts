@@ -109,11 +109,12 @@ export function createSolanaChain(opts: SolanaChainOptions): UnsleptChain & {
   }
 
   async function sign(tx: Transaction): Promise<Transaction> {
-    if (opts.signer instanceof Keypair) {
-      tx.sign(opts.signer);
+    const s = opts.signer as Partial<Keypair> & { signTransaction?: (t: Transaction) => Promise<Transaction> };
+    if (s.secretKey) {
+      tx.sign(s as Keypair);
       return tx;
     }
-    return opts.signer.signTransaction(tx);
+    return s.signTransaction!(tx);
   }
 
   async function requestPayment(input: PaymentRequestInput): Promise<SettlementResult> {
