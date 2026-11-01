@@ -1,42 +1,33 @@
 # @unslept/sdk
 
-Pay x402 paywalls from an Unslept agent account on Robinhood Chain. The client catches HTTP 402, checks the
-agent's on-chain spending policy, settles the payment from the Unslept buffer and retries the request with the
-payment proof.
+Pay x402 paywalls in USDC on Solana from an Unslept agent account. Idle agent USDC can earn on Kamino Lend while the
+Unslept buffer pays every request the moment it is due.
 
 ```sh
-npm install @unslept/sdk viem
+npm install @unslept/sdk @solana/web3.js
 ```
 
 ```ts
 import { Unslept } from "@unslept/sdk";
-import { privateKeyToAccount } from "viem/accounts";
+import { Keypair } from "@solana/web3.js";
 
 const unslept = new Unslept({
-  agentAccount: process.env.UNSLEPT_AGENT_ACCOUNT,
-  signer: privateKeyToAccount(process.env.UNSLEPT_SIGNER_KEY as `0x${string}`),
-  network: "robinhood-chain",
+  agent: process.env.UNSLEPT_AGENT,              // agent account address, from the Unslept app
+  signer: Keypair.fromSecretKey(agentSecretKey), // the agent signer, never your own wallet
+  network: "solana",                             // or "solana-devnet"
+  rpcUrl: process.env.UNSLEPT_RPC_URL,           // a dedicated RPC is recommended
 });
 
-const res = await unslept.fetch("https://example.com/paid-resource", undefined, { maxAmount: 50_000n }); // 0.05 USDG
+const res = await unslept.fetch("https://api.example.com/data", undefined, { maxAmount: 50_000n }); // at most 0.05 USDC
 ```
 
-## Configuration
+On a 402 with an `unslept-direct` requirement in USDC on Solana, the SDK checks the agent's on-chain policy (per-call
+cap, daily cap, payee allowlist, collateral), sends one transaction to the Unslept program, and retries with
+`PAYMENT-SIGNATURE`. Merchants verify with [@unslept/pay](https://www.npmjs.com/package/@unslept/pay).
 
-The `robinhood-chain` preset reads its chain settings from the environment:
+Other calls: `getBalances()`, `getPolicy()`, `getPayments({ limit })`, `localPayments()`, `onLowBalance(cb, { threshold })`.
+Errors are `UnsleptError` with a stable `code` (`PER_CALL_CAP`, `DAILY_CAP`, `PAYEE_NOT_ALLOWED`, `INSUFFICIENT_COLLATERAL`, ...).
 
-```sh
-# Robinhood Chain mainnet. Addresses are published in contracts/deployments/4663.json.
-UNSLEPT_CHAIN_ID=4663
-UNSLEPT_RPC_URL=https://rpc.mainnet.chain.robinhood.com
-UNSLEPT_USDG=0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168
-UNSLEPT_ROUTER=0x1FeAB3B8f88FB0667B686fDCB0206194e88c984b
-UNSLEPT_BUFFERS=0xcD853fb30eCe3134Cf21e2f47B9e23eaf965F40D
-```
+The agent signer needs a little SOL for network fees and payment-record rent (returned after 24 hours).
 
-## Errors
-
-Policy refusals throw `UnsleptError` with a code: `PER_CALL_CAP`, `DAILY_CAP`, `PAYEE_NOT_ALLOWED`,
-`AGENT_PAUSED`, `AGENT_REVOKED` or `MAX_AMOUNT`.
-
-Unslept is experimental software on a guarded, unaudited mainnet launch. Yield is variable and not guaranteed. Give each agent a small daily cap.
+Docs: https://www.unslept.xyz/docs. MIT license.
