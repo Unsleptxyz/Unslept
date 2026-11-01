@@ -1,4 +1,4 @@
-# Solana program test 2026-11-01T00:22:47Z
+# Solana program test 2026-11-01T01:19:59Z
 All program id declarations are synced.
 Please rebuild the program to update the generated artifacts.
 build exit 0
@@ -14,27 +14,27 @@ build exit 0
 [0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(unused_mut)]` on by default[0m
 
 [1m[33mwarning[0m[1m:[0m `unslept` (lib) generated 1 warning (run `cargo fix --lib -p unslept` to apply 1 suggestion)
-[1m[32m    Finished[0m `release` profile [optimized] target(s) in 4.62s
+[1m[32m    Finished[0m `release` profile [optimized] target(s) in 4.63s
 + wget https://github.com/Snaipe/Criterion/releases/download/v2.3.3/criterion-v2.3.3-linux-x86_64.tar.bz2 -O criterion-v2.3.3-linux-x86_64.tar.bz2 --progress=dot:giga --retry-connrefused --read-timeout=30
---2026-11-01 00:23:46--  https://github.com/Snaipe/Criterion/releases/download/v2.3.3/criterion-v2.3.3-linux-x86_64.tar.bz2
-Resolving github.com (github.com)... 140.82.113.4
-Connecting to github.com (github.com)|140.82.113.4|:443... connected.
+--2026-11-01 01:21:09--  https://github.com/Snaipe/Criterion/releases/download/v2.3.3/criterion-v2.3.3-linux-x86_64.tar.bz2
+Resolving github.com (github.com)... 140.82.114.4
+Connecting to github.com (github.com)|140.82.114.4|:443... connected.
 HTTP request sent, awaiting response... 302 Found
-Location: https://release-assets.githubusercontent.com/github-production-release-asset/30111969/98b27400-e1f1-11e8-8f10-e43f4ef84b92?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-01T01%3A15%3A36Z&rscd=attachment%3B+filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-01T00%3A15%3A33Z&ske=2026-11-01T01%3A15%3A36Z&sks=b&skv=2018-11-09&sig=4K3Z1b%2B7jKDx3evZmZlSLE0AKX1LVWW6gJc8%2BSKpYRY%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5MzQ5MjkyNiwibmJmIjoxNzkzNDkyNjI2LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.pp2h38iZ8Z2OknxicpbyP6_xZN_jWG9sNwRqihkwsYs&response-content-disposition=attachment%3B%20filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&response-content-type=application%2Foctet-stream [following]
---2026-11-01 00:23:46--  https://release-assets.githubusercontent.com/github-production-release-asset/30111969/98b27400-e1f1-11e8-8f10-e43f4ef84b92?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-01T01%3A15%3A36Z&rscd=attachment%3B+filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-01T00%3A15%3A33Z&ske=2026-11-01T01%3A15%3A36Z&sks=b&skv=2018-11-09&sig=4K3Z1b%2B7jKDx3evZmZlSLE0AKX1LVWW6gJc8%2BSKpYRY%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5MzQ5MjkyNiwibmJmIjoxNzkzNDkyNjI2LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.pp2h38iZ8Z2OknxicpbyP6_xZN_jWG9sNwRqihkwsYs&response-content-disposition=attachment%3B%20filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&response-content-type=application%2Foctet-stream
-Resolving release-assets.githubusercontent.com (release-assets.githubusercontent.com)... 185.199.108.133, 185.199.111.133, 185.199.110.133, ...
+Location: https://release-assets.githubusercontent.com/github-production-release-asset/30111969/98b27400-e1f1-11e8-8f10-e43f4ef84b92?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-01T02%3A08%3A58Z&rscd=attachment%3B+filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-01T01%3A08%3A13Z&ske=2026-11-01T02%3A08%3A58Z&sks=b&skv=2018-11-09&sig=b4kfv4NaEhuE2nRbJFaU%2BXjd46pzgLcO%2BiKPyRZbLMQ%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5MzQ5NjM2OSwibmJmIjoxNzkzNDk2MDY5LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.sfPZ5JI0mwU0UYV7xtCo7tipDXtyPptD9CIYTGTRbiE&response-content-disposition=attachment%3B%20filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&response-content-type=application%2Foctet-stream [following]
+--2026-11-01 01:21:10--  https://release-assets.githubusercontent.com/github-production-release-asset/30111969/98b27400-e1f1-11e8-8f10-e43f4ef84b92?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-01T02%3A08%3A58Z&rscd=attachment%3B+filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-01T01%3A08%3A13Z&ske=2026-11-01T02%3A08%3A58Z&sks=b&skv=2018-11-09&sig=b4kfv4NaEhuE2nRbJFaU%2BXjd46pzgLcO%2BiKPyRZbLMQ%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc5MzQ5NjM2OSwibmJmIjoxNzkzNDk2MDY5LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.sfPZ5JI0mwU0UYV7xtCo7tipDXtyPptD9CIYTGTRbiE&response-content-disposition=attachment%3B%20filename%3Dcriterion-v2.3.3-linux-x86_64.tar.bz2&response-content-type=application%2Foctet-stream
+Resolving release-assets.githubusercontent.com (release-assets.githubusercontent.com)... 185.199.108.133, 185.199.110.133, 185.199.109.133, ...
 Connecting to release-assets.githubusercontent.com (release-assets.githubusercontent.com)|185.199.108.133|:443... connected.
 HTTP request sent, awaiting response... 200 OK
 Length: 677858 (662K) [application/octet-stream]
 Saving to: ‘criterion-v2.3.3-linux-x86_64.tar.bz2’
 
-     0K                                    100%  117M=0.006s
+     0K                                    100% 18.4M=0.04s
 
-2026-11-01 00:23:46 (117 MB/s) - ‘criterion-v2.3.3-linux-x86_64.tar.bz2’ saved [677858/677858]
+2026-11-01 01:21:10 (18.4 MB/s) - ‘criterion-v2.3.3-linux-x86_64.tar.bz2’ saved [677858/677858]
 
 + tar --strip-components 1 -jxf criterion-v2.3.3-linux-x86_64.tar.bz2
 [1m[92m   Compiling[0m unslept v0.1.0 (/home/runner/work/Unslept/Unslept/solana/programs/unslept)
-[1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 2.57s
+[1m[92m    Finished[0m `test` profile [unoptimized + debuginfo] target(s) in 3.86s
 [1m[92m     Running[0m unittests src/lib.rs (/home/runner/work/Unslept/Unslept/solana/target/debug/deps/unslept-b10f48fe981526a6)
       --skip-local-validator
           Flag to skip starting a local validator, if the configured cluster url is a localnet
@@ -46,43 +46,62 @@ Saving to: ‘criterion-v2.3.3-linux-x86_64.tar.bz2’
           [default: surfpool]
 Found a 'test' script in the Anchor.toml. Running it as a test suite!
 Running test suite: "/home/runner/work/Unslept/Unslept/solana/Anchor.toml"
-(node:3351) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts is not specified and it doesn't parse as CommonJS.
+(node:3359) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/runner/work/Unslept/Unslept/solana/tests/unslept.ts is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to /home/runner/work/Unslept/Unslept/solana/package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
   unslept
-    ✔ initializes the protocol (411ms)
-    ✔ takes buffer deposits and mints shares 1:1 at first (810ms)
-    ✔ refuses deposits above the cap (807ms)
-    ✔ creates an agent account with a policy (409ms)
+    ✔ initializes the protocol (407ms)
+    ✔ takes buffer deposits and mints shares 1:1 at first (808ms)
+    ✔ refuses deposits above the cap (805ms)
+    ✔ creates an agent account with a policy (406ms)
     ✔ refuses a payment the agent cannot cover
-    ✔ settles a payment from the buffer and repays it from the agent in the same transaction (802ms)
-    ✔ never accepts the same payment ID twice (448ms)
+    ✔ settles a payment from the buffer and repays it from the agent in the same transaction (803ms)
+    ✔ never accepts the same payment ID twice (430ms)
     ✔ enforces the per-call cap
-    ✔ enforces the daily cap (797ms)
-    ✔ enforces the payee allowlist (1216ms)
-    ✔ only the agent signer can pay (417ms)
-    ✔ pauses: payments stop, buffer withdrawals stay open (1202ms)
+    ✔ enforces the daily cap (789ms)
+    ✔ enforces the payee allowlist (1213ms)
+    ✔ only the agent signer can pay (418ms)
+    ✔ pauses: payments stop, buffer withdrawals stay open (1200ms)
     ✔ lets the owner withdraw and revoke (1232ms)
     ✔ a stranger cannot change the agent policy
   14 passing (12s)
 ## Kamino mainnet-fork test
 Wrote program to .fork/klend.so
-{"slot":463889088,"market":"7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF","reserve":"D6q6wuQSrifJKZYpR1M8R4YawnLDtDsMmWM1NbBmgJ59","supply":"Bgq7trRgVMeq33yt235zM2onQ4bRDBsY5EWiTetF4qw6","ctokenMint":"B8V6WVjPxW1UGwVDfxH2d2r8SyT4cqn7dQRK6XneVa7D"}
-(node:3822) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/runner/work/Unslept/Unslept/solana/tests-fork/kamino.ts is not specified and it doesn't parse as CommonJS.
+{"slot":463905166,"market":"7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF","reserve":"D6q6wuQSrifJKZYpR1M8R4YawnLDtDsMmWM1NbBmgJ59","supply":"Bgq7trRgVMeq33yt235zM2onQ4bRDBsY5EWiTetF4qw6","ctokenMint":"B8V6WVjPxW1UGwVDfxH2d2r8SyT4cqn7dQRK6XneVa7D"}
+(node:3939) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/runner/work/Unslept/Unslept/solana/tests-fork/kamino.ts is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to /home/runner/work/Unslept/Unslept/solana/package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
   unslept + kamino (mainnet fork)
-    ✔ initializes with real USDC and the Kamino Main Market USDC reserve (1628ms)
-      40 USDC -> 33.083977 cUSDC
-    ✔ creates an agent and puts its USDC to work in Kamino (1220ms)
-    ✔ pays more than the liquid balance; the Kamino position backs the debt (404ms)
-    ✔ refuses redemption by a stranger (422ms)
-      redeemed 33.083977 cUSDC, 34.924999 USDC left after repaying debt
-    ✔ keeper redeems from Kamino and the debt is repaid in the same transaction (407ms)
-  5 passing (6s)
-## SDK + @unslept/pay end to end
-  ok paid 0.025 USDC via x402: 5CEHa9M5AibrZH12..., fee 125, agent liquid 34924999 -> 34899874
-  ok on-chain history has 2 payment(s)
-  2 passing (sdk e2e)
+    ✔ initializes with real USDC and the Kamino Main Market USDC reserve (1617ms)
+    1) creates an agent and puts its USDC to work in Kamino
+    2) pays more than the liquid balance; the Kamino position backs the debt
+    ✔ refuses redemption by a stranger (386ms)
+    3) keeper redeems from Kamino and the debt is repaid in the same transaction
+  2 passing (6s)
+  3 failing
+  1) unslept + kamino (mainnet fork)
+       creates an agent and puts its USDC to work in Kamino:
+      AssertionError: expected 10000001 to equal 10000000
+      + expected - actual
+      -10000001
+      +10000000
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests-fork/kamino.ts:95:38)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+  2) unslept + kamino (mainnet fork)
+       pays more than the liquid balance; the Kamino position backs the debt:
+      AssertionError: expected 5074999 to equal 5075000
+      + expected - actual
+      -5074999
+      +5075000
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests-fork/kamino.ts:117:34)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
+  3) unslept + kamino (mainnet fork)
+       keeper redeems from Kamino and the debt is repaid in the same transaction:
+      AssertionError: expected 200000000 to equal 200000001
+      + expected - actual
+      -200000000
+      +200000001
+      at Context.<anonymous> (file:///home/runner/work/Unslept/Unslept/solana/tests-fork/kamino.ts:149:39)
+      at processTicksAndRejections (node:internal/process/task_queues:103:5)
