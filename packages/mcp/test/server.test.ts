@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { PassThrough } from "node:stream";
-import { handle, parseUsdg, serveStdio, type UnsleptLike } from "../src/server.js";
+import { handle, parseUsdc, serveStdio, type UnsleptLike } from "../src/server.js";
 
 function stub(): UnsleptLike & { lastMax?: bigint } {
   const log: unknown[] = [];
@@ -9,7 +9,7 @@ function stub(): UnsleptLike & { lastMax?: bigint } {
     lastMax: undefined as bigint | undefined,
     async fetch(_u: unknown, _i: unknown, o?: { maxAmount?: bigint }) {
       s.lastMax = o?.maxAmount;
-      log.push({ amount: 250_000n, fee: 250n, payee: "0xpayee", scheme: "unslept-direct", transactionHash: "0xabc" });
+      log.push({ amount: 250_000n, fee: 250n, payee: "0xpayee", scheme: "unslept-direct", transaction: "5abc" });
       return new Response('{"ok":true}', { status: 200, headers: { "content-type": "application/json" } });
     },
     async getBalances() {
@@ -51,10 +51,10 @@ test("pay_x402_request returns the response and the payment", async () => {
     jsonrpc: "2.0",
     id: 3,
     method: "tools/call",
-    params: { name: "pay_x402_request", arguments: { url: "https://api.example.com/data", max_amount_usdg: "0.50" } },
-  })) as { result: { structuredContent: { status: number; payment: { amountUsdg: string } } } };
+    params: { name: "pay_x402_request", arguments: { url: "https://api.example.com/data", max_amount_usdc: "0.50" } },
+  })) as { result: { structuredContent: { status: number; payment: { amountUsdc: string } } } };
   assert.equal(r.result.structuredContent.status, 200);
-  assert.equal(r.result.structuredContent.payment.amountUsdg, "0.250000");
+  assert.equal(r.result.structuredContent.payment.amountUsdc, "0.250000");
   assert.equal(s.lastMax, 500_000n);
 });
 
@@ -70,22 +70,22 @@ test("tool errors come back as isError results, not protocol errors", async () =
   assert.equal(u.error.code, -32602);
 });
 
-test("balances and policy are formatted in USDG", async () => {
+test("balances and policy are formatted in USDC", async () => {
   const b = (await handle(stub(), { jsonrpc: "2.0", id: 6, method: "tools/call", params: { name: "get_balances" } })) as {
     result: { structuredContent: Record<string, string> };
   };
-  assert.equal(b.result.structuredContent.workingUsdg, "49.000000");
+  assert.equal(b.result.structuredContent.workingUsdc, "49.000000");
   const p = (await handle(stub(), { jsonrpc: "2.0", id: 7, method: "tools/call", params: { name: "get_policy" } })) as {
     result: { structuredContent: Record<string, string> };
   };
-  assert.equal(p.result.structuredContent.perCallCapUsdg, "1.000000");
+  assert.equal(p.result.structuredContent.perCallCapUsdc, "1.000000");
 });
 
-test("parseUsdg", () => {
-  assert.equal(parseUsdg("1"), 1_000_000n);
-  assert.equal(parseUsdg("0.000001"), 1n);
-  assert.throws(() => parseUsdg("-1"));
-  assert.throws(() => parseUsdg("1.0000001"));
+test("parseUsdc", () => {
+  assert.equal(parseUsdc("1"), 1_000_000n);
+  assert.equal(parseUsdc("0.000001"), 1n);
+  assert.throws(() => parseUsdc("-1"));
+  assert.throws(() => parseUsdc("1.0000001"));
 });
 
 test("stdio transport answers requests and ignores notifications", async () => {

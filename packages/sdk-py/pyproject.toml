@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "unslept"
-version = "0.1.0"
-description = "Pay x402 paywalls from an Unslept agent account on Robinhood Chain."
+version = "0.2.0"
+description = "Pay x402 paywalls in USDC on Solana from an Unslept agent account."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -16,7 +16,7 @@ Homepage = "https://www.unslept.xyz/docs"
 Source = "https://github.com/Unsleptxyz/Unslept"
 
 [project.optional-dependencies]
-web3 = ["web3>=7,<8", "eth-account>=0.13"]
+solana = ["solders>=0.21"]
 langchain = ["langchain-core>=0.3"]
 
 [tool.hatch.build.targets.wheel]

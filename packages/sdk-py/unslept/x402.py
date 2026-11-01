@@ -3,27 +3,13 @@ from __future__ import annotations
 
 import base64
 import json
-import re
 from typing import Any, Iterable, Optional
 
 X402_VERSION = 2
 HEADER_REQUIRED = "PAYMENT-REQUIRED"
 HEADER_SIGNATURE = "PAYMENT-SIGNATURE"
 HEADER_RESPONSE = "PAYMENT-RESPONSE"
-SCHEME_EXACT = "exact"
 SCHEME_UNSLEPT = "unslept-direct"
-
-EIP3009_TYPES = {
-    "TransferWithAuthorization": [
-        {"name": "from", "type": "address"},
-        {"name": "to", "type": "address"},
-        {"name": "value", "type": "uint256"},
-        {"name": "validAfter", "type": "uint256"},
-        {"name": "validBefore", "type": "uint256"},
-        {"name": "nonce", "type": "bytes32"},
-    ]
-}
-
 
 class X402FormatError(ValueError):
     code = "X402_FORMAT"
@@ -56,13 +42,6 @@ def read_payment_required(headers: dict[str, str]) -> dict:
 def select_requirement(pr: dict, network: str, asset: str, schemes: Iterable[str]) -> Optional[dict]:
     for scheme in schemes:
         for r in pr["accepts"]:
-            if r.get("scheme") == scheme and r.get("network") == network and str(r.get("asset", "")).lower() == asset.lower():
+            if r.get("scheme") == scheme and r.get("network") == network and r.get("asset") == asset:
                 return r
     return None
-
-
-def chain_id_from_caip2(network: str) -> int:
-    m = re.fullmatch(r"eip155:(\d+)", network)
-    if not m:
-        raise X402FormatError(f"Network {network} is not an EVM CAIP-2 identifier.")
-    return int(m.group(1))

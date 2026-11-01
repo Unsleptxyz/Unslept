@@ -1,20 +1,20 @@
-"""Unslept: pay x402 paywalls from an agent account whose idle balance keeps working on Robinhood Chain."""
+"""Unslept: pay x402 paywalls in USDC on Solana from an agent account whose idle balance earns yield on Kamino."""
 from .client import (
     AccountState,
     Balances,
     HttpResponse,
     Payment,
     Policy,
-    SettlementMode,
     SettlementResult,
     Unslept,
     UnsleptError,
-    fmt_usdg,
+    fmt_usdc,
+    is_solana_address,
 )
-from .x402 import SCHEME_EXACT, SCHEME_UNSLEPT, X402FormatError, decode_header, encode_header
+from .x402 import SCHEME_UNSLEPT, X402FormatError, decode_header, encode_header
 
 __all__ = [
-    "AccountState", "Balances", "HttpResponse", "Payment", "Policy", "SettlementMode", "SettlementResult", "Unslept",
-    "UnsleptError", "fmt_usdg", "SCHEME_EXACT", "SCHEME_UNSLEPT", "X402FormatError", "decode_header", "encode_header",
+    "AccountState", "Balances", "HttpResponse", "Payment", "Policy", "SettlementResult", "Unslept", "UnsleptError",
+    "fmt_usdc", "is_solana_address", "SCHEME_UNSLEPT", "X402FormatError", "decode_header", "encode_header",
 ]
-__version__ = "0.1.0"
+__version__ = "0.2.0"

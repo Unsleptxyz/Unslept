@@ -25,11 +25,11 @@ export class UnsleptError extends Error {
   }
 }
 
-export const fmtUsdg = (atomic: bigint, decimals = 6): string => {
+export const fmtUsdc = (atomic: bigint, decimals = 6): string => {
   const neg = atomic < 0n;
   const v = neg ? -atomic : atomic;
   const base = 10n ** BigInt(decimals);
   const whole = v / base;
   const frac = (v % base).toString().padStart(decimals, "0").replace(/0+$/, "");
-  return `${neg ? "-" : ""}${whole}${frac ? "." + frac : ""} USDG`;
+  return `${neg ? "-" : ""}${whole}${frac ? "." + frac : ""} USDC`;
 };

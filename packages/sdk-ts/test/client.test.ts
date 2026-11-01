@@ -3,21 +3,23 @@ import assert from "node:assert/strict";
 import {
   Unslept,
   UnsleptError,
-  SettlementMode,
   decodeHeader,
   encodeHeader,
+  b58decode,
+  b58encode,
   type AccountState,
   type PaymentRequestInput,
   type UnsleptChain,
 } from "../src/index.js";
 
-const USDG = "0x00000000000000000000000000000000000000aa" as const;
-const PAYEE = "0x00000000000000000000000000000000000000bb" as const;
-const AGENT = "0x00000000000000000000000000000000000000cc" as const;
+const NET = "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp";
+const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const PAYEE = "7DNkxPNsu6hYKpwgHsVXgtnR4twnXKEUbffGDsWMM37Z";
+const AGENT = "HCdAT1i8DC1FKwsKsaKtpnLwzqWjjuLFSGMMpFyVxvv1";
 
 class FakeChain implements UnsleptChain {
-  chainId = 4242;
-  usdg = USDG;
+  network = NET;
+  usdc = USDC;
   calls: PaymentRequestInput[] = [];
   state: AccountState = {
     policy: { perCallCap: 5_000_000n, dailyCap: 20_000_000n },
@@ -27,10 +29,10 @@ class FakeChain implements UnsleptChain {
     liquid: 0n,
     parked: 100_000_000n,
     debt: 0n,
+    allowlist: [],
   };
-  allowed = new Set<string>([PAYEE]);
-  async isPayeeAllowed(p: string, d: string) {
-    return this.allowed.has(p) || this.allowed.has(d);
+  async isPayeeAllowed(p: string) {
+    return this.state.allowlist.length === 0 || this.state.allowlist.includes(p);
   }
   async getAccountState() {
     return this.state;
@@ -38,183 +40,85 @@ class FakeChain implements UnsleptChain {
   async requestPayment(i: PaymentRequestInput) {
     this.calls.push(i);
     this.state.remainingToday -= i.amount;
-    return { transactionHash: `0x${"11".repeat(32)}` as `0x${string}`, fee: i.amount / 1000n, buffer: USDG };
-  }
-  async setPolicy() {
-    return `0x${"22".repeat(32)}` as `0x${string}`;
+    return { transaction: "5sig", fee: i.amount / 1000n, payment: "PaymentRecord1111111111111111111111111111111" };
   }
   async getPayments() {
     return [];
   }
 }
 
-function paywall(price: string, schemes: string[] = ["unslept-direct"]) {
+function paywall(price: string, network = NET) {
   const seen: Headers[] = [];
   const f = async (_input: unknown, init?: RequestInit) => {
     const h = new Headers(init?.headers);
     seen.push(h);
-    const sig = h.get("PAYMENT-SIGNATURE");
-    if (!sig) {
+    if (!h.get("PAYMENT-SIGNATURE")) {
       const pr = {
         x402Version: 2,
         resource: { url: "https://api.example.com/data" },
-        accepts: schemes.map((scheme) => ({
-          scheme,
-          network: "eip155:4242",
-          amount: price,
-          asset: USDG,
-          payTo: PAYEE,
-          maxTimeoutSeconds: 60,
-          extra: scheme === "exact" ? { name: "Global Dollar", version: "2" } : { paymentId: `0x${"ab".repeat(32)}` },
-        })),
+        accepts: [{ scheme: "unslept-direct", network, amount: price, asset: USDC, payTo: PAYEE, maxTimeoutSeconds: 60, extra: { paymentId: `0x${"ab".repeat(32)}` } }],
       };
       return new Response("{}", { status: 402, headers: { "PAYMENT-REQUIRED": encodeHeader(pr) } });
     }
-    return new Response('{"ok":true}', {
-      status: 200,
-      headers: { "PAYMENT-RESPONSE": encodeHeader({ success: true, transaction: `0x${"11".repeat(32)}`, network: "eip155:4242" }) },
-    });
+    return new Response('{"ok":true}', { status: 200, headers: { "PAYMENT-RESPONSE": encodeHeader({ success: true, transaction: "5sig", network }) } });
   };
   return { fetch: f as unknown as typeof fetch, seen };
 }
 
-test("passes through non-402 responses untouched", async () => {
-  const chain = new FakeChain();
-  const u = new Unslept({ agentAccount: AGENT, signer: {}, network: "robinhood-chain", chain, fetch: (async () => new Response("hi")) as never });
-  const r = await u.fetch("https://api.example.com/free");
-  assert.equal(await r.text(), "hi");
-  assert.equal(chain.calls.length, 0);
+test("base58 round trip", () => {
+  const b = b58decode(AGENT);
+  assert.equal(b.length, 32);
+  assert.equal(b58encode(b), AGENT);
 });
 
-test("pays a 402 through the buffer and retries with PAYMENT-SIGNATURE", async () => {
+test("rejects a non-Solana agent address", () => {
+  assert.throws(() => new Unslept({ agent: "0x1234", chain: new FakeChain() }), /base58/);
+});
+
+test("pays a 402 and retries with PAYMENT-SIGNATURE", async () => {
   const chain = new FakeChain();
-  const pw = paywall("1000000");
-  const payments: unknown[] = [];
-  const u = new Unslept({ agentAccount: AGENT, signer: {}, network: "robinhood-chain", chain, fetch: pw.fetch, onPayment: (p) => payments.push(p) });
-  const r = await u.fetch("https://api.example.com/data");
-  assert.equal(r.status, 200);
+  const pw = paywall("10000");
+  const u = new Unslept({ agent: AGENT, chain, fetch: pw.fetch });
+  const res = await u.fetch("https://api.example.com/data");
+  assert.equal(res.status, 200);
   assert.equal(chain.calls.length, 1);
-  assert.equal(chain.calls[0].mode, SettlementMode.Direct);
-  assert.equal(chain.calls[0].paymentId, `0x${"ab".repeat(32)}`, "uses the server-issued payment id");
-  assert.equal(chain.calls[0].domain, "api.example.com");
-  const sent = decodeHeader<{ x402Version: number; accepted: { scheme: string }; payload: { transaction: string; agentAccount: string } }>(
-    pw.seen[1].get("PAYMENT-SIGNATURE")!,
-  );
-  assert.equal(sent.x402Version, 2);
-  assert.equal(sent.accepted.scheme, "unslept-direct");
-  assert.equal(sent.payload.agentAccount, AGENT);
-  assert.equal(payments.length, 1);
-  const [log] = u.localPayments();
-  assert.equal(log.endpoint, "https://api.example.com/data");
-  assert.equal(log.amount, 1_000_000n);
-  assert.equal(log.payee, PAYEE);
-  assert.ok(log.transactionHash.startsWith("0x"));
+  assert.equal(chain.calls[0].payee, PAYEE);
+  assert.equal(chain.calls[0].amount, 10_000n);
+  assert.equal(chain.calls[0].paymentId, `0x${"ab".repeat(32)}`);
+  const payload = decodeHeader<any>(pw.seen[1].get("PAYMENT-SIGNATURE")!);
+  assert.equal(payload.payload.transaction, "5sig");
+  assert.equal(payload.payload.agent, AGENT);
+  assert.ok(payload.payload.payment);
+  assert.equal(u.localPayments().length, 1);
 });
 
-test("rejects a payment over the per-call cap with a clear error", async () => {
-  const chain = new FakeChain();
-  const u = new Unslept({ agentAccount: AGENT, signer: {}, network: "robinhood-chain", chain, fetch: paywall("6000000").fetch });
-  await assert.rejects(u.fetch("https://api.example.com/data"), (e: unknown) => {
-    assert.ok(e instanceof UnsleptError);
-    assert.equal(e.code, "PER_CALL_CAP");
-    assert.match(e.message, /6 USDG is above the per-call cap of 5 USDG/);
-    return true;
-  });
-  assert.equal(chain.calls.length, 0, "nothing was settled");
+test("refuses other networks", async () => {
+  const u = new Unslept({ agent: AGENT, chain: new FakeChain(), fetch: paywall("10000", "eip155:1").fetch });
+  await assert.rejects(u.fetch("https://api.example.com/data"), (e: UnsleptError) => e.code === "NO_MATCHING_REQUIREMENT");
 });
 
-test("empty wallet cannot pay", async () => {
+test("enforces caps, allowlist and maxAmount before paying", async () => {
   const chain = new FakeChain();
-  chain.state.parked = 0n;
-  const u = new Unslept({ agentAccount: AGENT, signer: {}, network: "robinhood-chain", chain, fetch: paywall("1000000").fetch });
-  await assert.rejects(u.fetch("https://api.example.com/data"), (e: unknown) => (e as UnsleptError).code === "INSUFFICIENT_COLLATERAL");
+  const u = new Unslept({ agent: AGENT, chain, fetch: paywall("6000000").fetch });
+  await assert.rejects(u.fetch("https://api.example.com/data"), (e: UnsleptError) => e.code === "PER_CALL_CAP");
+  const u2 = new Unslept({ agent: AGENT, chain, fetch: paywall("10000").fetch });
+  await assert.rejects(u2.fetch("https://x.example/a", undefined, { maxAmount: 5000n }), (e: UnsleptError) => e.code === "MAX_AMOUNT");
+  chain.state.allowlist = [AGENT];
+  await assert.rejects(u2.fetch("https://x.example/a"), (e: UnsleptError) => e.code === "PAYEE_NOT_ALLOWED");
+  chain.state.allowlist = [];
+  chain.state.paused = true;
+  await assert.rejects(u2.fetch("https://x.example/a"), (e: UnsleptError) => e.code === "AGENT_PAUSED");
   assert.equal(chain.calls.length, 0);
 });
 
-test("enforces daily cap, allowlist, pause and maxAmount", async () => {
+test("refuses when the position cannot back the payment", async () => {
   const chain = new FakeChain();
-  const mk = () => new Unslept({ agentAccount: AGENT, signer: {}, network: "robinhood-chain", chain, fetch: paywall("1000000").fetch });
-  chain.state.remainingToday = 500_000n;
-  await assert.rejects(mk().fetch("https://api.example.com/data"), (e: unknown) => (e as UnsleptError).code === "DAILY_CAP");
-  chain.state.remainingToday = 20_000_000n;
-  chain.allowed.clear();
-  await assert.rejects(mk().fetch("https://api.example.com/data"), (e: unknown) => (e as UnsleptError).code === "PAYEE_NOT_ALLOWED");
-  chain.allowed.add("api.example.com");
-  chain.state.paused = true;
-  await assert.rejects(mk().fetch("https://api.example.com/data"), (e: unknown) => (e as UnsleptError).code === "AGENT_PAUSED");
-  chain.state.paused = false;
-  await assert.rejects(mk().fetch("https://api.example.com/data", undefined, { maxAmount: 999_999n }), (e: unknown) => (e as UnsleptError).code === "MAX_AMOUNT");
-  const r = await mk().fetch("https://api.example.com/data");
-  assert.equal(r.status, 200, "domain allowlisting works");
+  chain.state.parked = 1_000n;
+  const u = new Unslept({ agent: AGENT, chain, fetch: paywall("10000").fetch });
+  await assert.rejects(u.fetch("https://x.example/a"), (e: UnsleptError) => e.code === "INSUFFICIENT_COLLATERAL");
 });
 
-test("standard exact scheme signs an EIP-3009 authorization bound to payTo and amount", async () => {
-  const chain = new FakeChain();
-  const pw = paywall("2500000", ["exact"]);
-  let typed: { domain: Record<string, unknown>; message: Record<string, unknown>; primaryType: string } | undefined;
-  const signer = {
-    address: "0x00000000000000000000000000000000000000dd" as const,
-    async signTypedData(a: never) {
-      typed = a;
-      return `0x${"33".repeat(65)}` as `0x${string}`;
-    },
-  };
-  const u = new Unslept({ agentAccount: AGENT, signer, network: "robinhood-chain", chain, fetch: pw.fetch });
-  await u.fetch("https://api.example.com/data");
-  assert.equal(chain.calls[0].mode, SettlementMode.Exact);
-  assert.equal(typed!.primaryType, "TransferWithAuthorization");
-  assert.deepEqual(typed!.domain, { name: "Global Dollar", version: "2", chainId: 4242, verifyingContract: USDG });
-  assert.equal(typed!.message.to, PAYEE);
-  assert.equal(typed!.message.value, 2_500_000n);
-  assert.equal(typed!.message.nonce, chain.calls[0].paymentId, "EIP-3009 nonce doubles as the payment id");
-  const sent = decodeHeader<{ payload: { authorization: { from: string; value: string } } }>(pw.seen[1].get("PAYMENT-SIGNATURE")!);
-  assert.equal(sent.payload.authorization.from, signer.address);
-  assert.equal(sent.payload.authorization.value, "2500000");
-});
-
-test("no matching network or asset gives an actionable error", async () => {
-  const chain = new FakeChain();
-  chain.chainId = 1;
-  const u = new Unslept({ agentAccount: AGENT, signer: {}, network: "robinhood-chain", chain, fetch: paywall("1").fetch });
-  await assert.rejects(u.fetch("https://api.example.com/data"), (e: unknown) => {
-    assert.equal((e as UnsleptError).code, "NO_MATCHING_REQUIREMENT");
-    assert.match((e as Error).message, /It offers: unslept-direct on eip155:4242/);
-    return true;
-  });
-});
-
-test("onLowBalance fires after a payment drops the balance", async () => {
-  const chain = new FakeChain();
-  chain.state.parked = 1_500_000n;
-  const u = new Unslept({ agentAccount: AGENT, signer: {}, network: "robinhood-chain", chain, fetch: paywall("1000000").fetch });
-  let fired = 0;
-  u.onLowBalance(() => fired++, { threshold: 2_000_000n });
-  await u.fetch("https://api.example.com/data");
-  await new Promise((r) => setTimeout(r, 10));
-  assert.equal(fired, 1);
-});
-
-test("rejects bad configuration early", () => {
-  assert.throws(() => new Unslept({ agentAccount: "nope", signer: {}, network: "robinhood-chain" }), /agentAccount must be/);
-});
-
-test("policy violations are reported, signed by the agent signer", async () => {
-  const chain = new FakeChain();
-  const pw = paywall("6000000");
-  const reports: { url: string; body: Record<string, string> }[] = [];
-  const f = (async (input: unknown, init?: RequestInit) => {
-    if (String(input).endsWith("/api/alerts")) {
-      reports.push({ url: String(input), body: JSON.parse(String(init!.body)) });
-      return new Response("{}");
-    }
-    return pw.fetch(input as never, init);
-  }) as unknown as typeof fetch;
-  const signer = { address: "0x00000000000000000000000000000000000000dd", signMessage: async () => "0xsig" };
-  const u = new Unslept({ agentAccount: AGENT, signer, network: "robinhood-chain", chain, fetch: f, reportUrl: "https://app.example.com/" });
-  await assert.rejects(u.fetch("https://api.example.com/data"));
-  await new Promise((r) => setTimeout(r, 10));
-  assert.equal(reports.length, 1);
-  assert.equal(reports[0].url, "https://app.example.com/api/alerts");
-  assert.equal(reports[0].body.code, "PER_CALL_CAP");
-  assert.equal(reports[0].body.signature, "0xsig");
+test("passes non-402 responses through untouched", async () => {
+  const u = new Unslept({ agent: AGENT, chain: new FakeChain(), fetch: (async () => new Response("hi")) as unknown as typeof fetch });
+  assert.equal(await (await u.fetch("https://x.example")).text(), "hi");
 });

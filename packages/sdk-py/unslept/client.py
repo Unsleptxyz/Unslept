@@ -1,23 +1,18 @@
-"""Unslept Python SDK. Same surface as @unslept/sdk: fetch, get_balances, get_policy, set_policy,
-get_payments, on_low_balance."""
+"""Unslept Python SDK for Solana. Same surface as @unslept/sdk: fetch, get_balances, get_policy, get_payments,
+on_low_balance."""
 from __future__ import annotations
 
 import os
 import secrets
-import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from enum import IntEnum
 from typing import Any, Callable, Optional, Protocol
-from urllib.parse import urlparse
 
 from .x402 import (
-    EIP3009_TYPES,
     HEADER_RESPONSE,
     HEADER_SIGNATURE,
-    SCHEME_EXACT,
     SCHEME_UNSLEPT,
     X402_VERSION,
     decode_header,
@@ -27,11 +22,6 @@ from .x402 import (
 )
 
 
-class SettlementMode(IntEnum):
-    DIRECT = 0
-    EXACT = 1
-
-
 class UnsleptError(Exception):
     def __init__(self, code: str, message: str, **details: Any):
         super().__init__(message)
@@ -39,10 +29,23 @@ class UnsleptError(Exception):
         self.details = details
 
 
-def fmt_usdg(v: int) -> str:
+def fmt_usdc(v: int) -> str:
     whole, frac = divmod(abs(v), 10**6)
     f = str(frac).rjust(6, "0").rstrip("0")
-    return f"{'-' if v < 0 else ''}{whole}{'.' + f if f else ''} USDG"
+    return f"{'-' if v < 0 else ''}{whole}{'.' + f if f else ''} USDC"
+
+
+_B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+
+def is_solana_address(v: Any) -> bool:
+    if not isinstance(v, str) or not 32 <= len(v) <= 44 or any(c not in _B58 for c in v):
+        return False
+    n = 0
+    for c in v:
+        n = n * 58 + _B58.index(c)
+    lead = len(v) - len(v.lstrip("1"))
+    return lead + (n.bit_length() + 7) // 8 == 32
 
 
 @dataclass
@@ -60,24 +63,25 @@ class AccountState:
     liquid: int
     parked: int
     debt: int
+    allowlist: list[str] = field(default_factory=list)
 
 
 @dataclass
 class SettlementResult:
-    transaction_hash: str
+    transaction: str
     fee: int
-    buffer: str
+    payment: str
 
 
 @dataclass
 class Payment:
-    agent_id: str
+    agent: str
     endpoint: str
     payee: str
     amount: int
     fee: int
     scheme: str
-    transaction_hash: str
+    transaction: str
     payment_id: str
     settlement: Optional[dict] = None
     at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -92,20 +96,12 @@ class Balances:
 
 
 class Chain(Protocol):
-    chain_id: int
-    usdg: str
+    network: str  # CAIP-2
+    usdc: str  # mint
 
-    def is_payee_allowed(self, payee: str, domain: str) -> bool: ...
     def get_account_state(self) -> AccountState: ...
-    def request_payment(self, payee: str, amount: int, payment_id: str, domain: str, endpoint: str, mode: SettlementMode) -> SettlementResult: ...
-    def set_policy(self, policy: Policy) -> str: ...
+    def request_payment(self, payee: str, amount: int, payment_id: str, endpoint: str) -> SettlementResult: ...
     def get_payments(self, limit: Optional[int] = None) -> list[dict]: ...
-
-
-class Signer(Protocol):
-    address: str
-
-    def sign_typed_data(self, domain: dict, types: dict, primary_type: str, message: dict) -> str: ...
 
 
 @dataclass
@@ -139,22 +135,22 @@ def urllib_transport(method: str, url: str, headers: dict[str, str], body: Optio
 class Unslept:
     def __init__(
         self,
-        agent_account: str,
+        agent: str,
         signer: Any = None,
-        network: str = "robinhood-chain",
+        network: str = "solana",
+        rpc_url: Optional[str] = None,
         chain: Optional[Chain] = None,
         transport: Transport = urllib_transport,
-        schemes: Optional[list[str]] = None,
         on_payment: Optional[Callable[[Payment], None]] = None,
     ):
-        if not agent_account or len(agent_account) != 42 or not agent_account.startswith("0x"):
-            raise UnsleptError("CONFIG", "agent_account must be an AgentAccount address (0x followed by 40 hex characters).")
-        self.agent_account = agent_account
+        if not is_solana_address(agent):
+            raise UnsleptError("CONFIG", "agent must be an Unslept agent account address (base58).")
+        self.agent = agent
         self.signer = signer
         self.network = network
+        self.rpc_url = rpc_url
         self._chain = chain
         self._transport = transport
-        self._schemes = schemes or [SCHEME_UNSLEPT, SCHEME_EXACT]
         self._on_payment = on_payment
         self._log: list[Payment] = []
         self._low: list[tuple[int, Callable[[Balances], None]]] = []
@@ -162,16 +158,18 @@ class Unslept:
     @property
     def chain(self) -> Chain:
         if self._chain is None:
-            from .web3_chain import web3_chain_from_env
+            from .solana_chain import SolanaChain
 
-            self._chain = web3_chain_from_env(self.agent_account, self.signer, self.network)
+            if self.signer is None:
+                raise UnsleptError("CONFIG", "signer is required: pass the agent signer (a solders Keypair).")
+            self._chain = SolanaChain(self.agent, self.signer, self.network, self.rpc_url)
         return self._chain
 
     # ------------------------------------------------------------------ fetch
 
     def fetch(self, url: str, method: str = "GET", headers: Optional[dict[str, str]] = None, body: Optional[bytes] = None,
               max_amount: Optional[int] = None) -> HttpResponse:
-        """Drop-in HTTP call. Pays x402 paywalls from a balance that is always working."""
+        """Drop-in HTTP call. Pays x402 paywalls in USDC on Solana from a balance that keeps earning."""
         headers = dict(headers or {})
         res = self._transport(method, url, headers, body)
         if res.status != 402:
@@ -179,29 +177,25 @@ class Unslept:
 
         chain = self.chain
         pr = read_payment_required(res.headers)
-        network = f"eip155:{chain.chain_id}"
-        req = select_requirement(pr, network, chain.usdg, self._schemes)
+        req = select_requirement(pr, chain.network, chain.usdc, [SCHEME_UNSLEPT])
         if req is None:
             offered = "; ".join(f"{a.get('scheme')} on {a.get('network')} in {a.get('asset')}" for a in pr["accepts"])
             raise UnsleptError("NO_MATCHING_REQUIREMENT",
-                               f"The server does not accept USDG on {network} through {' or '.join(self._schemes)}. It offers: {offered}.")
+                               f"The server does not accept USDC on {chain.network} through {SCHEME_UNSLEPT}. It offers: {offered}.")
         amount = int(req["amount"])
         if max_amount is not None and amount > max_amount:
-            raise UnsleptError("MAX_AMOUNT", f"The server asks {fmt_usdg(amount)}, above the {fmt_usdg(max_amount)} limit set for this request.")
-        domain = urlparse(url).hostname or ""
-        self._check_policy(chain, req, amount, domain)
+            raise UnsleptError("MAX_AMOUNT", f"The server asks {fmt_usdc(amount)}, above the {fmt_usdc(max_amount)} limit set for this request.")
+        self._check_policy(chain, req, amount)
 
-        exact = req["scheme"] == SCHEME_EXACT
         pid = (req.get("extra") or {}).get("paymentId")
         payment_id = pid if isinstance(pid, str) and len(pid) == 66 else "0x" + secrets.token_hex(32)
-        s = chain.request_payment(req["payTo"], amount, payment_id, domain, url, SettlementMode.EXACT if exact else SettlementMode.DIRECT)
+        s = chain.request_payment(req["payTo"], amount, payment_id, url)
 
         payload = {
             "x402Version": X402_VERSION,
             "resource": pr.get("resource"),
             "accepted": req,
-            "payload": self._sign_exact(chain, req, amount, payment_id) if exact else {
-                "transaction": s.transaction_hash, "paymentId": payment_id, "agentAccount": self.agent_account},
+            "payload": {"transaction": s.transaction, "paymentId": payment_id, "agent": self.agent, "payment": s.payment},
         }
         if pr.get("extensions"):
             payload["extensions"] = pr["extensions"]
@@ -215,19 +209,18 @@ class Unslept:
                 sr = decode_header(raw)
             except Exception:  # noqa: BLE001
                 sr = None
-        record = Payment(self.agent_account, url, req["payTo"], amount, s.fee, req["scheme"],
-                         (sr or {}).get("transaction") or s.transaction_hash, payment_id, sr)
+        record = Payment(self.agent, url, req["payTo"], amount, s.fee, req["scheme"], s.transaction, payment_id, sr)
         self._log.append(record)
         if self._on_payment:
             self._on_payment(record)
         self._check_low_balance()
         if paid.status == 402:
             raise UnsleptError("PAYMENT_REJECTED",
-                               f"Paid {fmt_usdg(amount)} (transaction {s.transaction_hash}) but the server still answered 402. "
-                               "Contact the merchant with the transaction hash.", record=record)
+                               f"Paid {fmt_usdc(amount)} (transaction {s.transaction}) but the server still answered 402. "
+                               "Contact the merchant with the transaction signature.", record=record)
         return paid
 
-    def _check_policy(self, chain: Chain, req: dict, amount: int, domain: str) -> None:
+    def _check_policy(self, chain: Chain, req: dict, amount: int) -> None:
         st = chain.get_account_state()
         if st.revoked:
             raise UnsleptError("AGENT_REVOKED", "This agent was revoked by its owner. Create a new agent account to keep paying.")
@@ -235,40 +228,18 @@ class Unslept:
             raise UnsleptError("AGENT_PAUSED", "This agent is paused. Its owner can resume it in the Unslept app.")
         if amount > st.policy.per_call_cap:
             raise UnsleptError("PER_CALL_CAP",
-                               f"Payment of {fmt_usdg(amount)} is above the per-call cap of {fmt_usdg(st.policy.per_call_cap)}. "
+                               f"Payment of {fmt_usdc(amount)} is above the per-call cap of {fmt_usdc(st.policy.per_call_cap)}. "
                                "Raise the cap in the agent's spending policy to allow it.", amount=amount, cap=st.policy.per_call_cap)
         if amount > st.remaining_today:
-            raise UnsleptError("DAILY_CAP", f"Payment of {fmt_usdg(amount)} would pass today's cap. "
-                                            f"{fmt_usdg(st.remaining_today)} is left until 00:00 UTC.")
-        if not chain.is_payee_allowed(req["payTo"], domain):
-            raise UnsleptError("PAYEE_NOT_ALLOWED", f"Payee {req['payTo']} ({domain}) is not on this agent's allowlist. "
-                                                    "Add the address or the domain in the agent's spending policy.")
-        if amount + st.debt > st.liquid + st.parked:
+            raise UnsleptError("DAILY_CAP", f"Payment of {fmt_usdc(amount)} would pass today's cap. "
+                                            f"{fmt_usdc(st.remaining_today)} is left until 00:00 UTC.")
+        if st.allowlist and req["payTo"] not in st.allowlist:
+            raise UnsleptError("PAYEE_NOT_ALLOWED", f"Payee {req['payTo']} is not on this agent's allowlist. "
+                                                    "Add the wallet in the agent's spending policy.")
+        if amount + st.debt > st.liquid + st.parked * 95 // 100:
             raise UnsleptError("INSUFFICIENT_COLLATERAL",
-                               f"The agent holds {fmt_usdg(st.liquid + st.parked)} and owes {fmt_usdg(st.debt)}, "
-                               f"not enough to cover {fmt_usdg(amount)}. Fund the agent account.")
-
-    def _sign_exact(self, chain: Chain, req: dict, amount: int, nonce: str) -> dict:
-        extra = req.get("extra") or {}
-        if not self.signer or not hasattr(self.signer, "sign_typed_data"):
-            raise UnsleptError("CONFIG", "The exact scheme needs a signer with sign_typed_data.")
-        if not isinstance(extra.get("name"), str) or not isinstance(extra.get("version"), str):
-            raise UnsleptError("CONFIG", "The server's exact requirement is missing extra.name or extra.version.")
-        auth = {
-            "from": self.signer.address,
-            "to": req["payTo"],
-            "value": str(amount),
-            "validAfter": "0",
-            "validBefore": str(int(time.time()) + int(req["maxTimeoutSeconds"])),
-            "nonce": nonce,
-        }
-        sig = self.signer.sign_typed_data(
-            {"name": extra["name"], "version": extra["version"], "chainId": chain.chain_id, "verifyingContract": req["asset"]},
-            EIP3009_TYPES,
-            "TransferWithAuthorization",
-            {**auth, "value": amount, "validAfter": 0, "validBefore": int(auth["validBefore"])},
-        )
-        return {"signature": sig, "authorization": auth}
+                               f"The agent holds {fmt_usdc(st.liquid + st.parked)} and owes {fmt_usdc(st.debt)}, "
+                               f"not enough to cover {fmt_usdc(amount)}. Fund the agent account.")
 
     # ------------------------------------------------------------------ reads
 
@@ -279,10 +250,7 @@ class Unslept:
     def get_policy(self) -> dict:
         s = self.chain.get_account_state()
         return {"per_call_cap": s.policy.per_call_cap, "daily_cap": s.policy.daily_cap,
-                "remaining_today": s.remaining_today, "paused": s.paused, "revoked": s.revoked}
-
-    def set_policy(self, policy: Policy) -> str:
-        return self.chain.set_policy(policy)
+                "remaining_today": s.remaining_today, "paused": s.paused, "revoked": s.revoked, "allowlist": s.allowlist}
 
     def get_payments(self, limit: Optional[int] = None) -> list[dict]:
         return self.chain.get_payments(limit)
@@ -310,5 +278,5 @@ class Unslept:
 def env(name: str) -> str:
     v = (os.environ.get(name) or "").strip()
     if not v:
-        raise UnsleptError("CONFIG", f"{name} is not set. See .env.example for the Robinhood Chain settings.")
+        raise UnsleptError("CONFIG", f"{name} is not set. See the Unslept docs.")
     return v
