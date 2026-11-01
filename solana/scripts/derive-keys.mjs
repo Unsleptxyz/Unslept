@@ -16,4 +16,7 @@ for (const label of ["program", "deployer", "keeper", "treasury"]) {
   fs.writeFileSync(`${dir}/${label}.json`, JSON.stringify(Array.from(kp.secretKey)), { mode: 0o600 });
   out[label] = kp.publicKey.toBase58();
 }
+// The secret used directly as an ed25519 seed: the address a wallet shows when the same key is imported into it.
+const hex = secret.trim().replace(/^0x/, "");
+if (/^[0-9a-fA-F]{64}$/.test(hex)) out.rawSeed = Keypair.fromSeed(Buffer.from(hex, "hex")).publicKey.toBase58();
 console.log(JSON.stringify(out));
