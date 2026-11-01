@@ -18,6 +18,7 @@ const paywall = createPaywall({
   secret: "e2e-secret-of-sufficient-length",
   description: "Fork e2e quote",
   reader: rpcAccountReader(RPC),
+  chain: { program: process.env.PROGRAM_ID },
 });
 const handler = paywall.protect(async (_req, payment) => Response.json({ quote: 101.25, paidBy: payment.payer }));
 
@@ -36,7 +37,7 @@ const fail = (m: string) => {
   process.exit(1);
 };
 try {
-  const chain = createSolanaChain({ agent, signer: agentSigner, connection: new Connection(RPC, "confirmed"), priorityFee: 1 });
+  const chain = createSolanaChain({ agent, signer: agentSigner, connection: new Connection(RPC, "confirmed"), priorityFee: 1, programId: process.env.PROGRAM_ID });
   const unslept = new Unslept({ agent, chain });
   const before = await unslept.getBalances();
   const res = await unslept.fetch("http://127.0.0.1:4021/quote");

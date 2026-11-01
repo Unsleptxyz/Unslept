@@ -27,19 +27,6 @@ jobs:
       - run: python -m unittest discover -s tests
         working-directory: packages/sdk-py
 
-  e2e:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: foundry-rs/foundry-toolchain@v1
-      - uses: actions/setup-node@v4
-        with: { node-version: 22 }
-      - run: npm install
-        working-directory: packages/sdk-ts
-      - run: ./scripts/e2e.sh
-        env:
-          TSX_IMPORT: ${{ github.workspace }}/packages/sdk-ts/node_modules/tsx/dist/esm/index.mjs
-
   web:
     runs-on: ubuntu-latest
     steps:

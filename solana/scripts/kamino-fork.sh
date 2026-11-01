@@ -16,7 +16,7 @@ for f in .fork/*.json; do args+=(--account "$(basename "$f" .json)" "$f"); done
 solana-test-validator "${args[@]}" > .fork/validator.log 2>&1 &
 VPID=$!
 for i in $(seq 1 60); do solana -u localhost cluster-version > /dev/null 2>&1 && break; sleep 1; done
-export ANCHOR_PROVIDER_URL=http://127.0.0.1:8899 ANCHOR_WALLET=$HOME/.config/solana/id.json CTOKEN_MINT SUPPLY
+export ANCHOR_PROVIDER_URL=http://127.0.0.1:8899 ANCHOR_WALLET=$HOME/.config/solana/id.json CTOKEN_MINT SUPPLY PROGRAM_ID
 npx ts-mocha -p ./tsconfig.json -t 1000000 tests-fork/kamino.ts
 code=$?
 if [ $code -eq 0 ]; then
