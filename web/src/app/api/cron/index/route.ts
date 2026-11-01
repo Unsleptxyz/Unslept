@@ -39,6 +39,14 @@ function decodeAgentCreated(b64: string) {
 }
 
 export async function GET() {
+  try {
+    return await run();
+  } catch (e) {
+    return NextResponse.json({ error: String((e as Error)?.message ?? e).slice(0, 500) }, { status: 500 });
+  }
+}
+
+async function run() {
   const secret = process.env.INDEXER_SECRET;
   if (!secret || !process.env.SUPABASE_URL || !process.env.SUPABASE_PUBLISHABLE_KEY) {
     return NextResponse.json({ error: "Indexer is not configured." }, { status: 503 });
