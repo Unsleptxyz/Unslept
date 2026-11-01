@@ -3,7 +3,7 @@ name: solana
 # Builds the Anchor program and runs its test suite on a local validator. Results go to ops/solana-test.txt.
 on:
   push:
-    paths: ["solana/**", ".github/workflows/solana.yml"]
+    paths: ["solana/**", "packages/sdk-ts/**", "packages/pay/**", ".github/workflows/solana.yml"]
   workflow_dispatch:
 
 permissions:

@@ -7,7 +7,7 @@ type Category = { id: string; label: string };
 
 const price = (atomic: string) => {
   const n = Number(atomic) / 1e6;
-  return `${n.toLocaleString("en-US", { maximumFractionDigits: n < 0.01 ? 6 : 4 })} USDG`;
+  return `${n.toLocaleString("en-US", { maximumFractionDigits: n < 0.01 ? 6 : 4 })} USDC`;
 };
 const host = (u: string) => {
   try {
@@ -20,12 +20,13 @@ const host = (u: string) => {
 function snippet(e: DirectoryEntry) {
   const max = BigInt(e.price) * 2n;
   return `import { Unslept } from "@unslept/sdk";
-import { privateKeyToAccount } from "viem/accounts";
+import { Keypair } from "@solana/web3.js";
+import bs58 from "bs58";
 
 const unslept = new Unslept({
-  agentAccount: process.env.UNSLEPT_AGENT_ACCOUNT,
-  signer: privateKeyToAccount(process.env.UNSLEPT_SIGNER_KEY),
-  network: "robinhood-chain",
+  agent: process.env.UNSLEPT_AGENT,
+  signer: Keypair.fromSecretKey(bs58.decode(process.env.UNSLEPT_SIGNER_KEY)),
+  network: "solana",
 });
 
 // ${e.name}: ${price(e.price)} per call

@@ -16,7 +16,7 @@ export default function PrivacyPage() {
           items={[
             "No accounts, no identity checks, no advertising trackers.",
             "We store only what you choose to give: a waitlist email, and webhook settings you register.",
-            "Transactions on Robinhood Chain are public by design; we cannot hide or delete them.",
+            "Transactions on Solana are public by design; we cannot hide or delete them.",
             "Vercel, Supabase and GitHub process data for us.",
             "You can ask to see, correct or delete your data at any time.",
           ]}
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
 
         <h2>What is public by design</h2>
         <p>
-          Transactions on Robinhood Chain, including deposits, withdrawals, agent account creation and agent payments, are
+          Transactions on Solana, including deposits, withdrawals, agent account creation and agent payments, are
           public and permanent. Unslept indexes this public data to show protocol statistics. We cannot delete or hide it.
         </p>
 

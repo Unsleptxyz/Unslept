@@ -24,7 +24,7 @@ const outcomes = {
   },
   "invalid-wallet": {
     title: "The wallet address is not valid.",
-    body: "Enter 0x followed by 40 hexadecimal characters, or leave the field empty.",
+    body: "Enter a Solana wallet address, or leave the field empty.",
     ok: false,
   },
   unavailable: {

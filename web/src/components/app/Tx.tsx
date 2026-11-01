@@ -1,9 +1,9 @@
 "use client";
 
+import type { TransactionInstruction } from "@solana/web3.js";
 import { useEffect, useState, type ReactNode } from "react";
-import { BaseError, ContractFunctionRevertedError, type Abi } from "viem";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { txUrl } from "@/lib/web3";
+import { txUrl } from "@/lib/solana";
+import { useSolanaWallet } from "./solana-wallet";
 
 export interface PreviewRow {
   label: string;
@@ -28,93 +28,82 @@ export function TxPreview({ summary, rows }: { summary: string; rows: PreviewRow
 }
 
 const knownErrors: Record<string, string> = {
-  InsufficientLiquidity: "The buffer does not have that much free liquidity. Request a queued withdrawal instead.",
-  UseWithdrawQueue: "Utilization is above the queue threshold, so instant withdrawals are paused. Request a queued withdrawal; it is paid as liquidity returns.",
-  InsufficientLiquid: "The account does not hold that much liquid USDG. Unwind a parked position first.",
-  WouldLeaveDebtUncovered: "That withdrawal would leave buffer debt uncovered. Withdraw less, or unwind a position so the debt is repaid first.",
-  DepositNotAllowed: "This buffer tier is for $UNSLEPT stakers. Stake the required amount first.",
-  ERC4626ExceededMaxDeposit: "This deposit is above the buffer's current deposit cap. Deposit a smaller amount.",
-  ERC20InsufficientBalance: "Your wallet does not hold enough USDG for this.",
-  ERC20InsufficientAllowance: "USDG spending is not approved yet. Approve first, then retry.",
-  NotOwner: "Only the account owner can do this. Connect the owner wallet.",
-  AgentRevoked: "This agent is revoked. Its signer cannot be changed or restored.",
-  TicketNotFunded: "This withdrawal is still queued. It becomes claimable when liquidity returns.",
-  EnforcedPause: "The protocol is paused by the admin. Deposits, withdrawals and payments resume when it is unpaused.",
+  ProtocolPaused: "The protocol is paused by the admin. Deposits and payments resume when it is unpaused; withdrawals stay open.",
+  InsufficientLiquidity: "The buffer does not have that much free liquidity right now. Withdraw less, or try again as agents repay.",
+  CapExceeded: "This deposit is above the buffer's current deposit cap. Deposit a smaller amount.",
+  WouldLeaveDebtUncovered: "That withdrawal would leave buffer debt uncovered. Withdraw less, or redeem from Kamino first so the debt is repaid.",
+  InsufficientCollateral: "The agent does not hold enough to cover this.",
+  NotOwner: "Only the agent's owner can do this. Connect the owner wallet.",
+  NotOwnerOrKeeper: "Only the agent's owner or the keeper can redeem its Kamino position.",
+  AllowlistTooLong: "An agent can allowlist at most 8 payees.",
+  InsufficientPosition: "The agent does not hold that much in Kamino.",
+  YieldReserveNotSet: "Kamino yield is not enabled on this deployment yet.",
+  "insufficient funds": "Your wallet does not hold enough for this, including the network fee in SOL.",
+  "0x1": "Your wallet does not hold enough USDC for this.",
 };
 
 export function explainError(e: unknown): string {
-  if (e instanceof BaseError) {
-    const rev = e.walk((x) => x instanceof ContractFunctionRevertedError);
-    if (rev instanceof ContractFunctionRevertedError && rev.data?.errorName) {
-      return knownErrors[rev.data.errorName] ?? `The contract rejected the transaction with ${rev.data.errorName}.`;
-    }
-    if (e.shortMessage.toLowerCase().includes("user rejected")) return "You rejected the request in your wallet. Nothing was sent.";
-    return e.shortMessage;
-  }
-  return e instanceof Error ? e.message : String(e);
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/reject|denied|cancel/i.test(msg)) return "You rejected the request in your wallet. Nothing was sent.";
+  for (const [k, v] of Object.entries(knownErrors)) if (msg.includes(k)) return v;
+  return msg.length > 240 ? `${msg.slice(0, 240)}…` : msg;
 }
 
 interface TxButtonProps {
-  /** Exact action, for example "Deposit 500 USDG". */
+  /** Exact action, for example "Deposit 500 USDC". */
   label: string;
-  /** Same verb in the past tense, for example "Deposited 500 USDG". */
+  /** Same verb in the past tense, for example "Deposited 500 USDC". */
   doneLabel: string;
-  request: { address: `0x${string}`; abi: Abi; functionName: string; args?: readonly unknown[] } | undefined;
+  /** Builds the instructions to send. Undefined disables the button. */
+  build: (() => TransactionInstruction[]) | undefined;
   disabled?: boolean;
   variant?: "primary" | "ghost";
   onDone?: () => void;
 }
 
 /** Sends one transaction and reports its state with the action's own verb. */
-export function TxButton({ label, doneLabel, request, disabled, variant = "primary", onDone }: TxButtonProps) {
-  const { writeContract, data: hash, isPending, error, reset } = useWriteContract();
-  const receipt = useWaitForTransactionReceipt({ hash });
-  const [shown, setShown] = useState<string | null>(null);
+export function TxButton({ label, doneLabel, build, disabled, variant = "primary", onDone }: TxButtonProps) {
+  const { send, address } = useSolanaWallet();
+  const [state, setState] = useState<"idle" | "signing" | "done">("idle");
+  const [sig, setSig] = useState<string>();
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
-    if (receipt.isSuccess) {
-      setShown(doneLabel);
-      onDone?.();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receipt.isSuccess]);
-
-  useEffect(() => {
-    setShown(null);
-    reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setState("idle");
+    setError(undefined);
   }, [label]);
 
-  const busy = isPending || receipt.isLoading;
-  const link = hash ? txUrl(hash) : undefined;
+  async function run() {
+    if (!build) return;
+    setError(undefined);
+    setState("signing");
+    try {
+      const s = await send(build());
+      setSig(s);
+      setState("done");
+      onDone?.();
+    } catch (e) {
+      setError(explainError(e));
+      setState("idle");
+    }
+  }
+
   return (
     <div className="tx">
-      <button
-        type="button"
-        className={`btn btn--${variant}`}
-        disabled={disabled || !request || busy}
-        onClick={() => request && writeContract(request as never)}
-      >
-        {isPending ? "Confirm in your wallet" : receipt.isLoading ? "Waiting for confirmation" : label}
+      <button type="button" className={`btn btn--${variant}`} disabled={disabled || !build || !address || state === "signing"} onClick={run}>
+        {state === "signing" ? "Confirm in your wallet" : label}
       </button>
-      {shown ? (
+      {state === "done" && sig ? (
         <p className="tx__done" role="status">
-          {shown}.{" "}
-          {link ? (
-            <a className="text-link" href={link} target="_blank" rel="noopener noreferrer">
-              View transaction
-            </a>
-          ) : null}
+          {doneLabel}.{" "}
+          <a className="text-link" href={txUrl(sig)} target="_blank" rel="noopener noreferrer">
+            View transaction
+          </a>
         </p>
       ) : null}
       {error ? (
         <p className="app-error" role="alert">
-          {explainError(error)}
-        </p>
-      ) : null}
-      {receipt.isError ? (
-        <p className="app-error" role="alert">
-          The transaction was sent but failed on-chain. {explainError(receipt.error)}
+          {error}
         </p>
       ) : null}
     </div>

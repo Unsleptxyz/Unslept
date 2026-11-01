@@ -59,7 +59,7 @@ export function LiveFeed({ initial, explorerUrl }: { initial: FeedItem[]; explor
       <div className="feed feed--empty">
         <span className="feed__pulse" aria-hidden="true" />
         <p>
-          Waiting for the first settlement. Every x402 payment made through Unslept on Robinhood Chain appears here within a
+          Waiting for the first settlement. Every x402 payment made through Unslept on Solana appears here within a
           few minutes, with a link to the transaction.
         </p>
       </div>
@@ -76,7 +76,7 @@ export function LiveFeed({ initial, explorerUrl }: { initial: FeedItem[]; explor
             <span className="feed__main">
               <span className="feed__line">
                 Agent <span className="num">{short(it.agent)}</span> paid{" "}
-                <strong className="num">{usdg(it.amount)} USDG</strong>
+                <strong className="num">{usdg(it.amount)} USDC</strong>
               </span>
               <span className="feed__endpoint">{endpointLabel(it.endpoint)}</span>
             </span>

@@ -14,7 +14,7 @@ export async function AgentsAtWork() {
             Agents at work, <em>right now.</em>
           </h2>
           <p className="lede">
-            Every row is a real x402 payment an agent made through Unslept on Robinhood Chain, settled from the buffer in one
+            Every row is a real x402 payment an agent made through Unslept on Solana, settled from the buffer in one
             transaction. Open any row to see it on the explorer.
           </p>
           <div className="agents-live__links">

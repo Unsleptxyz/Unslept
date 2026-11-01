@@ -53,10 +53,10 @@ const templates = [
     slug: "paid-api",
     eyebrow: "For providers",
     title: "Paid API endpoint",
-    body: "A Next.js route that charges agents 0.01 USDG per request with Unslept Pay. Deploy it and list it in the directory.",
+    body: "A Next.js route that charges agents 0.01 USDC per request with Unslept Pay. Deploy it and list it in the directory.",
     tags: ["Next.js", "@unslept/pay", "Earn"],
     files: [{ filename: "app/api/quote/route.ts", rel: "paid-api/app/api/quote/route.ts" }],
-    run: "npm install @unslept/pay viem",
+    run: "npm install @unslept/pay",
   },
 ];
 
@@ -76,7 +76,7 @@ export default function TemplatesPage() {
               Start from an agent <em>that already pays.</em>
             </>
           }
-          lede="Four starting points that run against Unslept on Robinhood Chain mainnet. Create an agent account in the app, copy the environment from the Developers tab, and run."
+          lede="Four starting points that run against Unslept on Solana mainnet. Create an agent account in the app, copy the environment from the Developers tab, and run."
           actions={
             <>
               <a className="btn btn--primary btn--large" href="/app/developers">

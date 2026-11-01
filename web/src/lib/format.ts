@@ -1,9 +1,9 @@
-export const USDG_DECIMALS = 6;
+export const USDC_DECIMALS = 6;
 
 const grouped = new Intl.NumberFormat("en-US");
 
 /** 1234567890n -> "1,234.56789" (trailing zeros trimmed, at least 2 decimals). */
-export function fmtUsdg(v: bigint | undefined, opts: { decimals?: number } = {}): string {
+export function fmtUsdc(v: bigint | undefined, opts: { decimals?: number } = {}): string {
   if (v === undefined) return "--";
   const neg = v < 0n;
   const a = neg ? -v : v;
@@ -16,7 +16,7 @@ export function fmtUsdg(v: bigint | undefined, opts: { decimals?: number } = {})
 }
 
 /** "500" | "0.25" -> atomic units. Returns undefined for invalid input. */
-export function parseUsdg(s: string): bigint | undefined {
+export function parseUsdc(s: string): bigint | undefined {
   const m = /^\s*(\d{1,12})(?:\.(\d{0,6}))?\s*$/.exec(s.replace(/,/g, ""));
   if (!m) return undefined;
   return BigInt(m[1]) * 1_000_000n + BigInt((m[2] ?? "").padEnd(6, "0") || "0");

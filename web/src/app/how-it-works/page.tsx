@@ -23,7 +23,7 @@ export default function HowItWorksPage() {
               Ready to pay. <em>Working while it waits.</em>
             </>
           }
-          lede="Unslept separates the two jobs that usually fight each other. A shared USDG buffer pays every x402 request the instant it is due; each agent's idle balance sits in a tokenized savings position and repays the buffer in the background."
+          lede="Unslept separates the two jobs that usually fight each other. A shared USDC buffer pays every x402 request the instant it is due; each agent's idle balance sits in a Kamino lending position and repays the buffer in the background."
           actions={
             <>
               <a className="btn btn--primary btn--large" href="/app">

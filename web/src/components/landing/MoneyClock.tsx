@@ -191,12 +191,12 @@ const ClockFigure = memo(function ClockFigure({ hour }: { hour: number }) {
 
       <figcaption className="money-clock__counter">
         <p className="counter__label">Example balance</p>
-        <p className="counter__balance num">{usd.format(EXAMPLE_BALANCE)} USDG</p>
+        <p className="counter__balance num">{usd.format(EXAMPLE_BALANCE)} USDC</p>
         <p className="counter__label">Earned while you read</p>
         <p className="counter__earned num" aria-live="off">
-          +<EarnedCounter /> USDG
+          +<EarnedCounter /> USDC
         </p>
-        <p className="counter__rate num">+{micro.format(PER_SECOND)} USDG per second</p>
+        <p className="counter__rate num">+{micro.format(PER_SECOND)} USDC per second</p>
         <p className="counter__note">
           Illustration only. Assumes a variable rate of {(ILLUSTRATIVE_RATE * 100).toFixed(2)}% a year on an
           example balance. Not a projection. Actual rates vary and can fall.

@@ -1,29 +1,28 @@
 "use client";
 
-import { fmtUsdg, shortAddr } from "@/lib/format";
-import { txUrl } from "@/lib/web3";
-import { useBuffer, useMyAccounts, usePayments } from "./hooks";
+import { fmtUsdc, shortAddr } from "@/lib/format";
+import { txUrl } from "@/lib/solana";
+import { useBuffer, useMyAgents, usePayments, type PaymentRow } from "./hooks";
 
 export function Overview() {
-  const { accounts, isLoading } = useMyAccounts();
+  const { agents, isLoading } = useMyAgents();
   const buf = useBuffer();
-  const payments = usePayments(accounts.map((a) => a.address), 10);
+  const payments = usePayments(agents.map((a) => a.address), 10);
 
-  const working = accounts.reduce((s, a) => s + a.parked, 0n);
-  const liquid = accounts.reduce((s, a) => s + a.liquid, 0n);
-  const debt = accounts.reduce((s, a) => s + a.debt, 0n);
+  const working = agents.reduce((s, a) => s + a.positionValue, 0n);
+  const liquid = agents.reduce((s, a) => s + a.liquid, 0n);
+  const debt = agents.reduce((s, a) => s + a.debt, 0n);
   const inBuffer = buf.position ?? 0n;
   const total = working + liquid - debt + inBuffer;
-  const agents = accounts.filter((a) => !a.isTreasury);
 
-  if (!isLoading && accounts.length === 0 && (buf.shares ?? 0n) === 0n) {
+  if (!isLoading && agents.length === 0 && (buf.shares ?? 0n) === 0n) {
     return (
       <div className="app-empty">
         <h2>Nothing here yet</h2>
-        <p>Connect an agent to pay x402 requests from a balance that keeps working, or deposit to the buffer to earn from agent payments.</p>
+        <p>Create an agent to pay x402 requests in USDC from a balance that earns on Kamino, or deposit to the buffer to earn from agent payments.</p>
         <div className="page-actions">
           <a className="btn btn--primary" href="/app/agents">
-            Connect an agent
+            Create an agent
           </a>
           <a className="btn btn--ghost" href="/app/buffer">
             Deposit to the buffer
@@ -39,28 +38,28 @@ export function Overview() {
       <section className="ov-hero" aria-label="Totals">
         <div className="ov-total">
           <p className="muted">Total balance</p>
-          <p className="num ov-total__value">{fmtUsdg(total)} USDG</p>
+          <p className="num ov-total__value">{fmtUsdc(total)} USDC</p>
         </div>
         <dl className="ov-split">
           <div>
-            <dt>Working in tokenized assets</dt>
-            <dd className="num">{fmtUsdg(working)}</dd>
+            <dt>Working in Kamino</dt>
+            <dd className="num">{fmtUsdc(working)}</dd>
           </div>
           <div>
-            <dt>Held liquid in accounts</dt>
-            <dd className="num">{fmtUsdg(liquid)}</dd>
+            <dt>Held liquid in agents</dt>
+            <dd className="num">{fmtUsdc(liquid)}</dd>
           </div>
           <div>
             <dt>In the buffer</dt>
-            <dd className="num">{fmtUsdg(inBuffer)}</dd>
+            <dd className="num">{fmtUsdc(inBuffer)}</dd>
           </div>
           <div>
             <dt>Owed to the buffer</dt>
-            <dd className="num">{fmtUsdg(debt)}</dd>
+            <dd className="num">{fmtUsdc(debt)}</dd>
           </div>
         </dl>
         <p className="muted small">
-          Yield earned is shown per position on the Buffer page. Rates are variable; past results say nothing about future ones.
+          Kamino positions are shown at the USDC deposited; interest earned arrives when a position is redeemed. Rates are variable.
         </p>
       </section>
 
@@ -74,20 +73,20 @@ export function Overview() {
       </section>
 
       <section className="app-section" aria-labelledby="agents">
-        <h2 id="agents">Connected agents</h2>
+        <h2 id="agents">Agents</h2>
         {agents.length === 0 ? (
           <p className="muted">
-            No agents yet. <a className="text-link" href="/app/agents">Connect an agent</a>
+            No agents yet. <a className="text-link" href="/app/agents">Create an agent</a>
           </p>
         ) : (
           <ul className="agent-mini">
             {agents.map((a) => (
-              <li key={a.address}>
-                <a href={`/app/agents#${a.address}`} className="num">
-                  {shortAddr(a.address)}
+              <li key={a.address.toBase58()}>
+                <a href={`/app/agents#${a.address.toBase58()}`} className="num">
+                  {shortAddr(a.address.toBase58())}
                 </a>
                 <span className={a.paused || a.revoked ? "badge badge--off" : "badge"}>{a.revoked ? "Revoked" : a.paused ? "Paused" : "Active"}</span>
-                <span className="num">{fmtUsdg(a.parked + a.liquid)} USDG</span>
+                <span className="num">{fmtUsdc(a.positionValue + a.liquid)} USDC</span>
               </li>
             ))}
           </ul>
@@ -97,13 +96,7 @@ export function Overview() {
   );
 }
 
-export function PaymentTable({
-  rows,
-  showAgent,
-}: {
-  rows: { agent: string; endpoint: string; amount: bigint; fee: bigint; timestamp?: number; txHash: string }[];
-  showAgent?: boolean;
-}) {
+export function PaymentTable({ rows, showAgent }: { rows: PaymentRow[]; showAgent?: boolean }) {
   return (
     <div className="table-wrap">
       <table className="data-table">
@@ -111,7 +104,7 @@ export function PaymentTable({
           <tr>
             <th scope="col">Time (UTC)</th>
             {showAgent ? <th scope="col">Agent</th> : null}
-            <th scope="col">Endpoint</th>
+            <th scope="col">Payee</th>
             <th scope="col" className="r">
               Amount
             </th>
@@ -122,29 +115,20 @@ export function PaymentTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((p) => {
-            const link = txUrl(p.txHash);
-            return (
-              <tr key={p.txHash + p.endpoint}>
-                <td className="num">{p.timestamp ? new Date(p.timestamp * 1000).toISOString().slice(0, 19).replace("T", " ") : "--"}</td>
-                {showAgent ? <td className="num">{shortAddr(p.agent)}</td> : null}
-                <td className="endpoint" title={p.endpoint}>
-                  {p.endpoint}
-                </td>
-                <td className="num r">{fmtUsdg(p.amount)}</td>
-                <td className="num r">{fmtUsdg(p.fee, { decimals: 6 })}</td>
-                <td className="num">
-                  {link ? (
-                    <a className="text-link" href={link} target="_blank" rel="noopener noreferrer">
-                      {shortAddr(p.txHash)}
-                    </a>
-                  ) : (
-                    shortAddr(p.txHash)
-                  )}
-                </td>
-              </tr>
-            );
-          })}
+          {rows.map((p) => (
+            <tr key={p.signature + p.paymentId}>
+              <td className="num">{p.timestamp ? new Date(p.timestamp * 1000).toISOString().slice(0, 19).replace("T", " ") : "--"}</td>
+              {showAgent ? <td className="num">{shortAddr(p.agent)}</td> : null}
+              <td className="num">{shortAddr(p.payee)}</td>
+              <td className="num r">{fmtUsdc(p.amount)}</td>
+              <td className="num r">{fmtUsdc(p.fee, { decimals: 6 })}</td>
+              <td className="num">
+                <a className="text-link" href={txUrl(p.signature)} target="_blank" rel="noopener noreferrer">
+                  {shortAddr(p.signature)}
+                </a>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

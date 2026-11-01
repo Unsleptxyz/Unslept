@@ -8,7 +8,7 @@ import { site } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Unslept Pay",
-  description: "Accept x402 payments in USDG on Robinhood Chain. Put a price on any endpoint and let AI agents pay per request.",
+  description: "Accept x402 payments in USDC on Solana. Put a price on any endpoint and let AI agents pay per request.",
 };
 
 const tabs: CodeTab[] = [
@@ -18,8 +18,8 @@ const tabs: CodeTab[] = [
     code: `import { createPaywall } from "@unslept/pay";
 
 const paywall = createPaywall({
-  payTo: process.env.PAY_TO!,          // your wallet on Robinhood Chain
-  price: 10_000n,                      // 0.01 USDG per request
+  payTo: process.env.PAY_TO!,          // your wallet on Solana
+  price: 10_000n,                      // 0.01 USDC per request
   secret: process.env.PAYWALL_SECRET!, // 16+ characters
   description: "Live quote for one ticker",
 });
@@ -67,15 +67,15 @@ app.get("/quote", (c) =>
 
 const steps = [
   { t: "Install", b: "Add @unslept/pay to the API you already run. No account, no API key and no dashboard to set up." },
-  { t: "Set a price", b: "Choose a price per request in USDG and the wallet that receives it. Wrap the route." },
-  { t: "Agents pay", b: "Agents get a 402 with your price, settle on Robinhood Chain and retry. The package verifies the settlement on chain before your code runs." },
+  { t: "Set a price", b: "Choose a price per request in USDC and the wallet that receives it. Wrap the route." },
+  { t: "Agents pay", b: "Agents get a 402 with your price, settle on Solana and retry. The package verifies the settlement on chain before your code runs." },
   { t: "Get listed", b: "Submit the endpoint to the x402 Directory so agent developers can find it and copy a working snippet." },
 ];
 
 const facts = [
-  ["Settlement", "USDG on Robinhood Chain, paid straight to your wallet"],
+  ["Settlement", "USDC on Solana, paid straight to your wallet"],
   ["Protocol", "x402 v2: PAYMENT-REQUIRED, PAYMENT-SIGNATURE, PAYMENT-RESPONSE"],
-  ["Verification", "Settled event from the Unslept SettlementRouter, checked per request"],
+  ["Verification", "On-chain Payment record written by the Unslept program, checked per request"],
   ["Replay protection", "Signed, expiring payment IDs; each transaction accepted once"],
   ["Fees for providers", "None. The paying agent covers the settlement fee"],
   ["License", "MIT, open source"],
@@ -94,7 +94,7 @@ export default function PayPage() {
               Charge AI agents <em>per request.</em>
             </>
           }
-          lede="Put a USDG price on any endpoint in a few lines. Agents running Unslept pay on Robinhood Chain and your handler runs only after the payment is verified on chain. The money lands in your wallet, not ours."
+          lede="Put a USDC price on any endpoint in a few lines. Agents running Unslept pay on Solana and your handler runs only after the payment is verified on chain. The money lands in your wallet, not ours."
           actions={
             <>
               <a className="btn btn--primary btn--large" href="#code">
@@ -133,7 +133,7 @@ export default function PayPage() {
                 A paywall in <em>twelve lines.</em>
               </h2>
               <p className="lede">Works with any Fetch-style handler and with Express. Node 20 or later.</p>
-              <CopyCommand label="npm" command="npm install @unslept/pay viem" />
+              <CopyCommand label="npm" command="npm install @unslept/pay" />
             </header>
             <div data-reveal>
               <CodeTabs tabs={tabs} />

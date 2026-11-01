@@ -17,15 +17,14 @@ export const site = {
 };
 
 export const chain = {
-  id: read(process.env.NEXT_PUBLIC_CHAIN_ID),
-  name: read(process.env.NEXT_PUBLIC_CHAIN_NAME) ?? "Robinhood Chain",
-  rpcUrl: read(process.env.NEXT_PUBLIC_RPC_URL),
-  explorerUrl: read(process.env.NEXT_PUBLIC_EXPLORER_URL),
+  name: process.env.NEXT_PUBLIC_SOLANA_CLUSTER === "devnet" ? "Solana devnet" : "Solana",
+  explorerUrl: "https://solscan.io",
 };
 
 export const token = {
   address: read(process.env.NEXT_PUBLIC_UNSLEPT_TOKEN_ADDRESS),
-  ponsUrl: read(process.env.NEXT_PUBLIC_PONS_TOKEN_URL),
+  /** Where the token trades or launched, for example a launchpad or DEX page. */
+  launchUrl: read(process.env.NEXT_PUBLIC_TOKEN_LAUNCH_URL),
 };
 
 export const indexer = {

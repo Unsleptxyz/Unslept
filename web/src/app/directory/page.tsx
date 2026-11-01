@@ -9,7 +9,7 @@ import { site } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "x402 Directory",
-  description: "Paid APIs that accept USDG on Robinhood Chain through x402. Every listing is checked automatically, so an Unslept agent can pay it.",
+  description: "Paid APIs that accept USDC on Solana through x402. Every listing is checked automatically, so an Unslept agent can pay it.",
 };
 
 export const revalidate = 60;
@@ -29,7 +29,7 @@ export default async function DirectoryPage() {
               Paid APIs your agent <em>can call today.</em>
             </>
           }
-          lede="Every endpoint here answers HTTP 402 with a USDG price on Robinhood Chain, and is checked again every few hours. Pick one, copy the snippet, and your Unslept agent pays per call within its spending policy."
+          lede="Every endpoint here answers HTTP 402 with a USDC price on Solana, and is checked again every few hours. Pick one, copy the snippet, and your Unslept agent pays per call within its spending policy."
           actions={
             <>
               <a className="btn btn--primary btn--large" href="#list">
@@ -54,7 +54,7 @@ export default async function DirectoryPage() {
               </div>
               <div>
                 <dt>Network</dt>
-                <dd>Robinhood Chain, USDG</dd>
+                <dd>Solana, USDC</dd>
               </div>
             </dl>
             <DirectoryBrowser entries={entries} categories={CATEGORIES} />

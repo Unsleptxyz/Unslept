@@ -1,3 +1,4 @@
+import { network } from "@/lib/solana";
 import { NextResponse } from "next/server";
 import { listDirectory } from "@/lib/directory";
 
@@ -19,5 +20,5 @@ export async function GET() {
     verified: e.verified,
     online: e.online,
   }));
-  return NextResponse.json({ network: "eip155:4663", count: entries.length, entries }, { headers: { "access-control-allow-origin": "*" } });
+  return NextResponse.json({ network, count: entries.length, entries }, { headers: { "access-control-allow-origin": "*" } });
 }

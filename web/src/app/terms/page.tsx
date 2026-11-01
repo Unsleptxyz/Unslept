@@ -15,7 +15,7 @@ export default function TermsPage() {
         <Summary
           items={[
             "Unslept is non-custodial software. You keep your keys; we cannot move, freeze or recover your funds.",
-            "The contracts are live without a completed audit, with deposits capped at 50,000 USDG. Use only what you can afford to lose.",
+            "The contracts are live without a completed audit, with deposits capped at 50,000 USDC. Use only what you can afford to lose.",
             "There is no identity verification. You are responsible for using Unslept lawfully where you live.",
             "Fees are set on chain within fixed bounds and change only through a 24-hour timelock.",
             "The software is provided as is, and our liability is limited as far as the law allows.",
@@ -33,53 +33,52 @@ export default function TermsPage() {
 
         <h2>2. What Unslept is</h2>
         <p>
-          Unslept is software. The interface helps you create and use smart contracts on Robinhood Chain: agent accounts
-          with spending policies, a shared USDG buffer that settles x402 payments, and adapters that place idle balances
-          in tokenized assets. The interface is non-custodial. We never hold your keys or your funds, and we cannot move,
+          Unslept is software. The interface helps you use the Unslept program on Solana: agent accounts with
+          spending policies, a shared USDC buffer that settles x402 payments, and an adapter that can supply idle agent
+          balances to Kamino Lend. The interface is non-custodial. We never hold your keys or your funds, and we cannot move,
           freeze or recover them for you. Every action happens through a transaction you or your agent sign.
         </p>
         <p>
-          Some contract parameters, such as fee rates within fixed bounds, deposit caps and adapter settings, can be changed
-          by an admin role. Every such change goes through a 24-hour timelock on chain, so it is public before it takes
-          effect. The admin can also pause the contracts in an emergency.
+          Some program parameters, such as the fee rate (at most 1 percent), the deposit cap and operator keys, can be changed
+          by an admin. Every such change waits 24 hours on chain, so it is public before it takes effect. The admin can also
+          pause deposits and payments in an emergency; withdrawals stay open.
         </p>
 
         <h2>3. Agent accounts</h2>
         <p>
-          An agent account is a smart contract you create and own. You choose a signer key for your agent and a spending
-          policy: a per-call cap, a daily cap, and the payees or domains the agent may pay. The account contract enforces the
-          policy on every payment. The signer can only request payments within it and can never withdraw.
+          An agent account is an account in the Unslept program that you create and own. You choose a signer key for your
+          agent and a spending policy: a per-call cap, a daily cap, and optionally the payee wallets the agent may pay. The
+          program enforces the policy on every payment. The signer can only request payments within it and can never withdraw.
         </p>
         <p>
           You are responsible for the policy you set and for every payment your agent makes within it. Payments that settle on
-          chain are final; we cannot reverse them. You can pause the agent, revoke its signer, unwind parked funds and withdraw
+          chain are final; we cannot reverse them. You can pause the agent, revoke its signer, redeem from Kamino and withdraw
           at any time.
         </p>
 
         <h2>4. Buffer deposits</h2>
         <p>
-          When you deposit USDG into the buffer you receive vault shares. The buffer uses deposits to settle agent payments
-          and earns the settlement fee and, on its parked part, the variable rate of the underlying asset. The value of your
+          When you deposit USDC into the buffer you receive buffer shares, an SPL token. The buffer uses deposits to settle
+          agent payments and earns the settlement fee. The value of your
           shares can go up or down, including because of agent debt that cannot be recovered.
         </p>
         <p>
-          Withdrawals are instant while liquidity allows. When utilization is high they are queued and paid in order as
-          liquidity returns. There is no promised rate and no promised withdrawal time.
+          Withdrawals are instant up to the buffer&apos;s free liquidity. The rest becomes available as agents repay. There is no promised rate and no promised withdrawal time.
         </p>
 
         <h2>5. Guarded launch</h2>
         <p>
-          The contracts are deployed on mainnet without a completed third-party security audit. During this period total
-          deposits are capped at 50,000 USDG and each tokenized asset has its own cap. Use only amounts you can afford to
-          lose entirely. The caps and the audit status may change through the timelock; this page and the risk disclosure
+          The Solana program is deployed on mainnet without a completed third-party security audit. During this period total
+          buffer deposits are capped at 50,000 USDC. Use only amounts you can afford to lose entirely. The cap and the audit
+          status may change through the 24-hour parameter delay; this page and the risk disclosure
           will be updated when they do.
         </p>
 
         <h2>6. Eligibility</h2>
         <p>
           You must be at least 18 years old and legally able to enter into these terms. Unslept does not perform identity
-          verification. You alone are responsible for making sure that using the interface, holding USDG and gaining
-          exposure to tokenized assets is lawful where you live. The interface may refuse access from certain countries
+          verification. You alone are responsible for making sure that using the interface, holding USDC and gaining
+          exposure to a lending market such as Kamino is lawful where you live. The interface may refuse access from certain countries
           based on your approximate location. Do not use the interface if you are subject to sanctions or located in a
           country where its use is prohibited, and do not try to get around location restrictions.
         </p>
@@ -87,16 +86,16 @@ export default function TermsPage() {
         <h2>7. Risks</h2>
         <p>
           The <a className="text-link" href="/risk">risk disclosure</a> is part of these terms. In short: yield is variable
-          and not guaranteed and can be zero; smart contracts can fail; USDG, the tokenized assets and their issuers, Spark,
-          oracles and Robinhood Chain itself are outside our control; and withdrawals can be delayed when the buffer is in
+          and not guaranteed and can be zero; programs can fail; USDC and its issuer, Kamino,
+          oracles and Solana itself are outside our control; and withdrawals can be delayed when the buffer is in
           use. Nothing on this website is investment, legal or tax advice.
         </p>
 
         <h2>8. Fees</h2>
         <p>
           Instant settlement from the buffer charges a fee on each payment, paid to buffer depositors. The current rate is
-          shown in the app and read from the chain. The rate can only change within the bounds set in the FeeModule
-          contract, and only through the 24-hour timelock. Network gas fees are paid separately to Robinhood Chain.
+          read from the chain. It can never exceed 1 percent, and changes only after a 24-hour on-chain delay. Solana network
+          fees and account rent are paid separately in SOL.
         </p>
 
         <h2>9. Your responsibilities</h2>
@@ -111,7 +110,7 @@ export default function TermsPage() {
         <p>You agree not to use the interface to:</p>
         <ul>
           <li>break any law or sanctions rule, or move proceeds of crime;</li>
-          <li>attack, exploit or overload the contracts, the website or its infrastructure, outside a responsible disclosure;</li>
+          <li>attack, exploit or overload the program, the website or its infrastructure, outside a responsible disclosure;</li>
           <li>pay for content or services that are illegal where you or the payee are;</li>
           <li>mislead others about your relationship with Unslept.</li>
         </ul>
@@ -121,14 +120,14 @@ export default function TermsPage() {
 
         <h2>11. $UNSLEPT</h2>
         <p>
-          $UNSLEPT is a token launched on Pons. Holding it does not give you a share of a company, a claim on protocol
-          revenue unless a deployed contract says so, or any promise of value. Its price can fall to zero.
+          $UNSLEPT is a token on Solana. Holding it does not give you a share of a company, a claim on protocol
+          revenue unless a deployed program says so, or any promise of value. Its price can fall to zero.
         </p>
 
         <h2>12. Open source and third parties</h2>
         <p>
-          The Unslept SDKs and MCP server are published under the MIT license, and the source of every deployed contract is verified on chain. The interface links to and
-          depends on third-party services, including Robinhood Chain, Paxos (USDG), Spark, Pons, block explorers, wallet
+          The Unslept SDKs and MCP server are published under the MIT license, and the source of the Solana program is public. The interface links to and
+          depends on third-party services, including Solana, Circle (USDC), Kamino, block explorers, wallet
           software and hosting providers. Their terms apply to your use of them, and we are not responsible for them.
         </p>
 

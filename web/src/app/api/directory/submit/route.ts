@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max) : "");
 
-/** Adds an endpoint to the x402 Directory after checking that it really asks for USDG on Robinhood Chain. */
+/** Adds an endpoint to the x402 Directory after checking that it really asks for USDC on Solana. */
 export async function POST(req: NextRequest) {
   if (!dbConfigured()) return NextResponse.json({ error: "The directory is not configured on this deployment." }, { status: 503 });
   let body: Record<string, unknown>;

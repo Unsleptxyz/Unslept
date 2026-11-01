@@ -8,7 +8,7 @@ import { getTokenAddress } from "@/lib/token";
 
 export const metadata: Metadata = {
   title: "$UNSLEPT",
-  description: "$UNSLEPT, the Unslept protocol token on Pons: fee discounts, a staker buffer tier and governance signaling.",
+  description: "$UNSLEPT, the Unslept protocol token on Solana: fee discounts, a staker buffer tier and governance signaling.",
 };
 
 export const revalidate = 60;
@@ -27,30 +27,30 @@ export default async function TokenPage() {
               $UNSLEPT, <em>plainly.</em>
             </>
           }
-          lede="The protocol token launches on Pons, on Robinhood Chain. It does what is listed on this page and nothing more. It is not an investment, and it carries no claim on protocol revenue."
+          lede="The protocol token lives on Solana. It does what is listed on this page and nothing more. It is not an investment, and it carries no claim on protocol revenue."
           actions={
-            token.ponsUrl || (address && chain.explorerUrl) ? (
+            token.launchUrl || (address && chain.explorerUrl) ? (
               <>
-                {token.ponsUrl ? (
-                  <a className="btn btn--primary btn--large" href={token.ponsUrl} rel="noopener noreferrer" target="_blank">
-                    View on Pons
+                {token.launchUrl ? (
+                  <a className="btn btn--primary btn--large" href={token.launchUrl} rel="noopener noreferrer" target="_blank">
+                    View market
                   </a>
                 ) : null}
                 {address && chain.explorerUrl ? (
                   <a
-                    className={`btn ${token.ponsUrl ? "btn--ghost" : "btn--primary"} btn--large`}
-                    href={`${chain.explorerUrl.replace(/\/$/, "")}/token/${address}`}
+                    className={`btn ${token.launchUrl ? "btn--ghost" : "btn--primary"} btn--large`}
+                    href={`https://solscan.io/token/${address}`}
                     rel="noopener noreferrer"
                     target="_blank"
                   >
-                    View contract
+                    View mint
                   </a>
                 ) : null}
               </>
             ) : undefined
           }
         />
-        <Token address={address} ponsUrl={token.ponsUrl} explorerUrl={chain.explorerUrl} head={false} />
+        <Token address={address} launchUrl={token.launchUrl} explorerUrl={chain.explorerUrl} head={false} />
         <PageCta next={{ href: "/how-it-works", label: "How Unslept works" }} />
       </main>
       <SiteFooter docsUrl={site.docsUrl} githubUrl={site.githubUrl} xUrl={site.xUrl} />
