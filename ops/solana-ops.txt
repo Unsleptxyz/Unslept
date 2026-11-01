@@ -1,19 +1,5 @@
-# solana-ops deploy on devnet 2026-10-31T23:55:25Z
-keys: {"program":"HbAgL4w8R9D8RUEuK4rJknK5Vn8rBusfRtfTnFcYieue","deployer":"HCdAT1i8DC1FKwsKsaKtpnLwzqWjjuLFSGMMpFyVxvv1","keeper":"5UwLn5mb4zx6JM62E28YjvnTwt18LRtDBi3ue3ftKFEC","treasury":"7DNkxPNsu6hYKpwgHsVXgtnR4twnXKEUbffGDsWMM37Z"}
+# solana-ops status on mainnet 2026-11-01T01:19:51Z
+keys: {"program":"HbAgL4w8R9D8RUEuK4rJknK5Vn8rBusfRtfTnFcYieue","deployer":"HCdAT1i8DC1FKwsKsaKtpnLwzqWjjuLFSGMMpFyVxvv1","keeper":"5UwLn5mb4zx6JM62E28YjvnTwt18LRtDBi3ue3ftKFEC","treasury":"7DNkxPNsu6hYKpwgHsVXgtnR4twnXKEUbffGDsWMM37Z","rawSeed":"3GBaJz67i6Ecsr1QqBGktoNsjpDueyma49NFwDuGweQW"}
 deployer balance: 0 SOL
-Error: airdrop request failed. This can happen when the rate limit is reached.
-Error: airdrop request failed. This can happen when the rate limit is reached.
-All program id declarations are synced.
-build exit 0
-total 496
-drwxr-xr-x 2 runner runner   4096 Oct 31 23:59 .
-drwxr-xr-x 8 runner runner   4096 Oct 31 23:59 ..
--rw------- 1 runner runner    227 Oct 31 23:55 unslept-keypair.json
--rwxr-xr-x 1 runner runner 493992 Oct 31 23:59 unslept.so
-Or to recover the account's lamports, use:
-===========================================================================
-solana program close 6XXAmkzBAWKB85ejwBcDXjVLrA445fycXiy97dK1z3qN
-===========================================================================
-Error: Account HCdAT1i8DC1FKwsKsaKtpnLwzqWjjuLFSGMMpFyVxvv1 has insufficient funds for spend (2.5103582 SOL) + fee (0.038785 SOL)
 Error: Dynamic program error: No default signer found, run "solana-keygen new -o /home/runner/.config/solana/id.json" to create a new one
 deployer balance after: 0 SOL
