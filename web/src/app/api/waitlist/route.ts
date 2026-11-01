@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { saveWaitlistEntry } from "@/lib/waitlist-store";
 
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,63}$/;
-const WALLET = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+const WALLET = /^0x[a-fA-F0-9]{40}$/;
 
 type Outcome = "joined" | "already" | "invalid-email" | "invalid-wallet" | "unavailable";
 
@@ -10,7 +10,7 @@ const messages: Record<Outcome, string> = {
   joined: "You are on the waitlist.",
   already: "This email is already on the waitlist.",
   "invalid-email": "The email address is not valid. Check it and submit again.",
-  "invalid-wallet": "The wallet must be a Solana address (base58). Correct it or leave it empty.",
+  "invalid-wallet": "The wallet address must be 0x followed by 40 hexadecimal characters. Correct it or leave it empty.",
   unavailable: "The waitlist could not be saved right now. Try again in a few minutes.",
 };
 

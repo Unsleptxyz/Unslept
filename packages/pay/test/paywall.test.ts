@@ -1,36 +1,39 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createPaywall, SOLANA, type AccountReader } from "../src/index.ts";
+import { encodeAbiParameters, encodeEventTopics, parseAbiItem, pad } from "viem";
+import { createPaywall, ROBINHOOD_CHAIN } from "../src/index.ts";
 
-const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-const b58d = (s: string) => {
-  let n = 0n;
-  for (const c of s) n = n * 58n + BigInt(B58.indexOf(c));
-  const out: number[] = [];
-  while (n > 0n) { out.unshift(Number(n & 0xffn)); n >>= 8n; }
-  for (const c of s) { if (c !== "1") break; out.unshift(0); }
-  return Uint8Array.from(out);
-};
-const payTo = "7DNkxPNsu6hYKpwgHsVXgtnR4twnXKEUbffGDsWMM37Z";
-const agent = "HCdAT1i8DC1FKwsKsaKtpnLwzqWjjuLFSGMMpFyVxvv1";
-const record = "5UwLn5mb4zx6JM62E28YjvnTwt18LRtDBi3ue3ftKFEC";
-const tx = "5".repeat(88);
+const payTo = "0x00000000000000000000000000000000000000aa";
+const agent = "0x00000000000000000000000000000000000000bb";
+const ev = parseAbiItem(
+  "event Settled(bytes32 indexed paymentId, address indexed agent, address indexed payee, address buffer, address recipient, uint256 amount, uint256 fee, uint8 mode, string endpoint)",
+);
+const tx = `0x${"11".repeat(32)}`;
 
-function recordData(paymentId: string, amount: bigint, payee = payTo) {
-  const d = new Uint8Array(8 + 32 * 3 + 16 + 32 + 16 + 33);
-  d.set([227, 231, 51, 26, 244, 88, 4, 148], 0);
-  d.set(Buffer.from(paymentId.slice(2), "hex"), 8);
-  d.set(b58d(agent), 40);
-  d.set(b58d(payee), 72);
-  new DataView(d.buffer).setBigUint64(104, amount, true);
-  return d;
+function receiptFor(paymentId: `0x${string}`, amount: bigint, mode = 0) {
+  return {
+    status: "success" as const,
+    logs: [
+      {
+        address: ROBINHOOD_CHAIN.router,
+        topics: encodeEventTopics({ abi: [ev], eventName: "Settled", args: { paymentId, agent, payee: payTo } }),
+        data: encodeAbiParameters(
+          [{ type: "address" }, { type: "address" }, { type: "uint256" }, { type: "uint256" }, { type: "uint8" }, { type: "string" }],
+          [pad("0x01", { size: 20 }), payTo, amount, 0n, mode, "https://api.example.com/x"],
+        ),
+      },
+    ],
+  };
 }
 
-async function setup(amount = 10_000n, opts: { owner?: string; payee?: string } = {}) {
-  let paymentId = "0x";
-  const reader: AccountReader = async (addr) =>
-    addr === record ? { owner: opts.owner ?? SOLANA.program, data: recordData(paymentId, amount, opts.payee) } : undefined;
-  const pw = createPaywall({ payTo, price: 10_000n, secret: "a-test-secret-of-length", reader });
+async function setup(amount = 10_000n, mode = 0) {
+  let paymentId = "0x" as `0x${string}`;
+  const pw = createPaywall({
+    payTo,
+    price: 10_000n,
+    secret: "a-test-secret-of-length",
+    client: { getTransactionReceipt: (async () => receiptFor(paymentId, amount, mode)) as never },
+  });
   const first = await pw.verify(new Request("https://api.example.com/x"));
   assert.equal(first.paid, false);
   if (first.paid) throw new Error("unreachable");
@@ -38,39 +41,32 @@ async function setup(amount = 10_000n, opts: { owner?: string; payee?: string } 
   const pr = JSON.parse(Buffer.from(first.response.headers.get("PAYMENT-REQUIRED")!, "base64").toString());
   const accepted = pr.accepts[0];
   paymentId = accepted.extra.paymentId;
-  const sig = Buffer.from(JSON.stringify({ x402Version: 2, accepted, payload: { transaction: tx, paymentId, agent, payment: record } })).toString("base64");
+  const sig = Buffer.from(JSON.stringify({ x402Version: 2, accepted, payload: { transaction: tx, paymentId, agentAccount: agent } })).toString("base64");
   const paidReq = () => new Request("https://api.example.com/x", { headers: { "PAYMENT-SIGNATURE": sig } });
   return { pw, paidReq, accepted };
 }
 
-test("402 offers USDC on Solana with a signed payment ID", async () => {
+test("402 offers USDG on Robinhood Chain with a signed payment ID", async () => {
   const { accepted } = await setup();
   assert.equal(accepted.scheme, "unslept-direct");
-  assert.equal(accepted.network, SOLANA.network);
-  assert.equal(accepted.asset, SOLANA.usdc);
+  assert.equal(accepted.network, "eip155:4663");
   assert.equal(accepted.amount, "10000");
   assert.match(accepted.extra.paymentId, /^0x[0-9a-f]{64}$/);
 });
 
-test("a valid payment record passes once, then is refused as reused", async () => {
+test("a valid settlement passes once, then is refused as reused", async () => {
   const { pw, paidReq } = await setup();
   const ok = await pw.verify(paidReq());
   assert.equal(ok.paid, true);
-  if (ok.paid) assert.equal(ok.payment.payer, agent);
-  assert.equal((await pw.verify(paidReq())).paid, false);
+  const again = await pw.verify(paidReq());
+  assert.equal(again.paid, false);
 });
 
-test("underpayment, wrong payee and foreign records are refused", async () => {
+test("underpayment and non-direct settlements are refused", async () => {
   const low = await setup(9_999n);
   assert.equal((await low.pw.verify(low.paidReq())).paid, false);
-  const other = await setup(10_000n, { payee: agent });
-  assert.equal((await other.pw.verify(other.paidReq())).paid, false);
-  const foreign = await setup(10_000n, { owner: agent });
-  assert.equal((await foreign.pw.verify(foreign.paidReq())).paid, false);
-});
-
-test("rejects EVM payTo", () => {
-  assert.throws(() => createPaywall({ payTo: "0x00000000000000000000000000000000000000aa", price: 1n, secret: "a-test-secret-of-length" }));
+  const exact = await setup(10_000n, 1);
+  assert.equal((await exact.pw.verify(exact.paidReq())).paid, false);
 });
 
 test("protect() adds PAYMENT-RESPONSE to the handler response", async () => {

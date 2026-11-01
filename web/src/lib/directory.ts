@@ -1,6 +1,6 @@
-import { USDC_MINT, clusterName, network as solNetwork } from "@/lib/solana";
+import { addresses, chain } from "@/lib/web3";
 
-/** x402 Directory: paid endpoints that accept USDC on Solana, so Unslept agents can pay them. */
+/** x402 Directory: paid endpoints that accept USDG on Robinhood Chain, so Unslept agents can pay them. */
 export interface DirectoryEntry {
   id: number;
   url: string;
@@ -80,11 +80,12 @@ export function checkUrl(raw: string): URL | string {
 
 /**
  * Calls the endpoint without payment and checks that it answers 402 with an x402 v2 PAYMENT-REQUIRED header
- * offering USDC on Solana through "unslept-direct".
+ * offering USDG on Robinhood Chain through "unslept-direct" or "exact".
  */
 export async function probeEndpoint(raw: string): Promise<ProbeResult> {
   const u = checkUrl(raw);
   if (typeof u === "string") return { ok: false, reason: u };
+  if (!chain) return { ok: false, reason: "The chain is not configured on this deployment." };
   let res: Response;
   try {
     res = await fetch(u, { method: "GET", redirect: "manual", cache: "no-store", signal: AbortSignal.timeout(8000), headers: { "user-agent": "UnsleptDirectory/1.0" } });
@@ -100,11 +101,13 @@ export async function probeEndpoint(raw: string): Promise<ProbeResult> {
   } catch {
     return { ok: false, reason: "PAYMENT-REQUIRED is not base64-encoded JSON." };
   }
-  const network = solNetwork;
-  const usdc = USDC_MINT.toBase58();
-  const a = (pr.accepts ?? []).find((x) => x.network === network && x.asset === usdc && x.scheme === "unslept-direct");
-  if (!a) return { ok: false, reason: `No "unslept-direct" payment option for USDC on ${clusterName}. Unslept agents pay USDC on Solana.` };
-  if (!a.payTo || !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a.payTo) || !a.amount || !/^\d+$/.test(a.amount)) {
+  const network = `eip155:${chain.id}`;
+  const usdg = addresses.usdg?.toLowerCase();
+  const a = (pr.accepts ?? []).find(
+    (x) => x.network === network && x.asset?.toLowerCase() === usdg && (x.scheme === "unslept-direct" || x.scheme === "exact"),
+  );
+  if (!a) return { ok: false, reason: `No payment option for USDG on ${network}. Unslept agents can only pay USDG on Robinhood Chain.` };
+  if (!a.payTo || !/^0x[0-9a-fA-F]{40}$/.test(a.payTo) || !a.amount || !/^\d+$/.test(a.amount)) {
     return { ok: false, reason: "The payment option is missing payTo or amount." };
   }
   return { ok: true, scheme: a.scheme, network, asset: a.asset, payTo: a.payTo, price: a.amount, description: pr.resource?.description };

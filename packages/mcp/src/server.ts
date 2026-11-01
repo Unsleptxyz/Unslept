@@ -5,7 +5,7 @@
 import type { Unslept } from "@unslept/sdk";
 
 export const SUPPORTED_PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
-const SERVER_INFO = { name: "unslept", version: "0.2.0" };
+const SERVER_INFO = { name: "unslept", version: "0.1.0" };
 const MAX_BODY = 100_000;
 
 type Json = null | boolean | number | string | Json[] | { [k: string]: Json };
@@ -24,7 +24,7 @@ export const tools = [
     name: "pay_x402_request",
     title: "Pay an x402 request",
     description:
-      "Make an HTTP request. If the server answers 402 Payment Required, pay it in USDC on Solana from the agent's Unslept account within its spending policy, then return the paid response.",
+      "Make an HTTP request. If the server answers 402 Payment Required, pay it from the agent's Unslept account within its spending policy, then return the paid response.",
     inputSchema: {
       type: "object",
       properties: {
@@ -32,7 +32,7 @@ export const tools = [
         method: { type: "string", enum: ["GET", "POST", "PUT", "PATCH", "DELETE"], default: "GET" },
         headers: { type: "object", additionalProperties: { type: "string" } },
         body: { type: "string", description: "Request body, sent as is." },
-        max_amount_usdc: { type: "string", description: "Refuse to pay more than this, in USDC, for example \"0.50\"." },
+        max_amount_usdg: { type: "string", description: "Refuse to pay more than this, in USDG, for example \"0.50\"." },
       },
       required: ["url"],
       additionalProperties: false,
@@ -41,13 +41,13 @@ export const tools = [
   {
     name: "get_balances",
     title: "Get balances",
-    description: "Return the agent's liquid USDC, the amount working in Kamino, buffer debt and net balance.",
+    description: "Return the agent's liquid USDG, the amount working in tokenized assets, buffer debt and net balance.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_payment_history",
     title: "Get payment history",
-    description: "Return recent x402 payments made by this agent: endpoint, amount, payee, fee and transaction signature.",
+    description: "Return recent x402 payments made by this agent: endpoint, amount, payee, fee and transaction hash.",
     inputSchema: {
       type: "object",
       properties: { limit: { type: "integer", minimum: 1, maximum: 200, default: 20 } },
@@ -57,19 +57,19 @@ export const tools = [
   {
     name: "get_policy",
     title: "Get spending policy",
-    description: "Return the agent's per-call cap, daily cap, amount left today, payee allowlist, and whether it is paused or revoked.",
+    description: "Return the agent's per-call cap, daily cap, amount left today, and whether it is paused or revoked.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
 ] as const;
 
-const usdc = (v: bigint) => {
+const usdg = (v: bigint) => {
   const s = v.toString().padStart(7, "0");
   return `${s.slice(0, -6)}.${s.slice(-6)}`;
 };
 
-export function parseUsdc(s: string): bigint {
+export function parseUsdg(s: string): bigint {
   const m = /^(\d+)(?:\.(\d{1,6}))?$/.exec(s.trim());
-  if (!m) throw new Error(`"${s}" is not a USDC amount. Use a decimal such as 0.50.`);
+  if (!m) throw new Error(`"${s}" is not a USDG amount. Use a decimal such as 0.50.`);
   return BigInt(m[1]) * 1_000_000n + BigInt((m[2] ?? "").padEnd(6, "0"));
 }
 
@@ -100,7 +100,7 @@ export async function callTool(sdk: UnsleptLike, name: string, args: Record<stri
             headers: (args.headers as Record<string, string>) ?? undefined,
             body: (args.body as string) ?? undefined,
           },
-          { maxAmount: args.max_amount_usdc ? parseUsdc(String(args.max_amount_usdc)) : undefined },
+          { maxAmount: args.max_amount_usdg ? parseUsdg(String(args.max_amount_usdg)) : undefined },
         );
         const text = await res.text();
         const paid = sdk.localPayments().slice(before);
@@ -110,33 +110,32 @@ export async function callTool(sdk: UnsleptLike, name: string, args: Record<stri
           body: text.length > MAX_BODY ? `${text.slice(0, MAX_BODY)}\n[truncated]` : text,
           payment: paid[0]
             ? {
-                amountUsdc: usdc(paid[0].amount),
-                feeUsdc: usdc(paid[0].fee),
+                amountUsdg: usdg(paid[0].amount),
+                feeUsdg: usdg(paid[0].fee),
                 payee: paid[0].payee,
                 scheme: paid[0].scheme,
-                transaction: paid[0].transaction,
+                transactionHash: paid[0].transactionHash,
               }
             : null,
         });
       }
       case "get_balances": {
         const b = await sdk.getBalances();
-        return result({ liquidUsdc: usdc(b.liquid), workingUsdc: usdc(b.working), debtUsdc: usdc(b.debt), netUsdc: usdc(b.net) });
+        return result({ liquidUsdg: usdg(b.liquid), workingUsdg: usdg(b.working), debtUsdg: usdg(b.debt), netUsdg: usdg(b.net) });
       }
       case "get_payment_history": {
         const limit = Math.min(200, Math.max(1, Number(args.limit ?? 20)));
         const rows = await sdk.getPayments({ limit });
-        return result(rows.map((r) => ({ ...r, amountUsdc: usdc(r.amount), feeUsdc: usdc(r.fee) })));
+        return result(rows.map((r) => ({ ...r, amountUsdg: usdg(r.amount), feeUsdg: usdg(r.fee) })));
       }
       case "get_policy": {
         const p = await sdk.getPolicy();
         return result({
-          perCallCapUsdc: usdc(p.perCallCap),
-          dailyCapUsdc: usdc(p.dailyCap),
-          remainingTodayUsdc: usdc(p.remainingToday),
+          perCallCapUsdg: usdg(p.perCallCap),
+          dailyCapUsdg: usdg(p.dailyCap),
+          remainingTodayUsdg: usdg(p.remainingToday),
           paused: p.paused,
           revoked: p.revoked,
-          allowlist: p.allowlist,
         });
       }
       default:

@@ -1,5 +1,5 @@
 /**
- * Pluggable compliance provider for access to yield features: jurisdiction (geo) and KYC status.
+ * Pluggable compliance provider for tokenized-asset access: jurisdiction (geo) and KYC status.
  * Select with COMPLIANCE_PROVIDER:
  *   - "allowlist": KYC passes for addresses in COMPLIANCE_ALLOWLIST (comma-separated). For a controlled launch.
  *   - "http":      POST {address, country} to COMPLIANCE_API_URL with Bearer COMPLIANCE_API_KEY.
@@ -37,7 +37,7 @@ export function providerFromEnv(): ComplianceProvider | undefined {
     return {
       name: "allowlist",
       async kycStatus(address) {
-        return allowed.has(address) || allowed.has(address.toLowerCase()) ? { kyc: "verified" } : { kyc: "none", reason: "Address is not on the access list." };
+        return allowed.has(address.toLowerCase()) ? { kyc: "verified" } : { kyc: "none", reason: "Address is not on the access list." };
       },
     };
   }
@@ -82,7 +82,7 @@ export async function checkEligibility(address: string, country: string | null):
   const geo = geoStatus(country);
   const provider = providerFromEnv();
   if (geo === "blocked") {
-    return { eligible: false, country, geo, kyc: "none", provider: provider?.name ?? "none", reason: "Kamino lending are not available in your jurisdiction." };
+    return { eligible: false, country, geo, kyc: "none", provider: provider?.name ?? "none", reason: "Tokenized assets are not available in your jurisdiction." };
   }
   if (geo === "unknown") {
     return { eligible: false, country, geo, kyc: "none", provider: provider?.name ?? "none", reason: "Your jurisdiction could not be determined." };
@@ -92,10 +92,10 @@ export async function checkEligibility(address: string, country: string | null):
   }
   const k = await provider.kycStatus(address, country);
   const messages: Record<KycStatus, string> = {
-    verified: "Verified. You can use Kamino lending.",
-    pending: "Verification is in review. Actions that touch Kamino lending unlock once it passes.",
+    verified: "Verified. You can use tokenized assets.",
+    pending: "Verification is in review. Actions that touch tokenized assets unlock once it passes.",
     rejected: "Verification did not pass. Contact support to review it.",
-    none: "Complete identity verification to use Kamino lending.",
+    none: "Complete identity verification to use tokenized assets.",
     unavailable: "The verification service is unavailable. Try again in a few minutes.",
   };
   return { eligible: k.kyc === "verified", country, geo, kyc: k.kyc, provider: provider.name, reason: k.reason ?? messages[k.kyc] };

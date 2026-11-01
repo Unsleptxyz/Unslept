@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSolanaWallet } from "./solana-wallet";
+import { useAccount } from "wagmi";
 import { useEligibility } from "./Eligibility";
 
 type ThemeChoice = "system" | "light" | "dark";
@@ -37,7 +37,7 @@ function useThemeChoice(): [ThemeChoice, (t: ThemeChoice) => void] {
 
 export function SettingsPage() {
   const [theme, setTheme] = useThemeChoice();
-  const isConnected = !!useSolanaWallet().address;
+  const { isConnected } = useAccount();
   return (
     <div className="app-page">
       <h1 className="display app-title">Settings</h1>
@@ -64,7 +64,7 @@ export function SettingsPage() {
       </section>
       <section className="app-panel" aria-labelledby="elig">
         <h2 id="elig">Eligibility</h2>
-        {isConnected ? <EligibilityStatus /> : <p className="muted">Connect a wallet to see its eligibility for Kamino lending.</p>}
+        {isConnected ? <EligibilityStatus /> : <p className="muted">Connect a wallet to see its eligibility for tokenized assets.</p>}
       </section>
     </div>
   );
@@ -79,7 +79,7 @@ function EligibilityStatus() {
     <dl className="kv-list">
       <div>
         <dt>Status</dt>
-        <dd>{e.eligible ? "Eligible for Kamino lending" : "Not eligible yet"}</dd>
+        <dd>{e.eligible ? "Eligible for tokenized assets" : "Not eligible yet"}</dd>
       </div>
       <div>
         <dt>Jurisdiction</dt>

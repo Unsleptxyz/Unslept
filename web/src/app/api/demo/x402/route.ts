@@ -1,24 +1,25 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { createPublicClient, decodeEventLog, parseAbiItem } from "viem";
 import { dbConfigured, dbRpc } from "@/lib/server-db";
-import { PROGRAM_ID, USDC_MINT, network, rpcUrl } from "@/lib/solana";
+import { addresses, appTransport, chain } from "@/lib/web3";
 
 /**
- * Live x402 v2 demo endpoint on Solana.
+ * Live x402 v2 demo endpoint on Robinhood Chain mainnet.
  *
- * GET without PAYMENT-SIGNATURE answers 402 with PAYMENT-REQUIRED (scheme "unslept-direct", USDC).
- * The agent pays through the Unslept program, then retries with PAYMENT-SIGNATURE carrying the transaction signature
- * and the address of the on-chain Payment record. The server reads that record (owned by the Unslept program),
- * checks payment ID, payee and amount, and answers 200 with PAYMENT-RESPONSE.
+ * GET without PAYMENT-SIGNATURE answers 402 with PAYMENT-REQUIRED (scheme "unslept-direct").
+ * The agent pays through the SettlementRouter, then retries with PAYMENT-SIGNATURE carrying the transaction hash.
+ * The server checks the Settled event in the receipt and answers 200 with PAYMENT-RESPONSE.
  *
  * Stateless: the paymentId is an 8-byte expiry plus a 24-byte HMAC, so any instance can check it.
  * Each paymentId and each transaction is accepted once (un_demo_claim).
- * Config: DEMO_PAY_TO (Solana wallet), DEMO_PRICE (atomic USDC), INDEXER_SECRET.
+ * Config: DEMO_PAY_TO, DEMO_PRICE (atomic USDG), INDEXER_SECRET.
  */
 export const dynamic = "force-dynamic";
 
-const PAYMENT_DISC = [227, 231, 51, 26, 244, 88, 4, 148];
+const settled = parseAbiItem(
+  "event Settled(bytes32 indexed paymentId, address indexed agent, address indexed payee, address buffer, address recipient, uint256 amount, uint256 fee, uint8 mode, string endpoint)",
+);
 const TTL_SECONDS = 600;
 
 const enc = (v: unknown) => Buffer.from(JSON.stringify(v)).toString("base64");
@@ -28,8 +29,10 @@ function config() {
   const payTo = process.env.DEMO_PAY_TO;
   const price = process.env.DEMO_PRICE;
   const secret = process.env.INDEXER_SECRET;
-  if (!payTo || !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(payTo) || !price || !/^\d+$/.test(price) || !secret) return undefined;
-  return { payTo, price: BigInt(price), secret, network };
+  if (!chain || !addresses.usdg || !addresses.router || !payTo || !/^0x[0-9a-fA-F]{40}$/.test(payTo) || !price || !/^\d+$/.test(price) || !secret) {
+    return undefined;
+  }
+  return { chain, payTo: payTo as `0x${string}`, price: BigInt(price), secret, network: `eip155:${chain.id}` };
 }
 
 function mac(secret: string, expiryHex: string) {
@@ -60,10 +63,10 @@ function requirements(cfg: NonNullable<ReturnType<typeof config>>, resourceUrl: 
         scheme: "unslept-direct",
         network: cfg.network,
         amount: cfg.price.toString(),
-        asset: USDC_MINT.toBase58(),
+        asset: addresses.usdg,
         payTo: cfg.payTo,
         maxTimeoutSeconds: TTL_SECONDS,
-        extra: { paymentId: newPaymentId(cfg.secret), program: PROGRAM_ID.toBase58() },
+        extra: { paymentId: newPaymentId(cfg.secret), router: addresses.router },
       },
     ],
   };
@@ -83,7 +86,7 @@ export async function GET(req: NextRequest) {
   const sig = req.headers.get("payment-signature");
   if (!sig) return paymentRequired(cfg, url);
 
-  let p: { accepted?: { scheme?: string; network?: string; asset?: string; payTo?: string; amount?: string }; payload?: { transaction?: string; paymentId?: string; payment?: string } };
+  let p: { accepted?: { scheme?: string; network?: string; asset?: string; payTo?: string; amount?: string }; payload?: { transaction?: string; paymentId?: string } };
   try {
     p = dec(sig);
   } catch {
@@ -95,23 +98,34 @@ export async function GET(req: NextRequest) {
   const fail = (reason: string) => paymentRequired(cfg, url, reason, { success: false, errorReason: reason, transaction: tx, network: cfg.network });
 
   if (a.scheme !== "unslept-direct") return fail("unsupported_scheme");
-  if (a.network !== cfg.network || a.asset !== USDC_MINT.toBase58() || a.payTo !== cfg.payTo) return fail("accepted_requirements_mismatch");
-  if (!/^[1-9A-HJ-NP-Za-km-z]{64,90}$/.test(tx)) return fail("invalid_transaction_signature");
-  const record = p.payload?.payment ?? "";
-  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(record)) return fail("invalid_payment_record");
+  if (a.network !== cfg.network || a.asset?.toLowerCase() !== addresses.usdg.toLowerCase() || a.payTo?.toLowerCase() !== cfg.payTo.toLowerCase()) {
+    return fail("accepted_requirements_mismatch");
+  }
+  if (!/^0x[0-9a-fA-F]{64}$/.test(tx)) return fail("invalid_transaction_hash");
   const idState = checkPaymentId(cfg.secret, paymentId);
   if (idState !== "ok") return fail(idState === "expired" ? "payment_id_expired" : "unknown_payment_id");
 
-  const conn = new Connection(process.env.SOLANA_RPC_URL || rpcUrl, "confirmed");
-  const acct = await conn.getAccountInfo(new PublicKey(record), "confirmed").catch(() => null);
-  if (!acct) return fail("payment_record_not_found");
-  if (!acct.owner.equals(PROGRAM_ID)) return fail("payment_record_not_from_unslept");
-  const d = Buffer.from(acct.data);
-  if (d.length < 120 || PAYMENT_DISC.some((b, i) => d[i] !== b)) return fail("payment_record_invalid");
-  if (`0x${d.subarray(8, 40).toString("hex")}` !== paymentId.toLowerCase()) return fail("payment_id_mismatch");
-  const payer = new PublicKey(d.subarray(40, 72)).toBase58();
-  if (new PublicKey(d.subarray(72, 104)).toBase58() !== cfg.payTo) return fail("wrong_payee");
-  if (d.readBigUInt64LE(104) < cfg.price) return fail("insufficient_amount");
+  const client = createPublicClient({ chain: cfg.chain, transport: appTransport() });
+  const receipt = await client.getTransactionReceipt({ hash: tx as `0x${string}` }).catch(() => undefined);
+  if (!receipt || receipt.status !== "success") return fail("transaction_not_successful");
+
+  let payer: string | undefined;
+  for (const log of receipt.logs) {
+    if (log.address.toLowerCase() !== addresses.router.toLowerCase()) continue;
+    try {
+      const ev = decodeEventLog({ abi: [settled], data: log.data, topics: log.topics });
+      const v = ev.args;
+      if (v.paymentId.toLowerCase() !== paymentId.toLowerCase()) continue;
+      if (v.payee.toLowerCase() !== cfg.payTo.toLowerCase() || v.recipient.toLowerCase() !== cfg.payTo.toLowerCase()) return fail("wrong_payee");
+      if (v.mode !== 0) return fail("not_a_direct_payment");
+      if (v.amount < cfg.price) return fail("insufficient_amount");
+      payer = v.agent;
+      break;
+    } catch {
+      continue;
+    }
+  }
+  if (!payer) return fail("no_settlement_event");
 
   const fresh = await dbRpc<boolean>("un_demo_claim", { p_tx: tx, p_payment_id: paymentId, p_payer: payer }).catch(() => false);
   if (!fresh) return fail("payment_already_used");

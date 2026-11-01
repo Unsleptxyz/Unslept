@@ -16,7 +16,7 @@ export function SubmitForm({ categories }: { categories: readonly Category[] }) 
       const r = await fetch("/api/directory/submit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) });
       const j = (await r.json()) as { ok?: boolean; error?: string };
       if (r.ok && j.ok) {
-        setState({ kind: "ok", text: "Listed. The endpoint answered 402 with a valid USDC offer and appears in the directory within a minute." });
+        setState({ kind: "ok", text: "Listed. The endpoint answered 402 with a valid USDG offer and appears in the directory within a minute." });
         form.reset();
       } else setState({ kind: "error", text: j.error ?? "The endpoint could not be listed." });
     } catch {
@@ -66,7 +66,7 @@ export function SubmitForm({ categories }: { categories: readonly Category[] }) 
       <div className="dir-form__foot">
         <p className="muted small">
           We call your endpoint once without payment. It must answer HTTP 402 with an x402 v2 PAYMENT-REQUIRED header offering
-          USDC on Solana.
+          USDG on Robinhood Chain.
         </p>
         <button className="btn btn--primary" type="submit" disabled={state.kind === "busy"}>
           {state.kind === "busy" ? "Checking the endpoint" : "List my endpoint"}

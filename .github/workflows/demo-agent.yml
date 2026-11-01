@@ -1,10 +1,11 @@
-# Robinhood Chain demo agent, retired with the move to Solana. Manual runs only.
 name: demo-agent
 
 # The official demo agent: pays verified x402 Directory endpoints so the live feed shows real settlements.
 # The agent account is created by setup-demo-agent.yml (address in ops/demo-agent.txt) and signed by the keeper key.
 # DEMO_AGENT_ACCOUNT and DEMO_AGENT_SIGNER_KEY secrets override both. Skips quietly when nothing is set up.
 on:
+  schedule:
+    - cron: "17,47 * * * *"
   workflow_dispatch:
 
 permissions:

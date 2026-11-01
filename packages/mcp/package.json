@@ -1,7 +1,7 @@
 {
   "name": "@unslept/mcp",
-  "version": "0.2.0",
-  "description": "MCP server for paying x402 requests in USDC on Solana from an Unslept agent account.",
+  "version": "0.1.0",
+  "description": "MCP server for paying x402 requests from an Unslept agent account.",
   "type": "module",
   "license": "MIT",
   "bin": {
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@unslept/sdk": "file:../sdk-ts",
-    "@solana/web3.js": "^1.98.0"
+    "viem": "^2.21.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

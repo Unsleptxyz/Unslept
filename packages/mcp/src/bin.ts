@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * @unslept/mcp entry point.
- * Env: UNSLEPT_AGENT (agent account address), UNSLEPT_SIGNER_KEY (agent signer secret key: base58, or a JSON byte
- * array as written by solana-keygen), UNSLEPT_NETWORK (solana | solana-devnet), UNSLEPT_RPC_URL (optional).
+ * Env: UNSLEPT_AGENT_ACCOUNT, UNSLEPT_SIGNER_KEY, UNSLEPT_NETWORK (robinhood-chain),
+ * plus the chain settings the SDK reads: UNSLEPT_CHAIN_ID, UNSLEPT_RPC_URL, UNSLEPT_USDG, UNSLEPT_ROUTER, UNSLEPT_BUFFERS.
  */
-import { Unslept, b58decode } from "@unslept/sdk";
-import { Keypair } from "@solana/web3.js";
+import { Unslept } from "@unslept/sdk";
+import { privateKeyToAccount } from "viem/accounts";
 import { serveStdio } from "./server.js";
 
 function need(k: string): string {
@@ -17,8 +17,10 @@ function need(k: string): string {
   return v;
 }
 
-const raw = need("UNSLEPT_SIGNER_KEY");
-const signer = Keypair.fromSecretKey(raw.startsWith("[") ? Uint8Array.from(JSON.parse(raw)) : b58decode(raw));
-const network = (process.env.UNSLEPT_NETWORK ?? "solana") as "solana" | "solana-devnet";
-const sdk = new Unslept({ agent: need("UNSLEPT_AGENT"), signer, network, rpcUrl: process.env.UNSLEPT_RPC_URL });
+const signer = privateKeyToAccount(need("UNSLEPT_SIGNER_KEY") as `0x${string}`);
+const sdk = new Unslept({
+  agentAccount: need("UNSLEPT_AGENT_ACCOUNT"),
+  signer,
+  network: process.env.UNSLEPT_NETWORK ?? "robinhood-chain",
+});
 serveStdio(sdk);

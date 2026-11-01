@@ -34,7 +34,7 @@ const plexMono = localFont({
 });
 
 const description =
-  "Every AI agent holds idle cash between payments. Unslept keeps it working in Kamino on Solana and settles x402 payments the instant they are due.";
+  "Every AI agent holds idle cash between payments. Unslept keeps it working in tokenized assets on Robinhood Chain and settles x402 payments the instant they are due.";
 
 export const metadata: Metadata = {
   metadataBase: site.url ? new URL(site.url) : undefined,

@@ -1,7 +1,7 @@
 {
   "name": "@unslept/pay",
-  "version": "0.2.0",
-  "description": "Accept x402 payments in USDC on Solana from AI agents. Paywall middleware for Fetch-style handlers (Next.js, Hono, Bun) and Express. No dependencies.",
+  "version": "0.1.0",
+  "description": "Accept x402 payments in USDG on Robinhood Chain. Paywall middleware for Fetch-style handlers (Next.js, Hono, Bun) and Express.",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -27,10 +27,14 @@
     "test": "node --import tsx --test test/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "peerDependencies": {
+    "viem": "^2.21.0"
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "viem": "^2.21.0"
   },
   "engines": {
     "node": ">=20"
@@ -41,12 +45,5 @@
     "directory": "packages/pay"
   },
   "homepage": "https://www.unslept.xyz/pay",
-  "keywords": [
-    "x402",
-    "payments",
-    "paywall",
-    "usdc",
-    "solana",
-    "ai-agents"
-  ]
+  "keywords": ["x402", "payments", "paywall", "usdg", "robinhood-chain", "ai-agents"]
 }

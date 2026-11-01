@@ -1,17 +1,17 @@
 """LangChain agent with a tool that pays x402 requests from an Unslept agent account."""
 import os
 
-from solders.keypair import Keypair
+from eth_account import Account
 from langchain.agents import create_agent
 
 from unslept import Unslept
 from unslept.langchain_tool import unslept_tool
+from unslept.web3_chain import EthAccountSigner
 
 unslept = Unslept(
-    os.environ["UNSLEPT_AGENT"],
-    signer=Keypair.from_base58_string(os.environ["UNSLEPT_SIGNER_KEY"]),
-    network="solana",
-    rpc_url=os.environ.get("UNSLEPT_RPC_URL"),
+    agent_account=os.environ["UNSLEPT_AGENT_ACCOUNT"],
+    signer=EthAccountSigner(Account.from_key(os.environ["UNSLEPT_SIGNER_KEY"])),
+    network="robinhood-chain",
 )
 
 agent = create_agent(

@@ -1,10 +1,14 @@
 /**
- * The SDK talks to Solana through this interface. `createSolanaChain` (./solana.ts) is the production
+ * The SDK talks to the chain through this interface. `createViemChain` (./viem.ts) is the production
  * implementation. Tests and custom stacks can provide their own.
  */
 
+export enum SettlementMode {
+  Direct = 0,
+  Exact = 1,
+}
+
 export interface Policy {
-  /** Atomic USDC (6 decimals). */
   perCallCap: bigint;
   dailyCap: bigint;
 }
@@ -14,50 +18,53 @@ export interface AccountState {
   remainingToday: bigint;
   paused: boolean;
   revoked: boolean;
-  /** USDC in the agent vault, ready for repayments. */
   liquid: bigint;
-  /** USDC cost basis of the agent's Kamino position. */
   parked: bigint;
-  /** Owed to the buffer. */
   debt: bigint;
-  /** Allowed payee wallets. Empty means every payee is allowed. */
-  allowlist: string[];
 }
 
 export interface PaymentRequestInput {
-  /** Merchant wallet (base58). */
-  payee: string;
+  payee: `0x${string}`;
   amount: bigint;
-  /** 32-byte payment ID, 0x-prefixed hex. */
-  paymentId: string;
+  paymentId: `0x${string}`; // bytes32
+  domain: string;
   endpoint: string;
+  mode: SettlementMode;
 }
 
 export interface SettlementResult {
-  /** Transaction signature (base58). */
-  transaction: string;
+  transactionHash: `0x${string}`;
   fee: bigint;
-  /** Address of the on-chain Payment record. */
-  payment: string;
+  buffer: `0x${string}`;
 }
 
 export interface PaymentRecord {
-  paymentId: string;
-  payee: string;
+  paymentId: `0x${string}`;
+  payee: `0x${string}`;
   amount: bigint;
   fee: bigint;
-  transaction: string;
-  slot: number;
+  endpoint: string;
+  transactionHash: `0x${string}`;
+  blockNumber: bigint;
   timestamp?: number;
 }
 
+export interface TypedDataSigner {
+  address: `0x${string}`;
+  signTypedData(args: {
+    domain: Record<string, unknown>;
+    types: Record<string, readonly { name: string; type: string }[]>;
+    primaryType: string;
+    message: Record<string, unknown>;
+  }): Promise<`0x${string}`>;
+}
+
 export interface UnsleptChain {
-  /** CAIP-2 network, e.g. "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp". */
-  readonly network: string;
-  /** USDC mint (base58). */
-  readonly usdc: string;
-  isPayeeAllowed(payee: string): Promise<boolean>;
+  readonly chainId: number;
+  readonly usdg: `0x${string}`;
+  isPayeeAllowed(payee: `0x${string}`, domain: string): Promise<boolean>;
   getAccountState(): Promise<AccountState>;
   requestPayment(input: PaymentRequestInput): Promise<SettlementResult>;
+  setPolicy(policy: Policy): Promise<`0x${string}`>;
   getPayments(opts?: { limit?: number }): Promise<PaymentRecord[]>;
 }

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Brand } from "@/components/SiteChrome";
-import { clusterName } from "@/lib/solana";
 import { ConnectButton, NetworkGuard } from "./Wallet";
 
 function NavIcon({ d }: { d: string }) {
@@ -19,6 +18,7 @@ const nav = [
   { href: "/app", label: "Overview", icon: "M4 13h6V4H4v9Zm10 7h6V11h-6v9ZM4 20h6v-4H4v4Zm10-13h6V4h-6v3Z" },
   { href: "/app/agents", label: "Agents", icon: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0" },
   { href: "/app/buffer", label: "Buffer", icon: "M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3Zm0 0v10c0 1.7 3.6 3 8 3s8-1.3 8-3V7M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" },
+  { href: "/app/treasury", label: "Treasury", icon: "M3 10 12 4l9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 20h18" },
   { href: "/app/developers", label: "Developers", icon: "m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14" },
   { href: "/app/settings", label: "Settings", icon: "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7.4-3a7.4 7.4 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2-1.2L14.5 3h-5l-.4 2.6a7.6 7.6 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7.4 7.4 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 0 0 2 1.2l.4 2.6h5l.4-2.6a7.6 7.6 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z" },
 ];
@@ -47,7 +47,7 @@ export function AppShell({ children, configured }: { children: ReactNode; config
         <div className="app-sidebar__foot">
           <p className="pill">
             <span className="pill__dot" aria-hidden="true" />
-            {clusterName}
+            Robinhood Chain mainnet
           </p>
           <p className="app-sidebar__note">
             Guarded launch. Deposits are capped and yields are variable. <a className="text-link" href="/risk">Risks</a>

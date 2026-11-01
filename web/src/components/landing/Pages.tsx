@@ -46,14 +46,14 @@ const explore = [
     icon: <IconLayers />,
     eyebrow: "Discover",
     title: "x402 Directory",
-    body: "Paid APIs that accept USDC on Solana, checked automatically, with a snippet your agent can run as is.",
+    body: "Paid APIs that accept USDG on Robinhood Chain, checked automatically, with a snippet your agent can run as is.",
   },
   {
     href: "/pay",
     icon: <IconBolt />,
     eyebrow: "Earn",
     title: "Unslept Pay",
-    body: "Charge AI agents per request. A few lines in your API, USDC straight to your wallet, no provider fees.",
+    body: "Charge AI agents per request. A few lines in your API, USDG straight to your wallet, no provider fees.",
   },
   {
     href: "/developers",
@@ -67,14 +67,14 @@ const explore = [
     icon: <IconShield />,
     eyebrow: "Trust",
     title: "Security",
-    body: "Caps, a 24-hour parameter delay, on-chain spending policies and public source. Plus the risks that remain.",
+    body: "Caps, a 24-hour timelock, on-chain spending policies and verified source. Plus the risks that remain.",
   },
   {
     href: "/token",
     icon: <IconLayers />,
     eyebrow: "Token",
     title: "$UNSLEPT",
-    body: "The protocol token on Solana: fee discounts, a staker buffer tier and governance signaling. Nothing more.",
+    body: "The protocol token on Pons: fee discounts, a staker buffer tier and governance signaling. Nothing more.",
   },
 ];
 

@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 };
 
 const roles: [string, string][] = [
-  ["Account owner", "Your wallet. Sets the policy, adds payees, funds, moves USDC into and out of Kamino, withdraws, pauses and revokes."],
+  ["Account owner", "Your wallet. Sets the policy, adds payees, funds, unwinds and withdraws, pauses and revokes."],
   ["Agent signer", "Your agent's key. Can only request payments within the policy, and can never withdraw."],
-  ["Keeper", "Redeems an agent's Kamino position to repay that agent's own debt. Cannot send funds anywhere else."],
-  ["Admin", "Proposes parameter changes that wait 24 hours on-chain, so each one is public a full day before it takes effect."],
-  ["Anyone", "Can trigger debt repayment from an agent's liquid USDC, which only repays what is already owed."],
+  ["Keeper", "Moves an account's idle cash into a registered asset and back. Cannot send funds anywhere else."],
+  ["Admin", "A 24-hour timelock. Every parameter change is public a full day before it can take effect."],
+  ["Anyone", "Can trigger debt settlement and buffer refills, which only repay what is already owed."],
 ];
 
 export default function SecurityPage() {

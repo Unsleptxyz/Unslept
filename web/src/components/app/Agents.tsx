@@ -1,118 +1,151 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { PublicKey } from "@solana/web3.js";
 import { useMemo, useState } from "react";
-import { fmtUsdc, parseUsdc, shortAddr } from "@/lib/format";
-import { USDC_MINT, addressUrl, agentAddress, ata, build } from "@/lib/solana";
+import { isAddress, keccak256, toHex } from "viem";
+import { useAccount, usePublicClient, useReadContract } from "wagmi";
+import { fmtUsdg, parseUsdg, shortAddr } from "@/lib/format";
+import { abis, addressUrl, addresses, deployBlock } from "@/lib/web3";
 import { EligibilityGate } from "./Eligibility";
-import { getConnection, useSolanaWallet } from "./solana-wallet";
-import { useConfig, useMyAgents, usePayments, type AgentInfo } from "./hooks";
+import { useMyAccounts, usePayments, type AccountInfo } from "./hooks";
 import { PaymentTable } from "./Overview";
 import { TxButton, TxPreview } from "./Tx";
 
-const toKey = (s: string) => {
-  try {
-    const k = new PublicKey(s);
-    return PublicKey.isOnCurve(k.toBytes()) ? k : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-const toAddr = (s: string) => {
-  try {
-    return new PublicKey(s);
-  } catch {
-    return undefined;
-  }
-};
-
 export function AgentsPage() {
-  const { agents, isLoading, refetch } = useMyAgents();
+  const { accounts, isLoading, refetch } = useMyAccounts();
+  const agents = accounts.filter((a) => !a.isTreasury);
   return (
     <div className="app-page">
       <h1 className="display app-title">Agents</h1>
       <p className="lede muted">
-        Each agent gets its own account on Solana. You own it and can always withdraw. The agent&apos;s key can only request
-        payments inside the policy you set here, enforced by the Unslept program.
+        Each agent gets its own smart account. You own it and can always withdraw. The agent&apos;s key can only request
+        payments inside the policy you set here, enforced on-chain.
       </p>
-      <CreateAgent nextId={agents.reduce((m, a) => (a.agentId >= m ? a.agentId + 1n : m), 1n)} onDone={refetch} />
+      <CreateAccount kind="agent" onDone={refetch} />
       {isLoading ? <p className="muted">Loading agents</p> : null}
-      {!isLoading && agents.length === 0 ? <p className="muted">No agents yet. Create one above, then fund it and put its balance to work.</p> : null}
+      {!isLoading && agents.length === 0 ? (
+        <p className="muted">No agents yet. Create one above, then fund it and allowlist the APIs it pays.</p>
+      ) : null}
       {agents.map((a) => (
-        <AgentCard key={a.address.toBase58()} a={a} onChange={refetch} />
+        <AgentCard key={a.address} a={a} onChange={refetch} />
       ))}
     </div>
   );
 }
 
-function CreateAgent({ nextId, onDone }: { nextId: bigint; onDone: () => void }) {
-  const { address } = useSolanaWallet();
+export function CreateAccount({ kind, onDone }: { kind: "agent" | "treasury"; onDone: () => void }) {
+  const { address } = useAccount();
   const [signer, setSigner] = useState("");
   const [perCall, setPerCall] = useState("1");
   const [daily, setDaily] = useState("20");
-  const signerKey = toKey(signer);
-  const pc = parseUsdc(perCall);
-  const dc = parseUsdc(daily);
-  const valid = !!signerKey && pc !== undefined && dc !== undefined && pc <= dc;
-  const agent = address ? agentAddress(address, nextId) : undefined;
+  const [salt] = useState(() => keccak256(toHex(`${Date.now()}-${Math.random()}`)));
+  const isAgent = kind === "agent";
+  const pc = parseUsdg(perCall);
+  const dc = parseUsdg(daily);
+  const valid = isAgent ? isAddress(signer) && pc !== undefined && dc !== undefined && pc <= dc : true;
+  const policy = isAgent ? { perCallCap: pc ?? 0n, dailyCap: dc ?? 0n } : { perCallCap: 0n, dailyCap: 0n };
 
   return (
-    <section className="app-panel" aria-labelledby="create-agent">
-      <h2 id="create-agent">Create an agent account</h2>
-      <div className="form-grid">
-        <div className="field">
-          <label htmlFor="signer">Agent signer address</label>
-          <input id="signer" value={signer} onChange={(e) => setSigner(e.target.value.trim())} placeholder="Solana public key" spellCheck={false} />
-          <p className="field__hint">The key your agent runs with (solana-keygen new). Keep it separate from your own wallet.</p>
+    <section className="app-panel" aria-labelledby={`create-${kind}`}>
+      <h2 id={`create-${kind}`}>{isAgent ? "Create an agent account" : "Create a treasury account"}</h2>
+      {isAgent ? (
+        <div className="form-grid">
+          <div className="field">
+            <label htmlFor="signer">Agent signer address</label>
+            <input id="signer" value={signer} onChange={(e) => setSigner(e.target.value.trim())} placeholder="0x..." spellCheck={false} />
+            <p className="field__hint">The key your agent runs with. Keep it separate from your own wallet.</p>
+          </div>
+          <div className="field">
+            <label htmlFor="pc">Per-call cap (USDG)</label>
+            <input id="pc" inputMode="decimal" value={perCall} onChange={(e) => setPerCall(e.target.value)} />
+          </div>
+          <div className="field">
+            <label htmlFor="dc">Daily cap (USDG)</label>
+            <input id="dc" inputMode="decimal" value={daily} onChange={(e) => setDaily(e.target.value)} />
+          </div>
         </div>
-        <div className="field">
-          <label htmlFor="pc">Per-call cap (USDC)</label>
-          <input id="pc" inputMode="decimal" value={perCall} onChange={(e) => setPerCall(e.target.value)} />
-        </div>
-        <div className="field">
-          <label htmlFor="dc">Daily cap (USDC)</label>
-          <input id="dc" inputMode="decimal" value={daily} onChange={(e) => setDaily(e.target.value)} />
-        </div>
-      </div>
-      {signer && !signerKey ? <p className="app-error">The signer must be a Solana public key (base58).</p> : null}
-      {pc !== undefined && dc !== undefined && pc > dc ? <p className="app-error">The per-call cap cannot be above the daily cap.</p> : null}
+      ) : (
+        <p className="muted">A treasury account has no agent key. Only you can move funds; idle balance can be parked in tokenized assets.</p>
+      )}
+      {isAgent && signer && !isAddress(signer) ? <p className="app-error">The signer must be 0x followed by 40 hexadecimal characters.</p> : null}
+      {isAgent && pc !== undefined && dc !== undefined && pc > dc ? <p className="app-error">The per-call cap cannot be above the daily cap.</p> : null}
       <TxPreview
-        summary={`Creates agent account ${agent ? shortAddr(agent.toBase58()) : ""} owned by ${shortAddr(address?.toBase58())}. The signer can request payments up to ${fmtUsdc(pc ?? 0n)} USDC per call and ${fmtUsdc(dc ?? 0n)} USDC a day. It can never withdraw.`}
+        summary={
+          isAgent
+            ? `Creates an agent account owned by ${shortAddr(address)}. The signer can request payments up to ${fmtUsdg(policy.perCallCap)} USDG per call and ${fmtUsdg(policy.dailyCap)} USDG a day, to allowlisted payees only. It can never withdraw.`
+            : `Creates a treasury account owned by ${shortAddr(address)}.`
+        }
         rows={[
           { label: "Protocol fee", value: "None" },
-          { label: "Network cost", value: "About 0.004 SOL account rent, plus the network fee" },
+          { label: "Network fee", value: "Gas, paid in ETH" },
         ]}
       />
       <TxButton
-        label="Create agent account"
-        doneLabel="Created agent account"
+        label={isAgent ? "Create agent account" : "Create treasury account"}
+        doneLabel={isAgent ? "Created agent account" : "Created treasury account"}
         disabled={!valid}
-        build={address && signerKey && pc !== undefined && dc !== undefined ? () => build.createAgent(address, nextId, signerKey, pc, dc) : undefined}
+        request={{
+          address: addresses.factory,
+          abi: abis.factory,
+          functionName: "createAccount",
+          args: [isAgent ? signer : "0x0000000000000000000000000000000000000000", policy, salt],
+        }}
         onDone={onDone}
       />
     </section>
   );
 }
 
-function AgentCard({ a, onChange }: { a: AgentInfo; onChange: () => void }) {
+/** Current payee and domain allowlists, rebuilt from the account's events. */
+function useAllowlists(account: `0x${string}`) {
+  const client = usePublicClient();
+  return useQuery({
+    queryKey: ["allowlists", account],
+    enabled: !!client,
+    queryFn: async () => {
+      const get = (eventName: string) =>
+        client!.getContractEvents({ address: account, abi: abis.agentAccount, eventName, fromBlock: deployBlock } as never) as unknown as Promise<
+          { args: { payee?: string; domain?: string; allowed: boolean } }[]
+        >;
+      const [p, d] = await Promise.all([get("PayeeSet"), get("DomainSet")]);
+      const payees = new Map<string, boolean>();
+      p.forEach((l) => payees.set(l.args.payee!.toLowerCase(), l.args.allowed));
+      const domains = new Map<string, boolean>();
+      d.forEach((l) => domains.set(l.args.domain!, l.args.allowed));
+      return {
+        payees: [...payees].filter(([, v]) => v).map(([k]) => k as `0x${string}`),
+        domains: [...domains].filter(([, v]) => v).map(([k]) => k),
+      };
+    },
+  });
+}
+
+function AgentCard({ a, onChange }: { a: AccountInfo; onChange: () => void }) {
+  const { address } = useAccount();
+  const allow = useAllowlists(a.address);
   const payments = usePayments([a.address], 25);
-  const [tab, setTab] = useState<"policy" | "funds" | "log">("funds");
-  const id = a.address.toBase58();
+  const [tab, setTab] = useState<"policy" | "funds" | "log">("policy");
+  const acct = { address: a.address, abi: abis.agentAccount };
+  const refresh = () => {
+    onChange();
+    void allow.refetch();
+  };
 
   return (
-    <article id={id} className="app-panel agent-card" aria-label={`Agent ${id}`}>
+    <article id={a.address} className="app-panel agent-card" aria-label={`Agent ${a.address}`}>
       <header className="agent-card__head">
         <div>
-          <h2 className="num" title={id}>
-            {shortAddr(id)}
-          </h2>
+          <h2 className="num">{shortAddr(a.address)}</h2>
           <p className="muted small num">
-            Signer {a.revoked ? "removed" : shortAddr(a.signer.toBase58())}{" "}
-            <a className="text-link" href={addressUrl(id)} target="_blank" rel="noopener noreferrer">
-              Explorer
-            </a>
+            Signer {a.revoked ? "removed" : shortAddr(a.signer)}
+            {addressUrl(a.address) ? (
+              <>
+                {" "}
+                <a className="text-link" href={addressUrl(a.address)} target="_blank" rel="noopener noreferrer">
+                  Explorer
+                </a>
+              </>
+            ) : null}
           </p>
         </div>
         <span className={a.paused || a.revoked ? "badge badge--off" : "badge"}>{a.revoked ? "Revoked" : a.paused ? "Paused" : "Active"}</span>
@@ -120,33 +153,35 @@ function AgentCard({ a, onChange }: { a: AgentInfo; onChange: () => void }) {
 
       <dl className="kv-row">
         <div>
-          <dt>Working in Kamino</dt>
-          <dd className="num">{fmtUsdc(a.positionValue)}</dd>
+          <dt>Working</dt>
+          <dd className="num">{fmtUsdg(a.parked)}</dd>
         </div>
         <div>
           <dt>Liquid</dt>
-          <dd className="num">{fmtUsdc(a.liquid)}</dd>
+          <dd className="num">{fmtUsdg(a.liquid)}</dd>
         </div>
         <div>
           <dt>Owed to buffer</dt>
-          <dd className="num">{fmtUsdc(a.debt)}</dd>
+          <dd className="num">{fmtUsdg(a.debt)}</dd>
         </div>
         <div>
           <dt>Left today</dt>
-          <dd className="num">{fmtUsdc(a.remainingToday)}</dd>
+          <dd className="num">{fmtUsdg(a.remainingToday)}</dd>
         </div>
       </dl>
 
       <div role="tablist" aria-label="Agent sections" className="seg">
-        {(["funds", "policy", "log"] as const).map((t) => (
+        {(["policy", "funds", "log"] as const).map((t) => (
           <button key={t} role="tab" aria-selected={tab === t} className="seg__btn" onClick={() => setTab(t)} type="button">
             {t === "policy" ? "Spending policy" : t === "funds" ? "Funds" : "Payment log"}
           </button>
         ))}
       </div>
 
-      {tab === "policy" ? <PolicyEditor a={a} onDone={onChange} /> : null}
-      {tab === "funds" ? <FundsPanel a={a} onDone={onChange} /> : null}
+      {tab === "policy" ? <PolicyEditor a={a} payees={allow.data?.payees ?? []} domains={allow.data?.domains ?? []} onDone={refresh} /> : null}
+
+      {tab === "funds" ? <FundsPanel a={a} owner={address} onDone={onChange} /> : null}
+
       {tab === "log" ? (
         payments.isLoading ? (
           <p className="muted">Loading payments</p>
@@ -159,62 +194,41 @@ function AgentCard({ a, onChange }: { a: AgentInfo; onChange: () => void }) {
 
       {!a.revoked ? (
         <div className="agent-card__danger">
-          <OwnerTx
+          <TxButton
             variant="ghost"
             label={a.paused ? "Resume agent" : "Pause agent"}
             doneLabel={a.paused ? "Resumed agent" : "Paused agent"}
-            make={(o) => build.setAgentPaused(o, a.address, !a.paused)}
+            request={{ ...acct, functionName: "setPaused", args: [!a.paused] }}
             onDone={onChange}
           />
-          <RevokeButton a={a} onDone={onChange} />
+          <RevokeButton account={a.address} onDone={onChange} />
         </div>
       ) : null}
     </article>
   );
 }
 
-function OwnerTx(props: {
-  label: string;
-  doneLabel: string;
-  make: (owner: PublicKey) => ReturnType<typeof build.revoke>;
-  disabled?: boolean;
-  variant?: "primary" | "ghost";
-  onDone: () => void;
-}) {
-  const { address } = useSolanaWallet();
-  return (
-    <TxButton
-      label={props.label}
-      doneLabel={props.doneLabel}
-      variant={props.variant}
-      disabled={props.disabled}
-      build={address ? () => props.make(address) : undefined}
-      onDone={props.onDone}
-    />
-  );
-}
-
-function PolicyEditor({ a, onDone }: { a: AgentInfo; onDone: () => void }) {
-  const [perCall, setPerCall] = useState(fmtUsdc(a.perCallCap).replace(/,/g, ""));
-  const [daily, setDaily] = useState(fmtUsdc(a.dailyCap).replace(/,/g, ""));
+function PolicyEditor({ a, payees, domains, onDone }: { a: AccountInfo; payees: `0x${string}`[]; domains: string[]; onDone: () => void }) {
+  const [perCall, setPerCall] = useState(fmtUsdg(a.perCallCap).replace(/,/g, ""));
+  const [daily, setDaily] = useState(fmtUsdg(a.dailyCap).replace(/,/g, ""));
   const [entry, setEntry] = useState("");
-  const [newSigner, setNewSigner] = useState("");
-  const pc = parseUsdc(perCall);
-  const dc = parseUsdc(daily);
+  const pc = parseUsdg(perCall);
+  const dc = parseUsdg(daily);
   const changed = pc !== a.perCallCap || dc !== a.dailyCap;
-  const entryKey = entry.length >= 32 ? toAddr(entry) : undefined;
-  const signerKey = toKey(newSigner);
-  const list = a.allowlist;
+  const acct = { address: a.address, abi: abis.agentAccount };
+  const entryIsAddr = isAddress(entry);
+  const entryDomain = entry.trim().toLowerCase();
+  const entryIsDomain = !entryIsAddr && /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(entryDomain);
 
   return (
     <div className="policy">
       <div className="form-grid">
         <div className="field">
-          <label htmlFor={`pc-${a.address}`}>Per-call cap (USDC)</label>
+          <label htmlFor={`pc-${a.address}`}>Per-call cap (USDG)</label>
           <input id={`pc-${a.address}`} inputMode="decimal" value={perCall} onChange={(e) => setPerCall(e.target.value)} />
         </div>
         <div className="field">
-          <label htmlFor={`dc-${a.address}`}>Daily cap (USDC)</label>
+          <label htmlFor={`dc-${a.address}`}>Daily cap (USDG)</label>
           <input id={`dc-${a.address}`} inputMode="decimal" value={daily} onChange={(e) => setDaily(e.target.value)} />
         </div>
       </div>
@@ -223,175 +237,159 @@ function PolicyEditor({ a, onDone }: { a: AgentInfo; onDone: () => void }) {
           <TxPreview
             summary="Updates the limits the agent's key is held to. Payments above them are rejected on-chain."
             rows={[
-              { label: "Per-call cap", value: `${fmtUsdc(a.perCallCap)} → ${fmtUsdc(pc)} USDC` },
-              { label: "Daily cap", value: `${fmtUsdc(a.dailyCap)} → ${fmtUsdc(dc)} USDC` },
+              { label: "Per-call cap", value: `${fmtUsdg(a.perCallCap)} → ${fmtUsdg(pc)} USDG` },
+              { label: "Daily cap", value: `${fmtUsdg(a.dailyCap)} → ${fmtUsdg(dc)} USDG` },
             ]}
           />
-          <OwnerTx label="Save spending policy" doneLabel="Saved spending policy" disabled={pc > dc} make={(o) => build.setPolicy(o, a.address, pc, dc)} onDone={onDone} />
+          <TxButton
+            label="Save spending policy"
+            doneLabel="Saved spending policy"
+            disabled={pc > dc}
+            request={{ ...acct, functionName: "setPolicy", args: [{ perCallCap: pc, dailyCap: dc }] }}
+            onDone={onDone}
+          />
         </>
       ) : null}
 
       <h3>Allowlisted payees</h3>
-      <p className="muted small">Merchant wallets the agent may pay, up to 8. An empty list lets the agent pay any merchant within its caps.</p>
+      <p className="muted small">Addresses are enforced strictly on-chain. Domains rely on the host the SDK reports, so prefer addresses.</p>
       <ul className="chip-list">
-        {list.map((p) => (
-          <li key={p.toBase58()} className="chip num">
-            {shortAddr(p.toBase58())}
-            <OwnerTx
-              variant="ghost"
-              label={`Remove ${shortAddr(p.toBase58())}`}
-              doneLabel={`Removed ${shortAddr(p.toBase58())}`}
-              make={(o) => build.setAllowlist(o, a.address, list.filter((x) => !x.equals(p)))}
-              onDone={onDone}
-            />
+        {payees.map((p) => (
+          <li key={p} className="chip num">
+            {shortAddr(p)}
+            <TxButton variant="ghost" label={`Remove ${shortAddr(p)}`} doneLabel={`Removed ${shortAddr(p)}`} request={{ ...acct, functionName: "setPayee", args: [p, false] }} onDone={onDone} />
           </li>
         ))}
-        {list.length === 0 ? <li className="muted">None. Every payee is allowed within the caps.</li> : null}
+        {domains.map((d) => (
+          <li key={d} className="chip">
+            {d}
+            <TxButton variant="ghost" label={`Remove ${d}`} doneLabel={`Removed ${d}`} request={{ ...acct, functionName: "setDomain", args: [d, false] }} onDone={onDone} />
+          </li>
+        ))}
+        {payees.length + domains.length === 0 ? <li className="muted">None yet. The agent cannot pay anyone until you add a payee.</li> : null}
       </ul>
       <div className="field">
-        <label htmlFor={`entry-${a.address}`}>Add a payee wallet</label>
-        <input id={`entry-${a.address}`} value={entry} onChange={(e) => setEntry(e.target.value.trim())} placeholder="Merchant Solana address" spellCheck={false} />
+        <label htmlFor={`entry-${a.address}`}>Add a payee address or domain</label>
+        <input id={`entry-${a.address}`} value={entry} onChange={(e) => setEntry(e.target.value.trim())} placeholder="0x... or api.example.com" spellCheck={false} />
       </div>
-      {entry && !entryKey ? <p className="app-error">Enter a Solana wallet address.</p> : null}
-      {entryKey && list.length < 8 ? (
-        <OwnerTx
-          label={`Allow ${shortAddr(entry)}`}
-          doneLabel={`Allowed ${shortAddr(entry)}`}
-          make={(o) => build.setAllowlist(o, a.address, [...list, entryKey])}
+      {entry && !entryIsAddr && !entryIsDomain ? <p className="app-error">Enter an EVM address or a host name such as api.example.com.</p> : null}
+      {entryIsAddr || entryIsDomain ? (
+        <TxButton
+          label={`Allow ${entryIsAddr ? shortAddr(entry) : entryDomain}`}
+          doneLabel={`Allowed ${entryIsAddr ? shortAddr(entry) : entryDomain}`}
+          request={entryIsAddr ? { ...acct, functionName: "setPayee", args: [entry, true] } : { ...acct, functionName: "setDomain", args: [entryDomain, true] }}
           onDone={() => {
             setEntry("");
             onDone();
           }}
         />
       ) : null}
-
-      {!a.revoked ? (
-        <>
-          <h3>Agent signer</h3>
-          <div className="field">
-            <label htmlFor={`sg-${a.address}`}>Rotate to a new signer</label>
-            <input id={`sg-${a.address}`} value={newSigner} onChange={(e) => setNewSigner(e.target.value.trim())} placeholder="New signer public key" spellCheck={false} />
-          </div>
-          {signerKey ? (
-            <OwnerTx label="Rotate signer" doneLabel="Rotated signer" make={(o) => build.setSigner(o, a.address, signerKey)} onDone={onDone} />
-          ) : null}
-        </>
-      ) : null}
     </div>
   );
 }
 
-function useWalletUsdc() {
-  const { address } = useSolanaWallet();
-  return useQuery({
-    queryKey: ["wallet-usdc", address?.toBase58()],
-    enabled: !!address,
-    queryFn: async () => {
-      const r = await getConnection().getTokenAccountBalance(ata(address!, USDC_MINT), "confirmed").catch(() => undefined);
-      return r ? BigInt(r.value.amount) : 0n;
-    },
-  });
-}
-
-export function FundsPanel({ a, onDone }: { a: AgentInfo; onDone: () => void }) {
-  const wallet = useWalletUsdc();
-  const config = useConfig();
+export function FundsPanel({ a, owner, onDone }: { a: AccountInfo; owner?: `0x${string}`; onDone: () => void }) {
   const [fund, setFund] = useState("");
-  const [toYield, setToYield] = useState("");
   const [out, setOut] = useState("");
-  const walletBal = wallet.data ?? 0n;
-  const f = parseUsdc(fund);
-  const y = parseUsdc(toYield);
-  const w = parseUsdc(out);
-  const yieldOn = !!config.data && !config.data.yieldReserve.equals(PublicKey.default);
-  const outMax = useMemo(() => {
-    // Remaining debt must stay within 95% of the Kamino position.
-    const room = (a.positionValue * 95n) / 100n;
-    return a.debt <= room ? a.liquid : 0n;
-  }, [a]);
-  const done = () => {
-    onDone();
-    void wallet.refetch();
-  };
+  const wallet = useReadContract({ address: addresses.usdg, abi: abis.erc20, functionName: "balanceOf", args: owner ? [owner] : undefined, query: { enabled: !!owner } });
+  const walletBal = (wallet.data as bigint | undefined) ?? 0n;
+  const f = parseUsdg(fund);
+  const w = parseUsdg(out);
+  const acct = { address: a.address, abi: abis.agentAccount };
+  const total = a.liquid + a.parked;
+  const outMax = useMemo(() => (a.liquid > a.debt ? a.liquid - a.debt : 0n), [a]);
 
   return (
     <div className="funds">
-      <div className="field">
-        <label htmlFor={`fund-${a.address}`}>Add USDC from your wallet</label>
-        <input id={`fund-${a.address}`} inputMode="decimal" value={fund} onChange={(e) => setFund(e.target.value)} placeholder="0.00" />
-        <p className="field__hint num">Wallet: {fmtUsdc(walletBal)} USDC</p>
-      </div>
-      {f !== undefined && f > 0n ? (
-        <>
-          <TxPreview
-            summary={`Sends ${fmtUsdc(f)} USDC from your wallet to this agent's vault. It stays yours and you can withdraw it any time.`}
-            rows={[
-              { label: "Protocol fee", value: "None" },
-              { label: "Wallet after", value: `${fmtUsdc(walletBal - f)} USDC` },
-              { label: "Agent liquid after", value: `${fmtUsdc(a.liquid + f)} USDC` },
-            ]}
-          />
-          <OwnerTx label={`Add ${fmtUsdc(f)} USDC`} doneLabel={`Added ${fmtUsdc(f)} USDC`} disabled={f > walletBal} make={(o) => build.fundAgent(o, a.address, f)} onDone={() => (setFund(""), done())} />
-        </>
-      ) : null}
-
-      {yieldOn ? (
-        <EligibilityGate action="Moving funds into Kamino">
-          <div className="field">
-            <label htmlFor={`y-${a.address}`}>Put liquid USDC to work in Kamino</label>
-            <input id={`y-${a.address}`} inputMode="decimal" value={toYield} onChange={(e) => setToYield(e.target.value)} placeholder="0.00" />
-            <p className="field__hint num">Liquid now: {fmtUsdc(a.liquid)} USDC. Keep a little liquid so payments repay the buffer at once.</p>
-          </div>
-          {y !== undefined && y > 0n ? (
-            <>
-              <TxPreview
-                summary={`Supplies ${fmtUsdc(y)} USDC to the Kamino Main Market USDC reserve. The agent receives cUSDC, which earns the variable lending rate. The position backs buffer debt up to 95% of its value.`}
-                rows={[
-                  { label: "Protocol fee", value: "None" },
-                  { label: "Working after", value: `${fmtUsdc(a.positionValue + y)} USDC` },
-                ]}
-              />
-              <OwnerTx label={`Deposit ${fmtUsdc(y)} USDC to Kamino`} doneLabel={`Deposited ${fmtUsdc(y)} USDC to Kamino`} disabled={y > a.liquid} make={(o) => build.yieldDeposit(o, a.address, y)} onDone={() => (setToYield(""), done())} />
-            </>
-          ) : null}
-        </EligibilityGate>
-      ) : null}
-
-      {a.ctokens > 0n ? (
-        <div className="positions">
-          <h3>Kamino position</h3>
-          <div className="position-row">
-            <span className="num">
-              {fmtUsdc(a.ctokens, { decimals: 6 })} cUSDC, deposited {fmtUsdc(a.positionValue)} USDC
-            </span>
-            <OwnerTx
-              variant="ghost"
-              label="Redeem all to liquid"
-              doneLabel="Redeemed to liquid"
-              make={(o) => build.yieldRedeem(o, a.address, a.ctokens)}
-              onDone={done}
-            />
-          </div>
-          <p className="muted small">Redeeming repays any buffer debt first; the rest, interest included, lands in the agent&apos;s liquid balance.</p>
+      <EligibilityGate action="Funding an account that parks idle balance in tokenized assets">
+        <div className="field">
+          <label htmlFor={`fund-${a.address}`}>Add USDG from your wallet</label>
+          <input id={`fund-${a.address}`} inputMode="decimal" value={fund} onChange={(e) => setFund(e.target.value)} placeholder="0.00" />
+          <p className="field__hint num">Wallet: {fmtUsdg(walletBal)} USDG</p>
         </div>
-      ) : null}
+        {f !== undefined && f > 0n ? (
+          <>
+            <TxPreview
+              summary={`Sends ${fmtUsdg(f)} USDG from your wallet to this account. ${a.autoAllocate ? "The allocator can park it in tokenized assets; it stays yours." : "Automatic allocation is off, so it stays liquid."}`}
+              rows={[
+                { label: "Protocol fee", value: "None" },
+                { label: "Wallet after", value: `${fmtUsdg(walletBal - f)} USDG` },
+                { label: "Account after", value: `${fmtUsdg(total + f)} USDG` },
+              ]}
+            />
+            <TxButton
+              label={`Add ${fmtUsdg(f)} USDG`}
+              doneLabel={`Added ${fmtUsdg(f)} USDG`}
+              disabled={f > walletBal}
+              request={{ address: addresses.usdg, abi: abis.erc20, functionName: "transfer", args: [a.address, f] }}
+              onDone={() => {
+                setFund("");
+                onDone();
+                void wallet.refetch();
+              }}
+            />
+          </>
+        ) : null}
+      </EligibilityGate>
 
       <div className="field">
-        <label htmlFor={`out-${a.address}`}>Withdraw liquid USDC to your wallet</label>
+        <label htmlFor={`out-${a.address}`}>Withdraw liquid USDG to your wallet</label>
         <input id={`out-${a.address}`} inputMode="decimal" value={out} onChange={(e) => setOut(e.target.value)} placeholder="0.00" />
-        <p className="field__hint num">Withdrawable now: {fmtUsdc(outMax)} USDC. Kamino funds come back through Redeem first.</p>
+        <p className="field__hint num">
+          Withdrawable now: {fmtUsdg(outMax)} USDG. Parked funds come back through Unwind first.
+        </p>
       </div>
       {w !== undefined && w > 0n ? (
         <>
-          <TxPreview summary="Sends liquid USDC from the agent's vault to your wallet. Allowed even while the protocol is paused." rows={[{ label: "Protocol fee", value: "None" }]} />
-          <OwnerTx label={`Withdraw ${fmtUsdc(w)} USDC`} doneLabel={`Withdrew ${fmtUsdc(w)} USDC`} disabled={w > outMax} make={(o) => build.agentWithdraw(o, a.address, w)} onDone={() => (setOut(""), done())} />
+          <TxPreview
+            summary="Repays any buffer debt from liquid USDG first, then sends the rest of the amount to your wallet."
+            rows={[
+              { label: "Protocol fee", value: "None" },
+              { label: "Account after", value: `${fmtUsdg(total - a.debt - w)} USDG` },
+            ]}
+          />
+          <TxButton
+            label={`Withdraw ${fmtUsdg(w)} USDG`}
+            doneLabel={`Withdrew ${fmtUsdg(w)} USDG`}
+            disabled={!owner || w > outMax}
+            request={{ ...acct, functionName: "withdraw", args: [owner, w] }}
+            onDone={() => {
+              setOut("");
+              onDone();
+            }}
+          />
         </>
       ) : null}
+
+      {a.positions.length > 0 ? (
+        <div className="positions">
+          <h3>Parked positions</h3>
+          {a.positions.map((p) => (
+            <div key={p} className="position-row">
+              <span className="num">{shortAddr(p)}</span>
+              <TxButton
+                variant="ghost"
+                label="Unwind all to liquid"
+                doneLabel="Unwound to liquid"
+                request={{ ...acct, functionName: "ownerUnwind", args: [p, 2n ** 255n] }}
+                onDone={onDone}
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <TxButton
+        variant="ghost"
+        label={a.autoAllocate ? "Turn off automatic allocation" : "Turn on automatic allocation"}
+        doneLabel={a.autoAllocate ? "Turned off automatic allocation" : "Turned on automatic allocation"}
+        request={{ ...acct, functionName: "setAutoAllocate", args: [!a.autoAllocate] }}
+        onDone={onDone}
+      />
     </div>
   );
 }
 
-function RevokeButton({ a, onDone }: { a: AgentInfo; onDone: () => void }) {
+function RevokeButton({ account, onDone }: { account: `0x${string}`; onDone: () => void }) {
   const [confirm, setConfirm] = useState("");
   const [open, setOpen] = useState(false);
   if (!open) {
@@ -407,7 +405,13 @@ function RevokeButton({ a, onDone }: { a: AgentInfo; onDone: () => void }) {
         Revoking removes the agent key for good. You keep the account and every withdrawal right. Type <strong>revoke</strong> to confirm.
       </p>
       <input aria-label="Type revoke to confirm" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-      <OwnerTx label="Revoke agent" doneLabel="Revoked agent" disabled={confirm !== "revoke"} make={(o) => build.revoke(o, a.address)} onDone={onDone} />
+      <TxButton
+        label="Revoke agent"
+        doneLabel="Revoked agent"
+        disabled={confirm !== "revoke"}
+        request={{ address: account, abi: abis.agentAccount, functionName: "revoke" }}
+        onDone={onDone}
+      />
     </div>
   );
 }

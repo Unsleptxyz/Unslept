@@ -11,10 +11,11 @@ export const HEADER_REQUIRED = "PAYMENT-REQUIRED";
 export const HEADER_SIGNATURE = "PAYMENT-SIGNATURE";
 export const HEADER_RESPONSE = "PAYMENT-RESPONSE";
 
+/** Standard x402 scheme. Settled by a facilitator from an EIP-3009 authorization. */
+export const SCHEME_EXACT = "exact";
 /**
- * Unslept scheme on Solana: the Unslept buffer pays `payTo` in USDC on-chain first, and the client sends the
- * transaction signature and the address of the on-chain Payment record. The merchant reads that record (owned by
- * the Unslept program) and checks payment ID, payee and amount.
+ * Unslept scheme for merchants that opt in: the buffer pays `payTo` on-chain first and the client sends
+ * the transaction hash. The merchant (or its facilitator) verifies the SettlementRouter `Settled` event.
  */
 export const SCHEME_UNSLEPT = "unslept-direct";
 
@@ -29,7 +30,7 @@ export interface ResourceInfo {
 
 export interface PaymentRequirements {
   scheme: string;
-  network: string; // CAIP-2, e.g. "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+  network: string; // CAIP-2, e.g. "eip155:<chainId>"
   amount: string; // atomic units
   asset: string;
   payTo: string;
@@ -53,15 +54,24 @@ export interface PaymentPayload<P = unknown> {
   extensions?: Record<string, unknown>;
 }
 
+export interface Eip3009Authorization {
+  from: string;
+  to: string;
+  value: string;
+  validAfter: string;
+  validBefore: string;
+  nonce: string;
+}
+
+export interface ExactEip3009Payload {
+  signature: string;
+  authorization: Eip3009Authorization;
+}
+
 export interface UnsleptDirectPayload {
-  /** Transaction signature (base58). */
   transaction: string;
-  /** 32-byte payment ID, 0x-prefixed hex. */
   paymentId: string;
-  /** Agent account address (base58). */
-  agent: string;
-  /** On-chain Payment record address (base58). */
-  payment: string;
+  agentAccount: string;
 }
 
 export interface SettlementResponse {
@@ -71,6 +81,17 @@ export interface SettlementResponse {
   transaction: string;
   network: string;
 }
+
+export const eip3009Types = {
+  TransferWithAuthorization: [
+    { name: "from", type: "address" },
+    { name: "to", type: "address" },
+    { name: "value", type: "uint256" },
+    { name: "validAfter", type: "uint256" },
+    { name: "validBefore", type: "uint256" },
+    { name: "nonce", type: "bytes32" },
+  ],
+} as const;
 
 function toBase64(s: string): string {
   let bin = "";
@@ -125,9 +146,18 @@ export interface SelectOptions {
 
 /** Picks the first requirement matching our network and asset, by scheme preference. */
 export function selectRequirement(pr: PaymentRequired, opts: SelectOptions): PaymentRequirements | undefined {
+  const asset = opts.asset.toLowerCase();
   for (const scheme of opts.schemes) {
-    const match = pr.accepts.find((r) => r.scheme === scheme && r.network === opts.network && r.asset === opts.asset);
+    const match = pr.accepts.find(
+      (r) => r.scheme === scheme && r.network === opts.network && r.asset.toLowerCase() === asset,
+    );
     if (match) return match;
   }
   return undefined;
+}
+
+export function chainIdFromCaip2(network: string): number {
+  const m = /^eip155:(\d+)$/.exec(network);
+  if (!m) throw new X402FormatError(`Network ${network} is not an EVM CAIP-2 identifier.`);
+  return Number(m[1]);
 }

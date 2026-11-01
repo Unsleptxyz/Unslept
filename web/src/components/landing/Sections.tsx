@@ -43,8 +43,8 @@ export function Hero({ docsUrl }: { docsUrl: string }) {
           Your agent&apos;s money, <em>unslept.</em>
         </h1>
         <p className="hero__sub">
-          AI agents keep cash waiting between payments. Unslept puts that balance to work on Kamino and settles
-          every x402 payment the instant it is due, from a shared USDC buffer. The agent never waits for its money.
+          AI agents keep cash waiting between payments. Unslept parks that balance in tokenized assets and settles
+          every x402 payment the instant it is due, from a shared USDG buffer. The agent never waits for its money.
         </p>
         <div className="hero__actions">
           <a className="btn btn--primary btn--large" href="/app">
@@ -77,7 +77,7 @@ export function Hero({ docsUrl }: { docsUrl: string }) {
 }
 
 export function BuiltWith() {
-  const items = ["Solana", "USDC by Circle", "Kamino Lend", "x402", "Anchor", "Kamino", "MCP"];
+  const items = ["Robinhood Chain", "USDG by Paxos", "Spark Savings", "x402", "ERC-4337", "ERC-4626", "MCP"];
   return (
     <section className="built" aria-label="Built with">
       <p className="built__label">Built on open standards</p>
@@ -138,7 +138,7 @@ export function Problem() {
                 <span key={h} className={paid.has(h) ? "day-cell day-cell--pay" : "day-cell day-cell--work"} />
               ))}
             </div>
-            <p className="day-row__note">Between payments the balance sits in a Kamino lending position. Payments still settle at once.</p>
+            <p className="day-row__note">Between payments the balance sits in a tokenized savings position. Payments still settle at once.</p>
           </div>
           <div className="day-card__legend" aria-hidden="true">
             <span>
@@ -165,22 +165,22 @@ const steps = [
   {
     icon: <IconPark />,
     title: "Park",
-    body: "Owners supply an agent's idle USDC to the Kamino Main Market USDC reserve, a lending position on Solana, and keep a little liquid for payments. It stays theirs and can be redeemed at any time.",
+    body: "Idle agent balances move into Spark Savings USDG (spUSDG), a tokenized savings position on Robinhood Chain. A keeper does it automatically. Owners can opt out per account.",
   },
   {
     icon: <IconBolt />,
     title: "Pay",
-    body: "When an API answers 402, the SDK checks the agent's on-chain policy and the Unslept program pays at once from the buffer, in a single Solana transaction. The agent never waits for a position to be redeemed.",
+    body: "When an API answers 402, the SDK checks the agent's on-chain policy and the settlement router pays at once from the buffer, in a single transaction. The agent never waits for an asset to be sold.",
   },
   {
     icon: <IconRefresh />,
     title: "Rebalance",
-    body: "The agent repays the buffer in the same transaction from its liquid USDC. Any rest is repaid when its Kamino position is redeemed, and can only settle that same agent's debt.",
+    body: "In the background, the parked position repays the buffer. Anyone can trigger it, and it can only move an account's funds to settle that same account's debt.",
   },
   {
     icon: <IconLayers />,
     title: "Earn",
-    body: "Depositors supply the USDC that settles payments. They earn the settlement fee agents pay on every payment. The rate is variable and can fall to zero.",
+    body: "Depositors supply the USDG that settles payments. They earn the instant-settlement fee and the buffer's share of asset yield. The rate is variable and can fall to zero.",
   },
 ];
 
@@ -196,7 +196,7 @@ export function HowItWorks() {
               Four steps, <em>always on.</em>
             </>
           }
-          lede="Unslept separates two jobs that usually fight each other: keeping money ready to pay, and keeping money working. The buffer does the first, Kamino does the second."
+          lede="Unslept separates two jobs that usually fight each other: keeping money ready to pay, and keeping money working. The buffer does the first, tokenized assets do the second."
         />
         <ol className="how__steps">
           {steps.map((s, i) => (
@@ -223,8 +223,8 @@ function FlowDiagram() {
     <svg viewBox="0 0 1000 220" className="flow__svg" role="img" aria-labelledby="flow-title flow-desc">
       <title id="flow-title">Payment flow</title>
       <desc id="flow-desc">
-        The agent asks its account to pay. The buffer pays the API at once. Later, the agent&apos;s
-        Kamino position repays the buffer.
+        The agent asks its account to pay. The router pays the API at once from the buffer. Later, the agent&apos;s parked
+        spUSDG position repays the buffer.
       </desc>
       <g className="flow__edges">
         <path id="e1" d="M170 110 H330" />
@@ -263,7 +263,7 @@ function FlowDiagram() {
         </g>
         <g transform="translate(630 60)" className="flow__node--lamp">
           <rect width="140" height="100" rx="16" />
-          <text x="70" y="44">USDC buffer</text>
+          <text x="70" y="44">USDG buffer</text>
           <text x="70" y="64" className="flow__sub">
             pays at once
           </text>
@@ -277,7 +277,7 @@ function FlowDiagram() {
         </g>
       </g>
       <text x="550" y="212" className="flow__caption">
-        the Kamino position repays the buffer in the background
+        spUSDG repays the buffer in the background
       </text>
     </svg>
   );
@@ -307,13 +307,13 @@ export function Clock() {
           />
           <ul className="clock__points" data-reveal>
             <li>
-              <strong>Liquid when it matters.</strong> The buffer fronts the payment, so a balance working in Kamino never makes a call fail.
+              <strong>Liquid when it matters.</strong> The buffer fronts the payment, so a parked balance never makes a call fail.
             </li>
             <li>
               <strong>Working when it does not.</strong> Between payments the balance earns the variable rate of the underlying asset.
             </li>
             <li>
-              <strong>Yours throughout.</strong> Owners can pause, revoke or withdraw at any time, including while funds are in Kamino.
+              <strong>Yours throughout.</strong> Owners can pause, revoke or withdraw at any time, including while funds are parked.
             </li>
           </ul>
         </div>
@@ -338,7 +338,7 @@ export function Audiences({ docsUrl }: { docsUrl: string }) {
     {
       icon: <IconWallet />,
       title: "Buffer depositors",
-      body: "Supply the USDC that settles agent payments and earn from real activity: the settlement fee plus the buffer's share of payment activity. No agent required. The rate is variable.",
+      body: "Supply the USDG that settles agent payments and earn from real activity: the settlement fee plus the buffer's share of asset yield. No agent required. The rate is variable.",
       href: "/app/buffer",
       cta: "Deposit to the buffer",
     },
@@ -384,28 +384,28 @@ export function Audiences({ docsUrl }: { docsUrl: string }) {
 /* ------------------------------------------------------------------ */
 
 const sdkCode = `import { Unslept } from "@unslept/sdk";
-import { Keypair } from "@solana/web3.js";
-import bs58 from "bs58";
+import { privateKeyToAccount } from "viem/accounts";
 
 const unslept = new Unslept({
-  agent: process.env.UNSLEPT_AGENT,
-  signer: Keypair.fromSecretKey(bs58.decode(process.env.UNSLEPT_SIGNER_KEY)),
-  network: "solana",
+  agentAccount: process.env.UNSLEPT_AGENT_ACCOUNT,
+  signer: privateKeyToAccount(process.env.UNSLEPT_SIGNER_KEY),
+  network: "robinhood-chain",
 });
 
 // A drop-in fetch. On 402 it checks the policy, settles, and retries.
 const res = await unslept.fetch("https://api.example.com/data", undefined, {
-  maxAmount: 50_000n, // 0.05 USDC, never more for this call
+  maxAmount: 50_000n, // 0.05 USDG, never more for this call
 });`;
 
 const pyCode = `import os
-from solders.keypair import Keypair
+from eth_account import Account
 from unslept import Unslept
+from unslept.web3_chain import EthAccountSigner
 
 unslept = Unslept(
-    agent=os.environ["UNSLEPT_AGENT"],
-    signer=Keypair.from_base58_string(os.environ["UNSLEPT_SIGNER_KEY"]),
-    network="solana",
+    agent_account=os.environ["UNSLEPT_AGENT_ACCOUNT"],
+    signer=EthAccountSigner(Account.from_key(os.environ["UNSLEPT_SIGNER_KEY"])),
+    network="robinhood-chain",
 )
 
 res = unslept.fetch("https://api.example.com/data")
@@ -417,9 +417,9 @@ const mcpCode = `{
       "command": "npx",
       "args": ["-y", "@unslept/mcp"],
       "env": {
-        "UNSLEPT_AGENT": "<your agent account address>",
+        "UNSLEPT_AGENT_ACCOUNT": "<your agent account address>",
         "UNSLEPT_SIGNER_KEY": "<agent signer key, from your secret store>",
-        "UNSLEPT_NETWORK": "solana"
+        "UNSLEPT_NETWORK": "robinhood-chain"
       }
     }
   }
@@ -450,8 +450,8 @@ export function Developers({ docsUrl, siteUrl, head = true }: { docsUrl: string;
           />
           ) : null}
           <div className="developers__installs" data-reveal>
-            <CopyCommand command="npm install @unslept/sdk @solana/web3.js" label="TypeScript" />
-            <CopyCommand command='pip install "unslept[solana]"' label="Python" />
+            <CopyCommand command="npm install @unslept/sdk viem" label="TypeScript" />
+            <CopyCommand command='pip install "unslept[web3]"' label="Python" />
             <CopyCommand command="npx -y @unslept/mcp" label="MCP" />
           </div>
           <div className="demo-callout card" data-reveal>
@@ -459,7 +459,7 @@ export function Developers({ docsUrl, siteUrl, head = true }: { docsUrl: string;
               <span className="badge badge--lamp">Live</span> Try a real paid endpoint
             </p>
             <p className="muted small">
-              The demo endpoint asks for 0.01 USDC on mainnet and answers with live protocol stats once the payment settles.
+              The demo endpoint asks for 0.01 USDG on mainnet and answers with live protocol stats once the payment settles.
             </p>
             <code className="demo-callout__code">GET {demo || "/api/demo/x402"}</code>
             <a className="arrow-link" href={`${docsUrl}/x402`}>
@@ -541,9 +541,9 @@ export function Stats({ stats }: { stats: NetworkStats }) {
       <StatsShell
         note={
           <p className="stats__note">
-            Read from the Unslept program by the indexer every few minutes. Rates are variable and change with utilization.{" "}
+            Read from the protocol contracts by the indexer every few minutes. Rates are variable and change with utilization.{" "}
             <a className="text-link" href="/docs/contracts">
-              See the program
+              See the contracts
             </a>
           </p>
         }
@@ -581,7 +581,7 @@ export function Stats({ stats }: { stats: NetworkStats }) {
   const message =
     stats.status === "error"
       ? "The indexer did not respond. Stats return as soon as it is reachable again."
-      : "Stats read from the Unslept program on Solana as soon as the indexer reports them.";
+      : "Stats read from the protocol contracts on Robinhood Chain as soon as the indexer reports them.";
 
   return (
     <StatsShell note={<p className="stats__note">{message}</p>}>
@@ -606,12 +606,12 @@ export function Stats({ stats }: { stats: NetworkStats }) {
 
 export function Security({ head = true }: { head?: boolean }) {
   const facts = [
-    { icon: <IconShield />, title: "Guarded launch", body: "Not yet audited by a third party. Until an audit is published, total buffer deposits are capped at 50,000 USDC by the program." },
-    { icon: <IconClock />, title: "24-hour delay", body: "Every parameter change, from the fee to the deposit cap, is proposed on-chain a full day before it can take effect. Anyone can watch it coming." },
-    { icon: <IconCheckFile />, title: "Open source", body: "The Solana program, SDKs and tests are public on GitHub, including a test suite that runs against the real Kamino program and reserve copied from mainnet." },
-    { icon: <IconSliders />, title: "Policies on chain", body: "Per-call caps, daily caps and payee allowlists are checked by the Unslept program itself, not by the SDK or a server." },
-    { icon: <IconKey />, title: "Owner always exits", body: "Each agent has its own account in the program. The owner can pause, revoke, redeem and withdraw at any time. Unslept never holds your keys." },
-    { icon: <IconPulse />, title: "Watched around the clock", body: "Buffer health, liquidity, outstanding debt and pending parameter changes are checked every 15 minutes, with alerts on anything new." },
+    { icon: <IconShield />, title: "Guarded launch", body: "Not yet audited by a third party. Until an audit is published, total buffer deposits and each asset are capped at 50,000 USDG by the contracts." },
+    { icon: <IconClock />, title: "24-hour timelock", body: "Every admin change, from fee levels to new assets, is scheduled on chain a full day before it can take effect. Anyone can watch it coming." },
+    { icon: <IconCheckFile />, title: "Verified source", body: "Every deployed contract matches its published source exactly on Sourcify, so anyone can read the code that actually runs." },
+    { icon: <IconSliders />, title: "Policies on chain", body: "Per-call caps, daily caps, payee and domain allowlists are checked by the account contract itself, not by the SDK or a server." },
+    { icon: <IconKey />, title: "Owner always exits", body: "Each agent has its own smart account. The owner can pause, revoke, unwind and withdraw at any time. Unslept never holds your keys." },
+    { icon: <IconPulse />, title: "Watched around the clock", body: "Buffer health, liquidity, price freshness, timelock operations and write-offs are checked every 15 minutes, with alerts on anything new." },
   ];
   return (
     <section id="security" className="section security" aria-labelledby="security-title">
@@ -641,7 +641,7 @@ export function Security({ head = true }: { head?: boolean }) {
           <div>
             <h3>Risks you take</h3>
             <p>
-              Smart contract bugs, loss of value in a lending market, a depeg of USDC, slower withdrawals when the buffer is
+              Smart contract bugs, loss of value in a tokenized asset, a depeg of USDG, slower withdrawals when the buffer is
               heavily used, and rules that limit access where you live. You can lose money.
             </p>
           </div>
@@ -658,7 +658,7 @@ export function Security({ head = true }: { head?: boolean }) {
 /* Token                                                               */
 /* ------------------------------------------------------------------ */
 
-export function Token({ address, launchUrl, head = true }: { address?: string; launchUrl?: string; explorerUrl?: string; head?: boolean }) {
+export function Token({ address, ponsUrl, explorerUrl, head = true }: { address?: string; ponsUrl?: string; explorerUrl?: string; head?: boolean }) {
   return (
     <section id="token" className="section token" aria-labelledby="token-title">
       <div className="container">
@@ -669,7 +669,7 @@ export function Token({ address, launchUrl, head = true }: { address?: string; l
             <h2 id="token-title" className="display section-title">
               $UNSLEPT
             </h2>
-            <p className="lede">It lives on Solana. It is planned to do what is listed here and nothing more.</p>
+            <p className="lede">It launches on Pons, on Robinhood Chain. It does what is listed here and nothing more.</p>
           </div>
           <dl className="token__facts">
             <div>
@@ -677,24 +677,28 @@ export function Token({ address, launchUrl, head = true }: { address?: string; l
               <dd>$UNSLEPT</dd>
             </div>
             <div>
-              <dt>Network</dt>
+              <dt>Launch venue</dt>
               <dd>
-                {launchUrl ? (
-                  <a className="text-link" href={launchUrl} rel="noopener noreferrer" target="_blank">
-                    Solana
+                {ponsUrl ? (
+                  <a className="text-link" href={ponsUrl} rel="noopener noreferrer" target="_blank">
+                    Pons, Robinhood Chain
                   </a>
                 ) : (
-                  "Solana"
+                  "Pons, Robinhood Chain"
                 )}
               </dd>
             </div>
             <div className="token__contract">
-              <dt>Mint</dt>
+              <dt>Contract</dt>
               <dd className="num">
                 {address ? (
-                  <a className="text-link" href={`https://solscan.io/token/${address}`} rel="noopener noreferrer" target="_blank">
-                    {address}
-                  </a>
+                  explorerUrl ? (
+                    <a className="text-link" href={`${explorerUrl.replace(/\/$/, "")}/address/${address}`} rel="noopener noreferrer" target="_blank">
+                      {address}
+                    </a>
+                  ) : (
+                    address
+                  )
                 ) : (
                   "Published on official Unslept channels only. Always check the address before you trade."
                 )}
@@ -712,7 +716,7 @@ export function Token({ address, launchUrl, head = true }: { address?: string; l
             </li>
             <li>
               <h3>Governance signaling</h3>
-              <p>Signal which yield venues and caps the protocol supports. Advisory until a formal process exists.</p>
+              <p>Signal which tokenized assets and caps the protocol supports. Advisory until a formal process exists.</p>
             </li>
           </ul>
           <p className="token__legal">
@@ -736,22 +740,22 @@ const faqs: { q: string; a: ReactNode }[] = [
   },
   {
     q: "Where does the yield come from?",
-    a: "From two places. Idle balances sit in Kamino Lend, whose rate is set by Kamino borrowers and changes over time. Buffer depositors also receive the small instant-settlement fee that agents pay. Both move with market conditions, so the rate is variable and can be zero.",
+    a: "From two places. Idle balances sit in Spark Savings USDG, whose rate is set by Spark and changes over time. Buffer depositors also receive the small instant-settlement fee that agents pay. Both move with market conditions, so the rate is variable and can be zero.",
   },
   {
     q: "What happens if the buffer runs low?",
-    a: "Payments larger than the free buffer liquidity fail cleanly with a clear error, and nothing is lost. Agents repay their debts from their own liquid USDC and Kamino positions. Depositor withdrawals are available up to the free liquidity and the rest returns as agents repay.",
+    a: "Payments larger than the free buffer liquidity fail cleanly with a clear error, and nothing is lost. Anyone can refill the buffer from its parked position, and agents repay their debts from their own parked funds. Depositor withdrawals queue until liquidity returns.",
   },
   {
     q: "Can Unslept move my funds?",
-    a: "No one can take funds out of your agent account except you. The keeper can only redeem an agent's Kamino position to repay that agent's own debt, and the agent key can only pay within your caps and allowlist. Parameter changes wait 24 hours on-chain.",
+    a: "No one can take funds out of your agent account except you. The keeper can only move an account's idle cash into a registered asset and back, and the settlement router can only pay payees you allowlisted, within your caps. Admin changes go through a 24-hour timelock.",
   },
   {
     q: "Is my deposit at risk?",
     a: (
       <>
-        Yes. Deposits carry program risk, lending market risk, USDC depeg risk, liquidity risk and regulatory risk,
-        and the program is not yet audited. Read the{" "}
+        Yes. Deposits carry smart contract risk, tokenized asset risk, USDG depeg risk, liquidity risk and regulatory risk,
+        and the contracts are not yet audited. Read the{" "}
         <a className="text-link" href="/risk">
           risk disclosure
         </a>{" "}
@@ -842,9 +846,9 @@ export function Closing({ docsUrl }: { docsUrl: string }) {
               <label htmlFor="wl-wallet">
                 Wallet address <span className="field__optional">(optional)</span>
               </label>
-              <input id="wl-wallet" name="wallet" type="text" autoComplete="off" spellCheck={false} pattern="^[1-9A-HJ-NP-Za-km-z]{32,44}$" placeholder="Solana address" aria-describedby="wl-wallet-hint" />
+              <input id="wl-wallet" name="wallet" type="text" autoComplete="off" spellCheck={false} pattern="^0x[a-fA-F0-9]{40}$" placeholder="0x..." aria-describedby="wl-wallet-hint" />
               <p id="wl-wallet-hint" className="field__hint">
-                A Solana address (base58).
+                An EVM address: 0x followed by 40 hexadecimal characters.
               </p>
             </div>
             <div className="field field--trap" aria-hidden="true">

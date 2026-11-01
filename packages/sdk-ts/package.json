@@ -1,7 +1,7 @@
 {
   "name": "@unslept/sdk",
-  "version": "0.2.0",
-  "description": "Pay x402 paywalls in USDC on Solana from an Unslept agent account whose balance earns yield on Kamino.",
+  "version": "0.1.0",
+  "description": "Pay x402 paywalls from an Unslept agent account on Robinhood Chain.",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -11,9 +11,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./solana": {
-      "types": "./dist/solana.d.ts",
-      "import": "./dist/solana.js"
+    "./viem": {
+      "types": "./dist/viem.d.ts",
+      "import": "./dist/viem.js"
     }
   },
   "files": [
@@ -28,10 +28,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "@solana/web3.js": "^1.98.0"
+    "viem": "^2.21.0"
   },
   "peerDependenciesMeta": {
-    "@solana/web3.js": {
+    "viem": {
       "optional": true
     }
   },
@@ -39,7 +39,7 @@
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
-    "@solana/web3.js": "^1.98.0"
+    "viem": "^2.21.0"
   },
   "engines": {
     "node": ">=20"
@@ -49,13 +49,5 @@
     "url": "git+https://github.com/Unsleptxyz/Unslept.git",
     "directory": "packages/sdk-ts"
   },
-  "homepage": "https://www.unslept.xyz/docs",
-  "keywords": [
-    "x402",
-    "solana",
-    "usdc",
-    "ai-agents",
-    "payments",
-    "kamino"
-  ]
+  "homepage": "https://www.unslept.xyz/docs"
 }
